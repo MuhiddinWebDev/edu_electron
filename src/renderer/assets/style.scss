@@ -1,0 +1,208 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    &::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+        background-color: #f5f5f5;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #7a84e6;
+        border-radius: 5px;
+    }
+}
+
+/* color palette from <https://github.com/vuejs/theme> */
+:root {
+    --vt-c-white: #ffffff;
+    --vt-c-white-soft: #f8f8f8;
+    --vt-c-white-mute: #f2f2f2;
+
+    --vt-c-black: #181818;
+    --vt-c-black-soft: #222222;
+    --vt-c-black-mute: #282828;
+
+    --vt-c-indigo: #2c3e50;
+
+    --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+    --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+    --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+    --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+    --vt-c-text-light-1: var(--vt-c-indigo);
+    --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+    --vt-c-text-dark-1: var(--vt-c-white);
+    --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+}
+
+/* semantic color variables for this project */
+:root {
+    --color-background: var(--vt-c-white);
+    --color-background-soft: var(--vt-c-white-soft);
+    --color-background-mute: var(--vt-c-white-mute);
+    --color-border: var(--vt-c-divider-light-2);
+    --color-border-hover: var(--vt-c-divider-light-1);
+    --color-heading: var(--vt-c-text-light-1);
+    --color-text: var(--vt-c-text-light-1);
+    --section-gap: 160px;
+}
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    position: relative;
+    font-weight: normal;
+}
+
+body {
+    min-height: 100vh;
+    transition: color 0.5s, background-color 0.5s;
+    line-height: 1.6;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+        Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-size: 15px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.login{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    background-color:var(--color-background-mute) ;
+    &-box{
+        min-width: 420px;
+    }
+}
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom:1px solid rgb(239, 239, 245);
+    padding: 2px 12px;
+    &-item{
+        display:flex;
+        align-items: center;
+        gap: 16px;
+        cursor: pointer;
+        &-icon{
+            background: red;
+        }     
+    }
+}
+.navbar{
+    &-header{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding:12px;
+        padding-left: 20px;
+        transition: padding-left 0.5;
+        border-bottom: 1px solid rgb(239, 239, 245);
+        h1{
+            font-weight: bolder;
+        }
+        &_active{
+            padding: 8px;
+            padding-left: 32px;
+        }
+    }
+}
+.user{
+    display: flex;
+    gap: 8px;
+}
+.template{
+    &-box{
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 20px;
+        gap: 20px;
+        &_item{
+            flex: 1 0 250px;
+            border-radius: 7px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+.setting{
+    &-item{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    &-menu{
+        display: flex;
+        justify-content: space-between;
+    }
+}
+.router-save{
+    padding: 4px 6px;
+}
+
+* {
+    font-family: sans-serif;
+}
+.selected_product  td {
+    background-color: #195FB0 !important;
+    color: white !important;
+}
+// .n-data-table-tr {
+// height: 30px!important;
+// }
+.selected_order td {
+    background-color: #72db7c !important;
+    color: white !important;
+}
+.n-tabs-tab--active {
+    border: 1px solid #324b97 !important;
+    background-color: #fff !important;
+    color: #324b97 !important;
+}
+.hg-standardBtn , .hg-button-bksp{
+    font-size: 25px !important;
+}
+
+
+.waiting_product td {
+    background-color: rgba(208, 48, 80, 0.08) !important;
+    color: #d03050 !important;
+    border-bottom: 1px solid #d03050 !important;
+}
+.sending_product td {
+    background: rgba(32, 128, 240, 0.1)!important;
+    color: #2080f0 !important;
+    border-bottom: 1px solid #2080f0 !important;
+}
+.processing_product td {
+    background-color: rgba(240, 160, 32, 0.12) !important;
+    color: #f0a020 !important;
+    border-bottom: 1px solid #f0a020 !important;
+
+}
+.completed_product td { 
+    color: #18a058 !important;
+    background-color: rgba(24, 160, 88, 0.1) !important;
+    border-bottom: 1px solid #18a058 !important;
+}
+.n-layout-sider.n-layout-sider--show-content .n-layout-sider-scroll-container {
+    background: #2d364c;
+}
