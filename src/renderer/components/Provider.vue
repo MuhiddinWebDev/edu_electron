@@ -1,27 +1,25 @@
 <script setup>
-import { computed, ref, onMounted } from "vue";
-import SocketInst from '../socket/socket'
-import App from "../App.vue";
-import { darkTheme, lightTheme } from "naive-ui";
-SocketInst.connect()
-SocketInst.socket.on('userConnect', (id) => {
-  console.log(`${id} shu id bilan`)
-})
-// const counter = useCounterStore()
+import { ref,} from 'vue';
+import App from '../App.vue'
+import { darkTheme, lightTheme } from 'naive-ui'
+import LoadingUI from './Animation/Loading/Load.vue'
+import { useCounterStore } from '../stores/counter';
+
 const themes = ref(lightTheme);
+const loadItem = useCounterStore();
 const uzUz = {
   name: "uz-UZ",
   global: {
-    undo: "Bekor qilish",
+    undo: "Chiqish",
     redo: "Qayta qiling",
     confirm: "Tasdiqlash",
   },
   Popconfirm: {
     positiveText: "Tasdiqlash",
-    negativeText: "Bekor qilish",
+    negativeText: "Chiqish",
   },
   Cascader: {
-    placeholder: "Iltimos tanlang",
+    placeholder: "tanlang",
     loading: "Yuklanmoqda",
     loadingRequiredMessage: (label) =>
       `Belgilashdan oldin ${label} ning barcha ichki elementlarini tanlang.`,
@@ -71,12 +69,12 @@ const uzUz = {
     description: "Maʼlumot yoʻq",
   },
   Select: {
-    placeholder: "Iltimos tanlang",
+    placeholder: "Tanlang",
   },
   TimePicker: {
     placeholder: "Vaqtni tanlang",
     positiveText: "OK",
-    negativeText: "Bekor qilish",
+    negativeText: "Chiqish",
     now: "Hozir",
   },
   Pagination: {
@@ -90,10 +88,10 @@ const uzUz = {
     loading: "Yuklanmoqda",
   },
   Input: {
-    placeholder: "Iltimos, kiriting",
+    placeholder: "Kiriting",
   },
   InputNumber: {
-    placeholder: "Iltimos, kiriting",
+    placeholder: "Kiriting",
   },
   DynamicInput: {
     create: "Yaratmoq",
@@ -119,78 +117,124 @@ const uzUz = {
     tipClose: "Yopish (Esc)",
   },
 };
+const menuStyle ={
+  common: {
+    
+      modalColor: '#fffefe',
+      
+    },
+  Menu:{
+    "borderRadius": "5px",
+    "color": "#0c1e35",
+    "groupTextColor": "#fff",
+    "itemColorHover": "#cccccc15",
+    "itemColorActive": "rgba(21, 230, 119, 0.8)",
+    "itemColorActiveHover": "rgba(21, 230, 119, 0.8)",
+    "itemColorActiveCollapsed": "rgba(14, 130, 69, 0.1)",
+    "itemTextColor": "#fff",
+    "itemTextColorHover": "#fff",
+    "itemTextColorActive": "#fff",
+    "itemTextColorActiveHover": "#fff",
+    "itemTextColorChildActive": "#1AEB7DFF",
+    "itemTextColorChildActiveHover": "#21E07BFF",
+    "itemTextColorHorizontal": "rgba(56, 70, 84, 1)",
+    "itemTextColorHoverHorizontal": "#22C66AFF",
+    "itemTextColorActiveHorizontal": "#22DE7BFF",
+    "itemTextColorActiveHoverHorizontal": "#0DDE70FF",
+    "itemTextColorChildActiveHorizontal": "#0C914AFF",
+    "itemTextColorChildActiveHoverHorizontal": "#33DD83FF",
+    "itemIconColor": "#fff",
+    "itemIconColorHover": "#fff",
+    "itemIconColorActive": "#fff",
+    "itemIconColorActiveHover": "#fff",
+    "itemIconColorChildActive": "#1EDC77FF",
+    "itemIconColorChildActiveHover": "#15CC6BFF",
+    "itemIconColorCollapsed": "#fff",
+    "itemIconColorHorizontal": "rgba(39, 125, 211, 1)",
+    "itemIconColorHoverHorizontal": "#1EBE64FF",
+    "itemIconColorActiveHorizontal": "#1DDA76FF",
+    "itemIconColorActiveHoverHorizontal": "#4AE090FF",
+    "itemIconColorChildActiveHorizontal": "#11CB68FF",
+    "itemIconColorChildActiveHoverHorizontal": "#29DD7EFF",
+    "itemHeight": "40px",
+    "arrowColor": "#fff",
+    "arrowColorHover": "#fff",
+    "arrowColorActive": "#fff",
+    "arrowColorActiveHover": "#fff",
+    "arrowColorChildActive": "#fff",
+    "arrowColorChildActiveHover": "#fff",
+    "colorInverted": "#fff",
+    "borderColorHorizontal": "#A7333300",
+    "fontSize": "14px",
+    "dividerColor": "#fff",
+    "itemColorHoverInverted": "#fff",
+    "itemColorActiveInverted": "#fff",
+    "itemColorActiveHoverInverted": "#fff",
+    "itemColorActiveCollapsedInverted": "#fff",
+    "itemTextColorInverted": "#fff",
+    "itemTextColorHoverInverted": "#fff",
+    "itemTextColorChildActiveInverted": "#fff",
+    "itemTextColorChildActiveHoverInverted": "#fff",
+    "itemTextColorActiveInverted": "#fff",
+    "itemTextColorActiveHoverInverted": "#fff",
+    "itemTextColorHorizontalInverted": "#fff",
+    "itemTextColorHoverHorizontalInverted": "#fff",
+    "itemTextColorChildActiveHorizontalInverted": "#fff",
+    "itemTextColorChildActiveHoverHorizontalInverted": "#fff",
+    "itemTextColorActiveHorizontalInverted": "#fff",
+    "itemTextColorActiveHoverHorizontalInverted": "#fff",
+    "itemIconColorInverted": "#fff",
+    "itemIconColorHoverInverted": "#fff",
+    "itemIconColorActiveInverted": "#fff",
+    "itemIconColorActiveHoverInverted": "#fff",
+    "itemIconColorChildActiveInverted": "#fff",
+    "itemIconColorChildActiveHoverInverted": "#fff",
+    "itemIconColorCollapsedInverted": "#fff",
+    "itemIconColorHorizontalInverted": "#fff",
+    "itemIconColorHoverHorizontalInverted": "#fff",
+    "itemIconColorActiveHorizontalInverted": "#fff",
+    "itemIconColorActiveHoverHorizontalInverted": "#fff",
+    "itemIconColorChildActiveHorizontalInverted": "#fff",
+    "itemIconColorChildActiveHoverHorizontalInverted": "#fff",
+    "arrowColorInverted": "#fff",
+    "arrowColorHoverInverted": "#fff",
+    "arrowColorActiveInverted": "#fff",
+    "arrowColorActiveHoverInverted": "#fff",
+    "arrowColorChildActiveInverted": "#fff",
+    "arrowColorChildActiveHoverInverted": "#fff",
+    "groupTextColorInverted": "#fff"
+  },
+  Drawer: {
+    "textColor":  "rgba(255, 255, 255, 1)",
+    "titleTextColor": "rgba(255, 255, 255, 1)",
+    "headerPadding": "12px",
+    "bodyPadding": "4px 6px"
+  }
+}
+const action = ref(true);
 const changeTheme = (e) => {
   if (e) {
     themes.value = darkTheme;
+    action.value = false
   } else {
     themes.value = lightTheme;
+    action.value = true
   }
-};
-const themeOverrides = {
-    common: {
-      primaryColor: '#0073fa',
-      primaryColorHover: '#0073fa',
-      primaryColorPressed: '#0073fa',
-      primaryColorSuppl: '#0073fa',
-      textColor2: '#000',
-      borderRadius: '7px',
-      modalColor: '#eee',
-      fontWeight: '700',
-      fontSize: '16px',
-      lineHeight: '20px',
-      textColorDisabled: '#000',
-    },
-    "Tabs": {
-      "tabTextColorActiveBar": "#FDBA81FF",
-      "tabTextColorActiveLine": "#FDBA81FF",
-      "tabTextColorHoverLine": "#FDBA81FF",
-      "tabTextColorHoverBar": "#FDBA81FF",
-      "barColor": "#FDBA81FF",
-      "tabTextColorActiveCard": "#FDBA81FF",
-    },
-    "Menu": {
-      "color": "#2d364c",
-      "itemColorHover": "#0cb754",
-      "itemColorActive": "#0cb754",
-      "groupTextColorInverted": "rgba(165, 190, 247, 1)",
-      "groupTextColor": "rgba(255, 255, 255, 1)",
-      "itemTextColor": "rgba(252, 252, 252, 1)",
-      "itemTextColorActive": "#FFFFFFFF",
-      "itemColorActiveHover": "#0cb754",
-      "itemTextColorActiveHover": "#F1FBF6FF",
-      "itemTextColorHover": "rgba(255, 255, 255, 1)",
-      "dividerColor": "#C7C7F9FF",
-      "itemIconColor": "#fff",
-      "itemIconColorHover": "#fff",
-      "arrowColor": "#fff",
-      "arrowColorHover": "#fff",
-      "itemIconColorActive": "#fff",
-      "itemTextColorChildActive": "#fff",
-      "itemIconColorChildActive": "#fff",
-      "arrowColorChildActive": "#fff",
-      "arrowColorChildActiveHover": "#fff",
-      "itemTextColorChildActiveHover": "#fff",
-      "itemIconColorChildActiveHover": "#fff",
-      "itemIconColorActiveHover": "#fff",
-      "itemIconColorCollapsed": "#fff",
-      "fontSize":"14px"
-    },
-    Button: {
-      // textColor: '#0922e3',
-    },
-    Collapse: {
-    },
-    // ...
-  }
+
+}
+
 </script>
 <template>
-  <n-config-provider :theme="themes" :theme-overrides="themeOverrides" :locale="uzUz">
+  <n-config-provider :theme="themes" :theme-overrides="action ? menuStyle:''" :locale="uzUz" >
     <n-loading-bar-provider>
       <n-dialog-provider>
         <n-message-provider>
           <n-notification-provider>
             <n-loading-bar-provider>
-              <App />
+              <div class="app-box">
+                <App  @themeupdate="changeTheme" />
+                <LoadingUI v-show="loadItem.loadAction"/>
+              </div>
             </n-loading-bar-provider>
           </n-notification-provider>
         </n-message-provider>
@@ -198,3 +242,4 @@ const themeOverrides = {
     </n-loading-bar-provider>
   </n-config-provider>
 </template>
+

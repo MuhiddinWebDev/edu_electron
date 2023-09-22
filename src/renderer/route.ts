@@ -1,312 +1,338 @@
 import { createRouter, createWebHistory } from "vue-router";
-
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: "/",
-      name: "layouts",
-      redirect: "/home",
-      component: () => import("./pages/Layouts/Sidebar.vue"),
-      children: [
-        {
-          path: "/home",
-          name: "Home",
-          component: () => import("./pages/Home/HomeIndex.vue"),
-        },
-        {
-          path: "/savdo-docs/branches",
-          name: "branches",
-          component: () =>
-            import("./pages/savdo-docs/branches/IndexBranch.vue"),
-        },
-        {
-          path: "/savdo-docs/clients",
-          name: "clients",
-          component: () => import("./pages/savdo-docs/clients/IndexClient.vue"),
-        },
-        {
-          path: "/savdo-docs/rooms",
-          name: "rooms",
-          component: () => import("./pages/savdo-docs/rooms/IndexRooms.vue"),
-        },
-        {
-          path: "/savdo-docs/tables",
-          name: "tables",
-          component: () => import("./pages/savdo-docs/tables/IndexTables.vue"),
-        },
-        {
-          path: "/savdo-docs/extra-service",
-          name: "extra-service",
-          component: () =>
-            import("./pages/savdo-docs/extra-services/IndexExtraService.vue"),
-        },
-        {
-          path: "/savdo-docs/printer",
-          name: "printers",
-          component: () =>
-            import("./pages/savdo-docs/printer/IndexPrinter.vue"),
-        },
-        {
-          path: "/savdo-docs/roles",
-          name: "roles",
-          component: () => import("./pages/savdo-docs/roles/IndexRoles.vue"),
-        },
-        {
-          path: "/savdo-docs/food-group",
-          name: "food-group",
-          component: () =>
-            import("./pages/savdo-docs/food-group/IndexFoodGroup.vue"),
-        },
-        {
-          path: "/savdo-docs/food",
-          name: "food",
-          component: () => import("./pages/savdo-docs/food/IndexFood.vue"),
-        },
-        {
-          path: "/savdo-docs/employee-salary",
-          name: "employee-salary",
-          component: () => import("./pages/savdo-docs/employee-salary/IndexEmpSalary.vue")
-        },
-        {
-          path: "/test",
-          name: 'test',
-          component: () => import("./components/text.vue")
-        },
-        {
-          path: "/payments/pay-supplier",
-          name: "pay-supplier",
-          component: () =>
-            import("./pages/payments/pay-supplier/IndexPaySupplier.vue"),
-        },
-        {
-          path: "/payments/pay-waiter",
-          name: "pay-waiter",
-          component: () =>
-            import("./pages/payments/pay-waiter/IndexPayWaiter.vue"),
-        },
-        {
-          path: "/payments/pay-chef",
-          name: "pay-chef",
-          component: () => import("./pages/payments/pay-chef/IndexPayChef.vue"),
-        },
-        {
-          path: "/payments/cleint-pay",
-          name: "pay-client",
-          component: () => import("./pages/payments/pay-client/PayClient.vue"),
-        },
-        {
-          path: "/payments/pay-worker",
-          name: "pay-worker",
-          component: () =>
-            import("./pages/payments/pay-worker/IndexPayWorker.vue"),
-        },
-        {
-          path: '/payments/pay-caisher',
-          name: "pay-caisher",
-          component: () => import("./pages/payments/pay-caisher/IndexPayCaisher.vue")
-        },
-        {
-          path: '/supplier-report',
-          name: 'supplier-report',
-          component: () => import('./pages/reports/supplierReports/Index.vue')
-        },
-        {
-          path: '/waiter-report',
-          name: 'waiter-report',
-          component: () => import('./pages/reports/waiterReports/Index.vue')
-        },
-        {
-          path: '/profit-report',
-          name: 'profit-report',
-          component: () => import('./pages/reports/profitFood/Index.vue')
-        },
-        {
-          path: '/refund-food',
-          name: 'refund-food',
-          component: () => import('./pages/reports/refundFood/Index.vue')
-        },
-        {
-          path: '/supplier-report',
-          name: 'supplier-report',
-          component: () => import('./pages/reports/supplierReports/Index.vue')
-        },
-        {
-          path: '/product-akt-sverka',
-          name: 'product-akt-sverka',
-          component: () => import('./pages/akt-sverka/sverka-product/Index.vue')
-        },
-        {
-          path: '/sold-food',
-          name: 'sold-food',
-          component: () => import('./pages/akt-sverka/sold-food/Index.vue')
-        },
-        {
-          path: '/worker-act',
-          name: 'worker-act',
-          component: () => import('./pages/akt-sverka/workerAct/Index.vue')
-        },
-        {
-          path: '/worker-report',
-          name: 'worker-report',
-          component: () => import('./pages/reports/workerReport/Index.vue')
-        },
-        {
-          path: '/waiter-act',
-          name: 'waiter-act',
-          component: () => import('./pages/akt-sverka/sverka-waiter/Index.vue')
-        },
-        {
-          path: '/chef-act',
-          name: 'chef-act',
-          component: () => import('./pages/akt-sverka/sverka-chef/Index.vue')
-        },
-        {
-          path: '/chef-report',
-          name: 'chef-report',
-          component: () => import('./pages/reports/chefReports/Index.vue')
-        },
-        {
-          path: '/caisher-act',
-          name: 'caisher-act',
-          component: () => import("./pages/akt-sverka/sverka-caisher/Index.vue")
-        },
-        {
-          path: '/caisher-report',
-          name: 'caisher-report',
-          component: () => import("./pages/reports/caisherReports/Index.vue")
-        },
-        {
-          name: 'akt-sverka-kassa',
-          path: '/reports/akt-sverka-kassa',
-          component: () => import(`./pages/akt-sverka/sverka-kassa/Index.vue`)
-        },
-        {
-          name: 'food-resource-report',
-          path: '/food-resource-report',
-          component: () => import(`./pages/reports/foodResourceReport/Index.vue`)
-        },
-        {
-          name: 'reports',
-          path: '/reports',
-          component: () => import(`./components/ReportsPage.vue`)
-        },
-        {
-          path: "/savdo-docs/orders",
-          name: "orders",
-          component: () => import("./pages/savdo-docs/orders/IndexOrders.vue"),
-        },
-        {
-          path: "/kirim",
-          name: "kirim",
-          component: () => import("./pages/kirim-docs/kirim/IndexKirim.vue"),
-        },
-        {
-          path: "/suppliers",
-          name: "suppliers",
-          component: () =>
-            import("./pages/kirim-docs/suppliers/IndexSuppliers.vue"),
-        },
-        {
-          path: "/raw_materials",
-          name: "raw_materials",
-          component: () =>
-            import("./pages/kirim-docs/raw_materials/IndexRaw_materials.vue"),
-        },
-        {
-          path: "/worker",
-          name: "worker",
-          component: () =>
-            import("./pages/kirim-docs/workers/IndexWorkers.vue"),
-        },
-        {
-          path: "/measure",
-          name: "measure",
-          component: () =>
-            import("./pages/kirim-docs/measure/IndexMeasure.vue"),
-        },
-        {
-          path: "/chiefs",
-          name: "chiefs",
-          component: () => import("./pages/kirim-docs/chiefs/IndexChiefs.vue"),
-        },
-        {
-          path: "/waiters",
-          name: "waiters",
-          component: () =>
-            import("./pages/kirim-docs/waiters/IndexWaiters.vue"),
-        },
-        {
-          path: "/caishers",
-          name: "caishers",
-          component: () =>
-            import("./pages/kirim-docs/caishers/IndexCaishers.vue"),
-        },
-        {
-          path: "/pay_to_work",
-          name: "pay_to_work",
-          component: () =>
-            import("./pages/kirim-docs/pay_to_worker/IndexSalary.vue"),
-        },
-        {
-          path: "/reports/akt-sverka-supplier",
-          name: "akt-sverka-supplier",
-          component: () =>
-            import("./pages/akt-sverka/sverka-supplier/Index.vue"),
-        },
-        {
-          path: "/restr-caisher",
-          name: "restr-caisher",
-          component: () => import("./pages/reports/restrcaisher/Index.vue"),
-        },
-      ],
-    },
-    {
-      path: "/login",
-      name: "Login",
-      component: () => import("./pages/Login/LoginIndex.vue"),
-    },
-    {
-      path: "/selling-window",
-      name: "sellingWindow",
-      component: () => import("./pages/selling_window/index.vue"),
-    },
-    {
-      path: '/chief-sell-window',
-      name: 'chiefSellWindow',
-      component: () => import("./pages/chief/Index.vue")
-    },
-    {
-      path: '/tablo',
-      name: 'tablo',
-      component: () => import("./pages/Tablo/Index.vue")
-    },
-    {
-      path: "/selling-window-entry",
-      name: "Selling Entry",
-      component: () => import("./pages/selling_window/enter.vue"),
-    },
-    {
-      path: "/chief-window",
-      name: "chief-window",
-      component: () => import("./pages/selling_window/ChiefWindow.vue"),
-    },  
-    {
-      path: "/selling-window-table-orginal/:order_id",
-      name: "SellingTable",
-      component: () => import("./pages/selling_window/TableWindow.vue"),
-      props: true,
-    },
-    // ## not found page
-    {
-      name: "not-found",
-      path: "/:path*",
-      component: () => import("./pages/Login/LoginIndex.vue"),
-      meta: {
-        title: "Oh no!",
-      },
-    },
-  ],
+	history: createWebHistory(import.meta.env.BASE_URL),
+	routes: [
+		{
+			path: "/",
+			name: "Addmissions",
+			redirect: "/login",
+			component: () => import("./pages/Admission/Index.vue"),
+			children: [
+				{
+					path: "/main-home",
+					name: "main-home",
+					component: () => import("./pages/Admission/Home.vue"),
+				},
+				{
+					path: "/main-courses",
+					name: "main-courses",
+					component: () => import("./pages/Admission/Courses.vue"),
+				},
+				{
+					path: "/main-connect",
+					name: "main-connect",
+					component: () => import("./pages/Admission/Connect.vue"),
+				},
+			],
+		},
+		{
+			path: "/Admin",
+			name: "Admin",
+			redirect: "/admin-home",
+			component: () => import("./pages/Layouts/Admin.vue"),
+			children: [
+				{
+					path: "/Admin-setting",
+					name: "Asosiy sahifa",
+					component: () => import("./pages/Admin/Setting/Setting.vue"),
+				},
+
+				{
+					path: "/report-all",
+					name: "Hisobotlar ",
+					component: () => import("./pages/Admin/Reports/Index.vue"),
+				},
+
+				{
+					path: "/Lessons",
+					name: "Darslar",
+					component: () => import("./pages/Admin/Lesson/Index.vue"),
+				},
+				////////////////////////////////////////// reports start here////////////////////////////////
+				{
+					path: "/report-attandance",
+					name: "Davomat hisoboti",
+					component: () => import("./pages/Admin/Reports/Attandance.vue"),
+				},
+				{
+					path: "/reports-teacher",
+					name: "O'qituvchi hisoboti",
+					component: () => import("./pages/Admin/Reports/Teacher.vue"),
+				},
+				{
+					path: "/reports-student",
+					name: "Talaba hisoboti",
+					component: () => import("./pages/Admin/Reports/Student.vue"),
+				},
+				{
+					path: "/reports-course",
+					name: "Kurs hisoboti",
+					component: () => import("./pages/Admin/Reports/Course.vue"),
+				},
+				{
+					path: "/reports-rasxod",
+					name: "Xarajat hisoboti",
+					component: () => import("./pages/Admin/Reports/Rasxod.vue"),
+				},
+				{
+					path: "/reports-lesson",
+					name: "Dars hisoboti",
+					component: () => import("./pages/Admin/Reports/Lesson.vue"),
+				},
+				{
+					path: "/reports-kassa",
+					name: "Kassa hisoboti",
+					component: () => import("./pages/Admin/Reports/Kassa.vue"),
+				},
+				{
+					path: "/reports-group",
+					name: "Guruh hisoboti",
+					component: () => import("./pages/Admin/Reports/Group.vue"),
+				},
+				////////////////////////////////////////// reports end here////////////////////////////////
+				//////////////////////////////////////////////////////////// sverka start here////////////////////////////////
+				{
+					path: "/sverka-attandance",
+					name: "Davomat sverka",
+					component: () => import("./pages/Admin/Sverka/Attandance.vue"),
+				},
+				{
+					path: "/sverka-teacher",
+					name: "O'qituvchi sverka",
+					component: () => import("./pages/Admin/Sverka/Teacher.vue"),
+				},
+				{
+					path: "/sverka-student",
+					name: "Talaba sverka",
+					component: () => import("./pages/Admin/Sverka/Student.vue"),
+				},
+				{
+					path: "/sverka-course",
+					name: "Kurs sverka",
+					component: () => import("./pages/Admin/Sverka/Course.vue"),
+				},
+				{
+					path: "/sverka-rasxod",
+					name: "Xarajat sverka",
+					component: () => import("./pages/Admin/Sverka/Rasxod.vue"),
+				},
+				{
+					path: "/sverka-lesson",
+					name: "Dars sverka",
+					component: () => import("./pages/Admin/Sverka/Lesson.vue"),
+				},
+				{
+					path: "/sverka-kassa",
+					name: "Kassa sverka",
+					component: () => import("./pages/Admin/Sverka/Kassa.vue"),
+				},
+				{
+					path: "/sverka-group",
+					name: "Guruh sverka",
+					component: () => import("./pages/Admin/Sverka/Group.vue"),
+				},
+				//////////////////////////////////////////////////////////// sverka end here////////////////////////////////
+				{
+					path: "/to-attendance",
+					name: "Davomat olish",
+					component: () => import("./pages/Admin/ToAttandance/Index.vue"),
+				},
+				{
+					path: "/pay-type",
+					name: "To'lov turi",
+					component: () => import("./pages/Admin/payType/Index.vue"),
+				},
+				{
+					path: "/branch",
+					name: "Filiallar",
+					component: () => import("./pages/Admin/Branch/Index.vue"),
+				},
+				{
+					path: "/salary",
+					name: "Ish haqqi",
+					component: () => import("./pages/Admin/Salary/Index.vue"),
+				},
+				{
+					path: "/rooms",
+					name: "Xonalar",
+					component: () => import("./pages/Admin/Rooms/Index.vue"),
+				},
+				{
+					path: "/rasxod-becouse",
+					name: "Xarajat sabablari",
+					component: () => import("./pages/Admin/RasxodBecouse/Index.vue"),
+				},
+				{
+					path: "/rasxod",
+					name: "Xarajatlar ",
+					component: () => import("./pages/Admin/Rasxod/Index.vue"),
+				},
+				{
+					path: "/discounts",
+					name: "Chegirmalar",
+					component: () => import("./pages/Admin/Discount/Index.vue"),
+				},
+				{
+					path: "/have-rest",
+					name: "Dam olish",
+					component: () => import("./pages/Admin/DayOff/Index.vue"),
+				},
+				{
+					path: "/lesson-table",
+					name: "Dars jadvali",
+					component: () => import("./pages/Admin/LessonTable/Index.vue"),
+				},
+				{
+					path: "/admin-home",
+					name: "Bosh sahifa",
+					component: () => import("./pages/Admin/AdminHome/Index.vue"),
+				},
+				{
+					path: "/email-messages",
+					name: "Xabarlar",
+					component: () => import("./pages/Admin/Messages/Index.vue"),
+				},
+				{
+					path: "/quiz",
+					name: "Savol-Javob",
+					component: () => import("./pages/Admin/Quiz/Index.vue"),
+				},
+				{
+					path: "/payment-students",
+					name: "Talabalar to'lovi",
+					component: () => import("./pages/Admin/PaymentStudent/Index.vue"),
+				},
+				{
+					path: "/payment-teacher",
+					name: "O'qituvchilar to'lovi",
+					component: () => import("./pages/Admin/PaymentTeacher/Index.vue"),
+				},
+				{
+					path: "/payment-employees",
+					name: "Xodimlar to'lovi",
+					component: () => import("./pages/Admin/PaymentEmployee/Index.vue"),
+				},
+				{
+					path: "/users",
+					name: "Foydalanuvchilar",
+					component: () => import("./pages/Admin/Users/Index.vue"),
+				},
+				{
+					path: "/students",
+					name: "Talabalar",
+					component: () => import("./pages/Admin/Student/Index.vue"),
+				},
+				{
+					path: "/student-parents",
+					name: "Ota onalar",
+					component: () => import("./pages/Admin/StudentParents/Index.vue"),
+				},
+				{
+					path: "/teachers",
+					name: "O'qituvchilar",
+					component: () => import("./pages/Admin/Teacher/Index.vue"),
+				},
+				{
+					path: "/admins",
+					name: "Adminlar",
+					component: () => import("./pages/Admin/Worker/Index.vue"),
+				},
+				{
+					path: "/groups",
+					name: "Guruhlar",
+					component: () => import("./pages/Admin/Groups/Index.vue"),
+				},
+				{
+					path: "/courses",
+					name: "Kurslar",
+					component: () => import("./pages/Admin/Courses/Index.vue"),
+				},
+			],
+		},
+		{
+			path: "/User",
+			name: "User",
+			component: () => import("./pages/Layouts/User.vue"),
+			children: [
+				// {
+				//   path:'/admin-home',
+				//   name:'Admin-home',
+				//   component: () => import("./pages/Admin/AdminHome/Index.vue"),
+				// }
+			],
+		},
+		{
+			path: "/teacher",
+			name: "Teacher",
+			redirect: "/teacher-lesson-table",
+			component: () => import("./pages/Layouts/Teacher.vue"),
+			children: [
+				{
+					path: "/teacher-home",
+					name: "Teacher-home",
+					component: () => import("./pages/Teacher/Home/Index.vue"),
+				},
+				{
+					path: "/teacher-money",
+					name: "Oyliklarim",
+					component: () => import("./pages/Teacher/TeacherMonth/Index.vue"),
+				},
+				{
+					path: "/teacher-lesson",
+					name: "Darslarim",
+					component: () => import("./pages/Teacher/Lesson/Index.vue"),
+				},
+				{
+					path: "/teacher-lesson-table",
+					name: "Dars jadvalim",
+					component: () => import("./pages/Teacher/LessonTable/Index.vue"),
+				},
+				{
+					path: "/teacher-course",
+					name: "Kurslarim",
+					component: () => import("./pages/Teacher/Course/Index.vue"),
+				},
+				{
+					path: "/teacher-salary",
+					name: "Ish haqqim",
+					component: () => import("./pages/Teacher/Salary/Index.vue"),
+				},
+				{
+					path: "/teacher-attandance",
+					name: "Davomat_ olish",
+					component: () => import("./pages/Teacher/ToAttandance/Index.vue"),
+				},
+				{
+					path: "/teacher-dayoff",
+					name: "Dam olish kunlari",
+					component: () => import("./pages/Teacher/DayOff/Index.vue"),
+				},
+			],
+		},
+		{
+			path: "/CRM",
+			name: "CRM",
+			component: () => import("./pages/Admin/CRM/Index.vue"),
+		},
+		{
+			path: "/login",
+			name: "Login",
+			component: () => import("./pages/Log/LoginIndex.vue"),
+		},
+	],
 });
 
+router.beforeEach((to, from, next) => {
+	const publicPages = ["/Login"];
+	const authRequired = !publicPages.includes(to.path);
+	const loggedIn = localStorage.getItem("token");
+	const role = localStorage.getItem("role");
+	// trying to access a restricted page + not logged in
+	// redirect to login page
+	if (authRequired && !loggedIn) {
+		next("/login");
+	} else {
+		next();
+	}
+});
 export default router;

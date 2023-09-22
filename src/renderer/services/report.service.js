@@ -1,60 +1,96 @@
-import axios from 'axios'
+import axios from "axios";
+const END_POINT = "/report";
 
-const END_POINT = '/akt-sverka'
+class Service {
 
-class ReportService {
-  restrCaisher(data) {
-    return axios.post(END_POINT + '/restr-caisher', data).then((res) => {
+  kassaSverka(data) {
+    return axios.post(END_POINT + `/kassa-sverka`, data).then((res) => {
       return res;
-    })
-  }
-  refundFood(data) {
-    return axios.post(END_POINT + '/refund-food', data).then((res) => {
-      return res;
-    })
-  }
-  supplierReports(data) {
-    return axios.post(END_POINT + '/supplier', data).then((res) => {
-      return res;
-    })
-  }
-  waiterReports(data) {
-    return axios.post(END_POINT + '/waiter', data).then((res) => {
-      return res;
-    })
-  }
-  chefReports (data) {
-    return axios.post(END_POINT + '/chef-report', data).then((res) => {
-      return res;
-    })
-  }
-  caisherReports (data) {
-    return axios.post(END_POINT + '/caisher-report', data).then((res) => {
-      return res;
-    })
-  }
-  profitReports(data) {
-    return axios.post(END_POINT + '/profit-food', data).then((res) => {
-      return res;
-    })
-  }
-  productAktSverka(data) {
-    return axios.post(END_POINT + '/product-act', data).then((res) => {
-      return res;
-    })
+    });
   }
 
-  soldFoodSverka(data) {
-    return axios.post(END_POINT + '/sold-food', data).then((res) => {
+  kassaReport(data) {
+    return axios.post(END_POINT + `/kassa-report`, data).then((res) => {
       return res;
-    })
+    });
   }
 
-  workerAct(data) {
-    return axios.post(END_POINT + '/worker-act', data).then((res) => {
+  rasxodReport(data) {
+    return axios.post(END_POINT + `/rasxod`, data).then((res) => {
       return res;
-    })
+    });
+  }
+
+  rasxodSverka(data) {
+    return axios.post(END_POINT + `/rasxod-table`, data).then((res) => {
+      return res;
+    });
   }
   
+  studentReport(data) {
+    return axios.post(END_POINT + `/student`, data).then((res) => {
+      return res;
+    });
+  }
+  
+  studentSverka(data) {
+    return axios.post(END_POINT + `/student-sverka`, data).then((res) => {
+      return res;
+    });
+  }
+
+  teacherReport(data) {
+    return axios.post(END_POINT + `/teacher`, data).then((res) => {
+      return res;
+    });
+  }
+
+  teacherSverka(data) {
+    return axios.post(END_POINT + `/teacher-sverka`, data).then((res) => {
+      return res;
+    });
+  }
+
+  davomatReport(data) {
+    return axios.post(END_POINT + `/davomat-report`, data).then((res) => {
+      return res;
+    });
+  }
+
+  davomatSverka(data) {
+    return axios.post(END_POINT + `/davomat-sverka`, data).then((res) => {
+      return res;
+    });
+  }
+
+  lessonReport(data) {
+    return axios.post(END_POINT + `/lesson-report`, data).then((res) => {
+      return res;
+    });
+  }
+
+  lessonSverka(data) {
+    return axios.post(END_POINT + `/lesson-sverka`, data).then((res) => {
+      return res;
+    });
+  }
+  
+  courseReport(data) {
+    return axios.post(END_POINT + "//course-report", data).then((res) => {
+      return res;
+    });
+  }
+
+  courseSverka(data) {
+    return axios.post(END_POINT + "/course-sverka", data).then((res) => {
+      return res;
+    });
+  }
+
+  
+
+  
+
+ 
 }
-export default new ReportService()
+export default new Service();

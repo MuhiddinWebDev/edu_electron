@@ -3,7 +3,7 @@ import { watch } from "vue";
 import { storeToRefs } from 'pinia'
 import { useRouter, useRoute } from "vue-router";
 import { useNotification, useLoadingBar, useMessage } from "naive-ui";
-import { useErrorStore } from './stores/error';
+import { useErrorStore } from './stores/errors';
 const errorStore = useErrorStore();
 const { error, error_code } = storeToRefs(errorStore);
 const router = useRouter();
