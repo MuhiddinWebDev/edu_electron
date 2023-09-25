@@ -12,11 +12,11 @@ import './assets/style.scss';
 
 import dayjs from 'dayjs' //import dayjs in your main.js
 //// error messages in axios 
+import { useErrorStore } from './stores/error'
 
 
 const app = createApp(Provider)
 app.use(createPinia());
-import { useErrorStore } from './stores/errors' ;
 
 const error_store = useErrorStore()
 
@@ -48,9 +48,9 @@ axios.interceptors.response.use(function (response) {
   return response.data;
 },
   function (error) {
-    if (error.message == 'Network Error') {
-      error_store.error_text = "Baza bilan aloqa uzildi!"
-    }
+    // if (error.message == 'Network Error') {
+    //   error_store.error_text = "Baza bilan aloqa uzildi!"
+    // }
     if (error.code == 'ERR_NETWORK') {
       router.push({ name: 'Login' });
       localStorage.clear();
