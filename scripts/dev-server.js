@@ -95,7 +95,7 @@ async function start() {
 
     const devServer = await startRenderer();
     rendererPort = devServer.config.server.port;
-
+    console.log(rendererPort)
     copyStaticFiles();
     startElectron();
 
