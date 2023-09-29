@@ -323,7 +323,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-	const publicPages = ["/Login"];
+	const publicPages = ["/login"];
 	const authRequired = !publicPages.includes(to.path);
 	const loggedIn = localStorage.getItem("token");
 	const role = localStorage.getItem("role");

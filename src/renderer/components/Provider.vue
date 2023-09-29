@@ -233,7 +233,7 @@ const changeTheme = (e) => {
             <n-loading-bar-provider>
               <div class="app-box">
                 <App  @themeupdate="changeTheme" />
-                <LoadingUI v-show="loadItem.loadAction"/>
+                <!-- <LoadingUI v-show="loadItem.loadAction"/> -->
               </div>
             </n-loading-bar-provider>
           </n-notification-provider>

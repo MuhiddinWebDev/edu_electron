@@ -45,7 +45,7 @@ import {
   ReportData as ReportIcon,
   UserProfileAlt as UserMain,
 } from "@vicons/carbon";
-import AdminForm from "./AdminForm.vue";
+// import AdminForm from "./AdminForm.vue";
 import ModelService from "../../services/users.service";
 import BranchService from "../../services/branch.service";
 import { useCounterStore } from "../../stores/counter";
@@ -750,7 +750,7 @@ window.addEventListener("resize", () => {
     </n-layout>
   </div>
   <!-- Modal service update end create -->
-  <section>
+  <!-- <section>
     <n-modal v-model:show="showUpdate" :mask-closable="false">
       <n-card
         class="auto-reponsive"
@@ -770,7 +770,7 @@ window.addEventListener("resize", () => {
         />
       </n-card>
     </n-modal>
-  </section>
+  </section> -->
   <!-- Phone responsive -->
   <section class="phone-responsive" v-if="windowWidth <= 768">
     <n-drawer
