@@ -1032,7 +1032,8 @@
   cursor: pointer;
   transition: all 0.3s ease-in;
   animation: cardAction 0.3s linear forwards;
-
+  background: #ccc;
+  border-radius: 12px;
   &-header {
     margin-bottom: 12px;
   }
@@ -1045,8 +1046,7 @@
   }
 
   &:hover {
-    border-radius: 12px;
-    background: #2221219a;
+    opacity: 0.7;
   }
 }
 
@@ -1089,6 +1089,13 @@
 
   &-group {
     background: linear-gradient(to bottom right, #00c6fb, #3d6496);
+  }
+  &-kassa {
+    background-image: linear-gradient(
+      to right bottom,
+      rgb(237, 6, 17),
+      rgb(148, 77, 33)
+    );
   }
 }
 

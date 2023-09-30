@@ -8,6 +8,7 @@ import Provider from './components/Provider.vue';
 import router from './route';
 import naive from 'naive-ui';
 import VWave from 'v-wave';
+import Print from 'vue3-print-nb'
 import './assets/style.scss';
 
 import dayjs from 'dayjs' //import dayjs in your main.js
@@ -68,7 +69,7 @@ axios.interceptors.response.use(function (response) {
 
 app.use(router)
 app.use(naive)
-
+app.use(Print)
 
 app.use(VWave, {
   color: '#fff',

@@ -5,10 +5,12 @@ import RoomService from "../../../services/room.service";
 import UserService from "../../../services/users.service";
 import CourseService from "../../../services/course.service";
 import GroupService from "../../../services/groups.service";
+import ReportService from "../../../services/report.service";
 import {
   Branch24Filled as BranchIcon,
   ConferenceRoom24Filled as roomIcon,
   PersonAccounts24Filled as EmployeeIcon,
+  ChartMultiple24Regular as KassaIcon
 } from "@vicons/fluent";
 import {
   PlayLessonRound as LessonIcon,
@@ -19,9 +21,16 @@ import { Education as StudentIcon } from "@vicons/carbon";
 import BarChart from "../../../components/Charts/Bar/Bar.vue";
 //// get length
 
-const findRole = ref( localStorage.getItem('role'));
-const findBranch = ref( JSON.parse(localStorage.getItem('filial_id')));
+const findRole = ref(localStorage.getItem("role"));
+const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
+const time_def = ref(new Date());
+const thisMonth = ref(
+  new Date(time_def.value.getFullYear(), time_def.value.getMonth())
+);
+const range_date = ref([thisMonth.value.getTime(), time_def.value.getTime()]);
+
+const kassaEndTotal = ref(0);
 const reportData = ref({
   branchLength: 0,
   roomLength: 0,
@@ -30,11 +39,12 @@ const reportData = ref({
   groupLength: 0,
   courseLength: 0,
 });
+
 const getUsers = (role) => {
   const senData = {
     id: null,
     role: role,
-    filial_id: findRole.value == 'SuperAdmin'? null : findBranch.value,
+    filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
   };
   UserService.getAll(senData).then((res) => {
     if (role == "User") {
@@ -44,9 +54,22 @@ const getUsers = (role) => {
     }
   });
 };
+
 const getByBranch = ref({
-  filial_id: findRole.value == 'SuperAdmin'? null : findBranch.value,
-})
+  filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
+});
+
+const getAllKassa = () => {
+  let sendData = {
+    filial_id: findBranch.value,
+    start_date: Math.floor(range_date.value[0] / 1000),
+    end_date: Math.floor(range_date.value[1] / 1000),
+  };
+  ReportService.kassaSverka(sendData).then((res) => {
+    kassaEndTotal.value = res.end_total;
+  });
+};
+
 onMounted(() => {
   BranchService.getAll().then((res) => {
     reportData.value.branchLength = res.length;
@@ -62,6 +85,7 @@ onMounted(() => {
   CourseService.searchModel(getByBranch.value).then((res) => {
     reportData.value.courseLength = res.length;
   });
+  getAllKassa();
 });
 const showModal = ref(false);
 const modalTitle = ref("");
@@ -98,7 +122,7 @@ const OpenModel = (id) => {
     const senData = {
       id: null,
       role: "Teacher",
-      filial_id: findRole.value == 'SuperAdmin' ? null : findBranch.value,
+      filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
     };
     UserService.getAll(senData).then((res) => {
       data.value = res;
@@ -110,7 +134,7 @@ const OpenModel = (id) => {
     const senData = {
       id: null,
       role: "User",
-      filial_id: findRole.value == 'SuperAdmin' ? null : findBranch.value,
+      filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
     };
     UserService.getAll(senData).then((res) => {
       data.value = res;
@@ -140,11 +164,38 @@ const exitAction = () => {
 
 <template>
   <div class="box">
-    <div class="box-wrapper box-chart">
+    <div class="box-wrapper">
       <div class="box-charts">
         <BarChart :data="reportData"></BarChart>
       </div>
+
       <n-grid cols="1 s:2 m:3 l:4" responsive="screen" :x-gap="12" :y-gap="12">
+        <n-grid-item>
+          <div class="simple-card status-kassa">
+            <div class="simple-card-header">
+              <h2>Kassa</h2>
+            </div>
+            <div class="simple-card-content">
+              <div class="simple-card-content_item">
+                <n-icon size="24">
+                  <KassaIcon />
+                </n-icon>
+              </div>
+              <div class="simple-card-content_item">
+                <n-statistic tabular-nums>
+                  <n-number-animation
+                    :from="0.0"
+                    :to="kassaEndTotal"
+                    :precision="2"
+                    locale="ru-RU"
+                    show-separator
+                  />
+                </n-statistic>
+              </div>
+            </div>
+          </div>
+        </n-grid-item>
+
         <n-grid-item v-if="findRole == 'SuperAdmin'">
           <div class="simple-card status-branch" v-wave @click="OpenModel(1)">
             <div class="simple-card-header">
@@ -341,6 +392,11 @@ const exitAction = () => {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+.box-reports {
+  max-width: 350px;
+  cursor: pointer;
+  margin: 8px 0px;
 }
 .box-chart {
   height: calc(100vh - 130px);
