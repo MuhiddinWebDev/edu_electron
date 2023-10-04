@@ -196,7 +196,7 @@ onMounted(() => {
     </div> -->
 		<div class="login-box">
 			<n-card :bordered="false" :style="{ borderRadius: '15px' }">
-				<h1 class="text-center">Platon</h1>
+				<h1 class="text-center">Log In</h1>
 				<n-form :model="signData" ref="sign_form" :rules="sign_rules">
 					<div class="login-padding">
 						<n-form-item @keydown="signKey" label="Telefon raqam" path="phone">
