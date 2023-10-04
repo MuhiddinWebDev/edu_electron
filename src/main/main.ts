@@ -14,6 +14,7 @@ function createWindow() {
   mainWindow.setMenuBarVisibility(false);;
   if (process.env.NODE_ENV === "development") {
     console.log(process.argv[2])
+    console.log("---------frontend-------------")
     const rendererPort = process.argv[2];
     mainWindow.loadURL(`http://localhost:${rendererPort}`);
   } else {
