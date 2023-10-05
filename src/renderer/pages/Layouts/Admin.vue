@@ -3,6 +3,7 @@ import { ref, h, onMounted, defineEmits, watch, inject } from "vue";
 import { useFullscreen } from "@vueuse/core";
 import { useRouter } from "vue-router";
 import { NIcon } from "naive-ui";
+import LoadingUI from "../../components/Animation/Loading/Load.vue"
 import { useMessage, useDialog } from "naive-ui";
 import {
   LineHorizontal320Filled as threeBtn,
@@ -623,6 +624,7 @@ window.addEventListener("resize", () => {
           </n-tabs>
         </div>
         <RouterView />
+        <LoadingUI v-if="counter.loadAction"/>
         <n-drawer
           resizable
           v-model:show="settingBtn"

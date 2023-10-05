@@ -4,6 +4,9 @@ import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 import { useNotification, useLoadingBar, useMessage } from "naive-ui";
 import { useErrorStore } from "./stores/error";
+import { useCounterStore } from "./stores/counter";
+
+const loadItem = useCounterStore();
 const errorStore = useErrorStore();
 const { error, error_code } = storeToRefs(errorStore);
 const router = useRouter();
@@ -12,9 +15,11 @@ const message = useMessage();
 const loadingBar = useLoadingBar();
 router.beforeEach(() => {
 	loadingBar.start();
+	loadItem.loadAction = true;
 });
 router.afterEach(() => {
 	loadingBar.finish();
+	loadItem.loadAction = false;
 	let path_val = route.name;
 	document.title = path_val + " - Admin" || Default_title;
 });

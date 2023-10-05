@@ -1,12 +1,12 @@
 <script setup>
-import { ref,} from 'vue';
+import { ref, onMounted} from 'vue';
+import { useRouter } from "vue-router";
 import App from '../App.vue'
 import { darkTheme, lightTheme } from 'naive-ui'
-import LoadingUI from './Animation/Loading/Load.vue'
-import { useCounterStore } from '../stores/counter';
+import PaymentService from "../services/softwarePayment.service";
 
 const themes = ref(lightTheme);
-const loadItem = useCounterStore();
+const router = useRouter();
 const uzUz = {
   name: "uz-UZ",
   global: {
@@ -222,7 +222,17 @@ const changeTheme = (e) => {
   }
 
 }
-
+const getSoftwareData = ()=>{
+  PaymentService.checkDate().then((res)=>{
+    if(!res.live){
+      router.push({path:'/software-payment'});
+      localStorage.clear();
+    }
+  })
+}
+onMounted(()=>{
+  getSoftwareData();
+})
 </script>
 <template>
   <n-config-provider :theme="themes" :theme-overrides="action ? menuStyle:''" :locale="uzUz" >

@@ -319,6 +319,11 @@ const router = createRouter({
 			name: "Login",
 			component: () => import("./pages/Log/LoginIndex.vue"),
 		},
+		{
+			path: '/software-payment',
+			name: "Software Payment",
+			component: () => import("./pages/Layouts/Software.vue"),
+		  },
 	],
 });
 
@@ -329,7 +334,7 @@ router.beforeEach((to, from, next) => {
 	const role = localStorage.getItem("role");
 	// trying to access a restricted page + not logged in
 	// redirect to login page
-	if (authRequired && !loggedIn) {
+	if (authRequired && !loggedIn && to.path != '/software-payment') {
 		next("/login");
 	} else {
 		next();
