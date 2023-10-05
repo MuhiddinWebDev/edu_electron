@@ -38,6 +38,12 @@ const router = createRouter({
 				},
 
 				{
+					path: '/software-setting',
+					name: "Dastur to'lovi",
+					component: () => import("./pages/Admin/Software/Index.vue"),
+				  },
+
+				{
 					path: "/report-all",
 					name: "Hisobotlar ",
 					component: () => import("./pages/Admin/Reports/Index.vue"),

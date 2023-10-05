@@ -25,6 +25,7 @@ import {
   AppsList24Filled as spendIcon,
   BuildingBank24Filled as MarkazIcon,
   MoneySettings20Filled as payTypeIcon,
+  Payment24Filled as PayCardIcon
 } from "@vicons/fluent";
 import {
   PhoneRound as phoneIcon,
@@ -250,30 +251,31 @@ const menuOptions = [
       // },
     ],
   },
-  // {
-  //   label: "Sozlamalar",
-  //   key: "read",
-  //   icon: renderIcon(SettingIcon),
-  //   children: [
-  //     {
-  //       type: "group",
-  //       label: "Sahifalar",
-  //       key: "people",
-  //       children: [
-  //         {
-  //           label: "Asosiy sahifa",
-  //           key: "Asosiy sahifa",
-  //           icon: renderIcon(SiteSetting),
-  //         },
-  //         // {
-  //         //   label:"Vuejs Tour",
-  //         //   key: "Vuejs Tour",
-  //         //   icon: renderIcon(vueIcon)
-  //         // }
-  //       ],
-  //     },
-  //   ],
-  // },
+  {
+    label: "Sozlamalar",
+    key: "read",
+    icon: renderIcon(SettingIcon),
+    show: localStorage.getItem('fullname') == 'Dasturchi',
+    children: [
+      {
+        type: "group",
+        label: "Sahifalar",
+        key: "people",
+        children: [
+          // {
+          //   label: "Asosiy sahifa",
+          //   key: "Asosiy sahifa",
+          //   icon: renderIcon(SiteSetting),
+          // },
+          {
+            label:"Dastur to'lovi",
+            key:"Dastur to'lovi",
+            icon: renderIcon(PayCardIcon)
+          }
+        ],
+      },
+    ],
+  },
 ];
 
 const userOption = [
@@ -623,8 +625,10 @@ window.addEventListener("resize", () => {
             </n-tab-pane>
           </n-tabs>
         </div>
-        <RouterView />
-        <LoadingUI v-if="counter.loadAction"/>
+        <div class="router-box">
+          <RouterView />
+          <LoadingUI v-if="counter.loadAction"/>
+        </div>
         <n-drawer
           resizable
           v-model:show="settingBtn"
@@ -811,5 +815,8 @@ window.addEventListener("resize", () => {
 .profile-button {
   display: flex;
   justify-content: flex-end;
+}
+.router-box{
+  position: relative !important;
 }
 </style>

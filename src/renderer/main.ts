@@ -25,7 +25,9 @@ const error_store = useErrorStore()
 
 
 ////////////////////////////////
-axios.defaults.baseURL = `http://81.95.226.11:64007/api/v1`;
+const BASE_URL = ref('http://81.95.226.11:64007/api/v1');
+// const BASE_URL = ref('http://localhost:8080/api/v1')
+axios.defaults.baseURL = BASE_URL.value;
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   config.headers['Authorization'] = `Bearer ` + localStorage.getItem('token');
@@ -80,8 +82,8 @@ app.use(VWave, {
 })
 
 app.provide('dayJS', dayjs);
-app.provide('img_url', `http://81.95.226.11:64007/api/v1/uploads/user`)
-app.provide('site_img', `http://81.95.226.11:64007/api/v1/uploads/image/`)
-app.provide('course_img', `http://81.95.226.11:64007/api/v1/uploads/course/`)
-app.provide('course_video', `http://81.95.226.11:64007/api/v1/uploads/coursePlan/`)
+app.provide('img_url', `${BASE_URL}/api/v1/uploads/user`)
+app.provide('site_img', `${BASE_URL}/api/v1/uploads/image/`)
+app.provide('course_img', `${BASE_URL}/api/v1/uploads/course/`)
+app.provide('course_video', `${BASE_URL}/api/v1/uploads/coursePlan/`)
 app.mount('#app')

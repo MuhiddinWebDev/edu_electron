@@ -42,7 +42,7 @@ const columns = ref([
     resizable: true,
     sortOrder: true,
     render(row){
-      return dayJS(row.pay_date * 1000).format('YYYY-MM-DD hh:mm:ss')
+      return dayJS(row.pay_date * 1000).format('YYYY-MM-DD HH:mm:ss')
     }
   },
   {
@@ -51,7 +51,7 @@ const columns = ref([
     resizable: true,
     sortOrder: true,
     render(row){
-      return dayJS(row.next_date * 1000).format('YYYY-MM-DD hh:mm:ss')
+      return dayJS(row.next_date * 1000).format('YYYY-MM-DD HH:mm:ss')
     }
   },
   {
@@ -110,6 +110,7 @@ const showClose = (e) => {
 
 const updateModel = (res) => {
   showUpdate.value = false;
+  getAll()
 };
 
 
