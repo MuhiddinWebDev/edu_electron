@@ -8,9 +8,14 @@ class Service {
     });
   }
 
-
   getCourseStudent(data) {
     return axios.post(END_POINT + `/students-of-course`, data).then((res) => {
+      return res;
+    });
+  }
+
+  groupTableAll(data) {
+    return axios.post(END_POINT + `/group-table`, data).then((res) => {
       return res;
     });
   }

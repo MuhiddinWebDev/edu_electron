@@ -6,23 +6,23 @@ import ModelService from "../../../services/groups.service";
 import CourseService from "../../../services/course.service";
 import BranchService from "../../../services/branch.service";
 
-import { NButton, NIcon, useMessage, useDialog } from "naive-ui";
+import { NButton, NIcon, useMessage } from "naive-ui";
 import ModelForm from "./Form.vue";
-
-import {
-  Add20Filled as AddIcon,
-  PersonEdit24Filled as PersonIcon,
-} from "@vicons/fluent";
+import ModelRead from "./Read.vue";
+import {Add20Filled as AddIcon} from "@vicons/fluent";
+import { RemoveRedEyeRound as EyeIcon} from "@vicons/material";
 import { TrashCan as TrashIcon, Pen as PenICon } from "@vicons/carbon";
 
 const props = defineProps(["type", "action", "itemValue"]);
 const emits = defineEmits(["select"]);
 const message = useMessage();
-const dialog = useDialog();
+
 const showCreate = ref(false);
 const showUpdate = ref(false);
+const showRead = ref(false);
 const updateId = ref(null);
-const ActionBtn = ref(null);
+const readId = ref(false)
+
 const loading = ref(true);
 const defaultName = ref("");
 //// select options get all
@@ -145,15 +145,34 @@ const columns = ref([
   {
     title: "Amallar",
     key: "action",
-    width: 75,
+    width: 105,
     render(row) {
       return [
+      h(
+          NButton,
+          {
+            size: "small",
+            type: "info",
+            style:{
+              marginRight:'12px'
+            },
+            onClick: (e) => {
+              showRead.value = true;
+              readId.value = row.id;
+            },
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: EyeIcon,
+              }),
+          }
+        ),
         h(
           NButton,
           {
             size: "small",
             type: "success",
-            block: true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -166,6 +185,7 @@ const columns = ref([
               }),
           }
         ),
+     
         // h(
         //   NButton,
         //   {
@@ -240,15 +260,15 @@ const createModel = () => {
   message.success("Ma'lumot qo'shildi");
   getBySearch(null, null, branchId.value);
 };
-const showClose = (e) => {
-  if (e == "create") {
-    showCreate.value = false;
-  } else if (e == "update") {
+
+const closeModel = (action) => {
+  if(action =='update'){
     showUpdate.value = false;
+  }else if(action == "create"){
+    showCreate.value = false;
+  }else if(action == "read"){
+    showRead.value = false;
   }
-};
-const closeUpdate = () => {
-  showUpdate.value = false;
 };
 const updateModel = () => {
   showUpdate.value = false;
@@ -477,7 +497,8 @@ const renderCourse = (option) => {
         :bordered="true"
         :single-line="false"
         size="small"
-        style="min-width: 1000px; max-height: calc(100vh - 300px)"
+        style="min-width: 1000px;"
+        max-height="60vh"
       >
       </n-data-table>
     </div>
@@ -497,10 +518,10 @@ const renderCourse = (option) => {
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('create')"
+        @close="closeModel('create')"
       >
         <ModelForm
-          @close="closeCreate"
+          @close="closeModel('create')"
           @create="createModel"
           :defaultname="defaultName"
           type="create"
@@ -520,10 +541,10 @@ const renderCourse = (option) => {
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('update')"
+        @close="closeModel('update')"
       >
         <ModelForm
-          @close="closeUpdate"
+          @close="closeModel('update')"
           type="update"
           :id="updateId"
           @update="updateModel"
@@ -531,29 +552,28 @@ const renderCourse = (option) => {
       </n-card>
     </n-modal>
 
-    <!-- <n-modal
+    <n-modal
       transform-orign="center"
-      v-model:show="showAttendance"
+      v-model:show="showRead"
       :mask-closable="false"
     >
       <n-card
-        style="max-width: 800px; width: calc(100% - 35px)"
-        title="Davomat"
+        style="max-width: 800px; width: calc(100vw - 20px)"
+        title="Guruh ma'lumotlari"
         :bordered="false"
         size="medium"
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('attendance')"
+        @close="closeModel('read')"
       >
-        <Attendance
-          @close="closeAttendance"
-          type="davomat"
-          :id="AttendanceId"
-          @davomat="AddendanceModel"
+        <ModelRead
+          @close="closeModel('read')"
+          type="read"
+          :id="readId"
         />
       </n-card>
-    </n-modal> -->
+    </n-modal>
   </section>
   <!-- create more  -->
 </template>

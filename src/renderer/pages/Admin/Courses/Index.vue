@@ -8,8 +8,10 @@ import BranchService from "../../../services/branch.service";
 
 import { NButton, NIcon, useMessage, useDialog, NImage } from "naive-ui";
 import ModelForm from "./Form.vue";
+import ModelRead from "./Read.vue"
 import { Add20Filled as AddIcon } from "@vicons/fluent";
 import { TrashCan as TrashIcon, Pen as PenICon } from "@vicons/carbon";
+import { RemoveRedEyeRound as EyeIcon} from "@vicons/material";
 import { useCounterStore } from "../../../stores/counter";
 
 const loading = ref(true);
@@ -18,9 +20,14 @@ const props = defineProps(["type", "action", "itemValue"]);
 const counter = useCounterStore();
 const message = useMessage();
 const dialog = useDialog();
+
 const showCreate = ref(false);
 const showUpdate = ref(false);
+const showRead = ref(false);
+
+const readId = ref(null);
 const updateId = ref(null);
+
 const img_url = inject("course_img");
 const data = ref([]);
 const defaultname = ref("");
@@ -137,6 +144,18 @@ const columns = ref([
       }).format(row.price_month);
     },
   },
+  {
+    title: "Darslar soni",
+    key: "lesson_count",
+    resizable: true,
+    titleAlign:'center',
+    align:'right',
+    render(row) {
+      return new Intl.NumberFormat("ru-Ru", {
+        style: "decimal",
+      }).format(row.course_plan.length);
+    },
+  },
   
   // {
   //   title: "To'liq narxi",
@@ -188,15 +207,34 @@ const columns = ref([
   {
     title: "Amallar",
     key: "action",
-    width: 75,
+    width: 105,
     render(row) {
       return [
         h(
           NButton,
           {
             size: "small",
+            type: "info",
+            onClick: (e) => {
+              showRead.value = true;
+              readId.value = row.id;
+            },
+            style:{
+              marginRight:'12px'
+            }
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: EyeIcon,
+              }),
+          }
+        ),
+        h(
+          NButton,
+          {
+            size: "small",
             type: "success",
-            block: true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -281,13 +319,10 @@ onMounted(() => {
   }
 });
 ///  create and update functions
-const closeCreate = () => {
-  showCreate.value = false;
-};
+
 
 const createModel = (res, action) => {
   showCreate.value = false;
-  message.success("Ma'lumot qo'shildi");
   updateId.value = res.id;
   counter.coursePlan = true;
   showUpdate.value = true;
@@ -297,15 +332,15 @@ const createModel = (res, action) => {
     getBySearch(null,null,findBranch.value)
   }
 };
-const showClose = (e) => {
-  if (e == "create") {
-    showCreate.value = false;
-  } else if (e == "update") {
+
+const closeModel = (action) => {
+  if(action == 'update'){
     showUpdate.value = false;
+  }else if(action == 'read'){
+    showRead.value = false
+  }else if(action == 'create'){
+    showCreate.value = false;
   }
-};
-const closeUpdate = () => {
-  showUpdate.value = false;
 };
 
 const updateModel = () => {
@@ -550,10 +585,10 @@ const renderCourse = (option) => {
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('create')"
+        @close="closeModel('create')"
       >
         <ModelForm
-          @close="closeCreate"
+          @close="closeModel('create')"
           @create="createModel"
           :defaultname="defaultname"
           type="create"
@@ -573,13 +608,35 @@ const renderCourse = (option) => {
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('update')"
+        @close="closeModel('update')"
       >
         <ModelForm
-          @close="closeUpdate"
+          @close="closeModel('update')"
           type="update"
           :id="updateId"
           @update="updateModel"
+        />
+      </n-card>
+    </n-modal>
+    <n-modal
+      transform-orign="center"
+      v-model:show="showRead"
+      :mask-closable="false"
+    >
+      <n-card
+        style="max-width: 800px; width: calc(100vw - 15px)"
+        title="Kurs ma'lumoti"
+        :bordered="false"
+        size="large"
+        role="dialog"
+        aria-modal="true"
+        closable
+        @close="closeModel('read')"
+      >
+        <ModelRead
+          @close="closeModel('read')"
+          type="read"
+          :id="readId"
         />
       </n-card>
     </n-modal>
