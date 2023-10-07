@@ -584,7 +584,7 @@ window.addEventListener("resize", () => {
             >
               <div class="user">
                 <div class="user-avatar" v-if="user_info.image.length > 0">
-                  <n-avatar size="small" round :src="img_url + '/' + user_info.image">
+                  <n-avatar size="small" round :src="img_url +'/'+ user_info.image">
                     <!-- <n-icon  size="24">
                       <UserIcon />
                     </n-icon> -->
@@ -688,7 +688,7 @@ window.addEventListener("resize", () => {
           resizable
           v-model:show="profileSetting"
           :default-width="420"
-          :style="{ height: '100vh' }"
+          :style="{ height: '100vh', color: ThemeAction ? '#fff':'#000'}"
         >
           <n-drawer-content closable>
             <template #header>
@@ -707,7 +707,7 @@ window.addEventListener("resize", () => {
             <div class="profile">
               <div class="profile-user" @click="openUpdate">
                 <div class="profile-user_avatar">
-                  <n-avatar round :size="68" :src="user_info.image" />
+                  <n-avatar round :size="68" :src=" img_url + '/' + user_info.image" />
                   <div class="profile-camera">
                     <n-icon size="16">
                       <cameraIcon />

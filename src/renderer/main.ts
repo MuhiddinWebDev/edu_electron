@@ -82,8 +82,8 @@ app.use(VWave, {
 })
 
 app.provide('dayJS', dayjs);
-app.provide('img_url', `${BASE_URL}/api/v1/uploads/user`)
-app.provide('site_img', `${BASE_URL}/api/v1/uploads/image/`)
-app.provide('course_img', `${BASE_URL}/api/v1/uploads/course/`)
-app.provide('course_video', `${BASE_URL}/api/v1/uploads/coursePlan/`)
+app.provide('img_url', `${BASE_URL.value}/uploads/user`)
+app.provide('site_img', `${BASE_URL.value}/uploads/image/`)
+app.provide('course_img', `${BASE_URL.value}/uploads/course/`)
+app.provide('course_video', `${BASE_URL.value}/uploads/coursePlan/`)
 app.mount('#app')
