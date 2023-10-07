@@ -25,8 +25,8 @@ const error_store = useErrorStore()
 
 
 ////////////////////////////////
-const BASE_URL = ref('http://81.95.226.11:64007/api/v1');
-// const BASE_URL = ref('http://localhost:8080/api/v1')
+// const BASE_URL = ref('http://81.95.226.11:64007/api/v1');
+const BASE_URL = ref('http://localhost:8080/api/v1')
 axios.defaults.baseURL = BASE_URL.value;
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
