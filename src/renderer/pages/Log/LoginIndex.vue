@@ -3,9 +3,10 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import BranchService from "../../services/branch.service";
 import PaymentService from "../../services/softwarePayment.service";
-
+import { useMessage } from "naive-ui"
 import axios from "axios";
 const router = useRouter();
+const message = useMessage();
 ///// sign in functionality
 const sign_form = ref(null);
 const signData = ref({
@@ -44,7 +45,10 @@ const signin = async () => {
       else if (res.role == "Teacher") {
         router.push({ name: "Teacher" });
       }
-    });
+    }).catch(error=>{
+      message.error("Telefon raqam yoki parol xato!")
+      console.log(error)
+    })
   } catch (e) {}
 };
 const signKey = (e) => {

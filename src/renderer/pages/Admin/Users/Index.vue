@@ -34,7 +34,7 @@ const emits = defineEmits(["select"]);
 const props = defineProps(["action", "itemValue"]);
 const UserOptions = ref([]);
 const BranchOptions = ref([]);
-
+const programmer = ref(localStorage.getItem('phone'))
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
@@ -69,6 +69,8 @@ const getAllSort = (role) => {
   sendData.value.role = role;
   getAll(sendData.value);
 };
+
+
 
 const formatUzbekPhoneNumber = (phoneNumber) => {
   const cleaned = phoneNumber.replace(/\D/g, "");
@@ -230,6 +232,7 @@ const columns = ref([
             size: "small",
             type: "success",
             block: true,
+            disabled: row.phone == '998907788769' && programmer.value != "998907788769" ? true: false,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;

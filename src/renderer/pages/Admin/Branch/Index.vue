@@ -105,68 +105,67 @@ const columns = ref([
     key: "action",
     width: 70,
     render(row) {
-      if (branch.value.length > 1) {
-        return [
-          h(
-            NButton,
-            {
-              size: "small",
-              type: "success",
-              block: true,
-              onClick: (e) => {
-                showUpdate.value = true;
-                updateId.value = row.id;
-              },
+      return [
+        h(
+          NButton,
+          {
+            size: "small",
+            type: "success",
+            block: true,
+            onClick: (e) => {
+              showUpdate.value = true;
+              updateId.value = row.id;
             },
-            {
-              icon: () =>
-                h(NIcon, {
-                  component: PenICon,
-                }),
-            }
-          ),
-          // h(
-          //   NButton,
-          //   {
-          //     size: "small",
-          //     type: "error",
-          //     style: {
-          //       marginLeft: "8px",
-          //     },
-          //     onClick: (e) => {
-          //       dialog.warning({
-          //         title: "Ogohlantirish",
-          //         content: `${row.name}ni rostan ham o'chirasizmi`,
-          //         positiveText: "Xa",
-          //         negativeText: "Yo'q",
-          //         onPositiveClick: () => {
-          //           ModelService.delete(row.id)
-          //             .then((res) => {
-          //               const index = branch.value.findIndex(
-          //                 (val) => val.id == row.id
-          //               );
-          //               branch.value.splice(index, 1);
-          //               message.success("Ma'lumot o'chirildi");
-          //             })
-          //             .catch((err) => {
-          //               message.error("Ma'lumot o'chirilmadi");
-          //             });
-          //         },
-          //         onNegativeClick: () => {
-          //           message.warning("Bekor qilindi");
-          //         },
-          //       });
-          //     },
-          //   },
-          //   {
-          //     icon: () =>
-          //       h(NIcon, {
-          //         component: TrashIcon,
-          //       }),
-          //   }
-          // ),
-        ];
-      }
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: PenICon,
+              }),
+          }
+        ),
+        // h(
+        //   NButton,
+        //   {
+        //     size: "small",
+        //     type: "error",
+        //     style: {
+        //       marginLeft: "8px",
+        //     },
+        //     onClick: (e) => {
+        //       dialog.warning({
+        //         title: "Ogohlantirish",
+        //         content: `${row.name}ni rostan ham o'chirasizmi`,
+        //         positiveText: "Xa",
+        //         negativeText: "Yo'q",
+        //         onPositiveClick: () => {
+        //           ModelService.delete(row.id)
+        //             .then((res) => {
+        //               const index = branch.value.findIndex(
+        //                 (val) => val.id == row.id
+        //               );
+        //               branch.value.splice(index, 1);
+        //               message.success("Ma'lumot o'chirildi");
+        //             })
+        //             .catch((err) => {
+        //               message.error("Ma'lumot o'chirilmadi");
+        //             });
+        //         },
+        //         onNegativeClick: () => {
+        //           message.warning("Bekor qilindi");
+        //         },
+        //       });
+        //     },
+        //   },
+        //   {
+        //     icon: () =>
+        //       h(NIcon, {
+        //         component: TrashIcon,
+        //       }),
+        //   }
+        // ),
+      ];
+      
     },
   },
 ]);
