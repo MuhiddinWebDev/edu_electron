@@ -1,5 +1,7 @@
 {
     "appId": "EduApp",
+    "icon":"public/logo.png",
+    "asar":true,
     "directories": {
         "output": "dist"
     },

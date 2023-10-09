@@ -329,7 +329,12 @@ const router = createRouter({
 			path: '/software-payment',
 			name: "Software Payment",
 			component: () => import("./pages/Layouts/Software.vue"),
-		  },
+		},
+		{
+			path: "/:pathMatch(.*)*",
+			name: "not-found",
+			component: () => import("./pages/NotFound.vue"),
+		}
 	],
 });
 
