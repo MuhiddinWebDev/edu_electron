@@ -34,14 +34,16 @@ const exit = () => {
     <n-tabs type="line" animated>
       <n-tab-pane name="Kurs" tab="Kurs">
         <div class="model-read-image" v-if="readData.image">
-          <n-image
-            lazy
-            width="100"
-            height="100"
-            :style="{ borderRadius: '50%' }"
-            :src="img_url + readData.image"
-          >
+          <div class="header-image">
+            <n-image
+              lazy
+              width="50"
+              height="100"
+              :style="{ borderRadius: '50%'}"
+              :src="img_url + readData.image"
+            >
           </n-image>
+          </div>
         </div>
         <div class="no-image" v-else>
           <div class="no-image_item"><b>Rasm yo'q</b></div>
@@ -141,6 +143,14 @@ const exit = () => {
   background: #e4dfdf;
 }
 .model-read-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-image{
+  padding: 12px 2px;
+  border-radius: 50%;
+  border: 2px dotted ;
   display: flex;
   align-items: center;
   justify-content: center;

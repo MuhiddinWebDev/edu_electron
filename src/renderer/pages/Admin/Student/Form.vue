@@ -99,22 +99,21 @@ const rules = {
 
 const defaultDisabled = ref(0);
 const firstInput = ref(null);
+const autoInput = (fullname, role, id)=>{
+  firstInput.value?.focus();
+  form_data.value.fullname = fullname;
+  form_data.value.role = role;
+  defaultDisabled.value = id;
+}
 
 onMounted(() => {
-  firstInput.value?.focus();
   if (props.type == "update") {
     ModelService.getOne(props.id).then((res) => {
       form_data.value = res;
     });
   } else if (props.type == "create") {
     if (props.defaultObeject.actionId == 1) {
-      form_data.value.fullname = props.defaultObeject.name;
-      form_data.value.role = "User";
-      defaultDisabled.value = 1;
-    } else if (props.defaultObeject.actionId == 3) {
-      form_data.value.fullname = props.defaultObeject.name;
-      form_data.value.role = "Teacher";
-      defaultDisabled.value = 1;
+      autoInput(props.defaultObeject.name, "User", 1)
     }
   }
   getBranches();

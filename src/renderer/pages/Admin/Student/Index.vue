@@ -13,20 +13,26 @@ import {
   useNotification,
 } from "naive-ui";
 import ModelForm from "./Form.vue";
+import ModelRead from "./Read.vue";
 import ModelFormMore from "./MoreForm.vue";
 import {
   Add20Filled as AddIcon,
   AddSquareMultiple16Filled as AddMoreIcon,
 } from "@vicons/fluent";
+import { RemoveRedEyeRound as EyeIcon} from "@vicons/material";
 import { Pen as PenICon } from "@vicons/carbon";
 
 const message = useMessage();
 const dialog = useDialog();
 const notification = useNotification();
+
 const showCreate = ref(false);
 const showCreateMore = ref(false);
 const showUpdate = ref(false);
+const showRead = ref(false);
 const updateId = ref(null);
+const readId = ref(null);
+
 const img_url = inject("img_url");
 const loadingRef = ref(true);
 const emits = defineEmits(["select"]);
@@ -207,15 +213,34 @@ const columns = ref([
   {
     title: "Yangilash",
     key: "action",
-    width: 80,
+    width: 105,
     render(row) {
       return [
+      h(
+          NButton,
+          {
+            size: "small",
+            type: "info",
+            onClick: (e) => {
+              showRead.value = true;
+              readId.value = row.id;
+            },
+            style:{
+              marginRight:'12px'
+            }
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: EyeIcon,
+              }),
+          }
+        ),
         h(
           NButton,
           {
             size: "small",
             type: "success",
-            block: true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -245,14 +270,7 @@ onMounted(() => {
     defaultObeject.value.actionId = props.action;
   } else if (props.action == 0) {
     getAllSort("User");
-  } else if (props.action == 2) {
-    getAllSort("Teacher");
-  } else if (props.action == 3) {
-    showCreate.value = true;
-    getAllSort("Teacher");
-    defaultObeject.value.name = props.itemValue;
-    defaultObeject.value.actionId = props.action;
-  } else {
+  }else {
     getAll(sendData.value);
   }
   getUserOptions(sendData.value);
@@ -280,13 +298,15 @@ const createMoreModel = () => {
 };
 
 //// create more functions end
-const modalClose = (e) => {
+const closeModel = (e) => {
   if (e == "create") {
     showCreate.value = false;
   } else if (e == "update") {
     showUpdate.value = false;
   } else if (e == "more-create") {
     showCreateMore.value = false;
+  }else if(e == 'read'){
+    showRead.value = false;
   }
 };
 
@@ -508,14 +528,13 @@ const pagination = reactive({
         "
         title="Talaba qo'shish"
         :bordered="false"
-        size="large"
         role="dialog"
         aria-modal="true"
         closable
-        @close="modalClose('create')"
+        @close="closeModel('create')"
       >
         <ModelForm
-          @close="modalClose('create')"
+          @close="closeModel('create')"
           @create="createModel"
           :defaultObeject="defaultObeject"
           type="create"
@@ -537,14 +556,13 @@ const pagination = reactive({
         "
         title="Talabani o'zgartirish"
         :bordered="false"
-        size="large"
         role="dialog"
         aria-modal="true"
         closable
-        @close="modalClose('update')"
+        @close="closeModel('update')"
       >
         <ModelForm
-          @close="modalClose('update')"
+          @close="closeModel('update')"
           type="update"
           :id="updateId"
           @update="updateModel"
@@ -559,12 +577,40 @@ const pagination = reactive({
     >
       <n-drawer-content title="Talabalar qo'shish" closable>
         <ModelFormMore
-          @close="modalClose('more-create')"
+          @close="closeModel('more-create')"
           @create="createMoreModel"
           type="create"
         />
       </n-drawer-content>
     </n-drawer>
+
+    <n-modal
+      transform-orign="center"
+      v-model:show="showRead"
+      :mask-closable="false"
+    >
+      <n-card
+        style="
+          max-width: 700px;
+          width: calc(100vw - 15px);
+          max-height: 900px;
+          overflow: hidden;
+          overflow-y: auto;
+        "
+        title="Talaba ma'lumoti"
+        :bordered="false"
+        role="dialog"
+        aria-modal="true"
+        closable
+        @close="closeModel('read')"
+      >
+        <ModelRead
+          @close="closeModel('read')"
+          type="read"
+          :id="readId"
+        />
+      </n-card>
+    </n-modal>
     <!-- create more end -->
   </section>
 </template>
