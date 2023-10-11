@@ -312,6 +312,7 @@ const delBtn = (index) => {
                   label-field="name"
                   value-field="id"
                   v-model:value="form_data.filial_id"
+                  filterable
                 >
                 </n-select>
               </n-form-item>
@@ -326,6 +327,7 @@ const delBtn = (index) => {
                   value-field="id"
                   v-model:value="form_data.group_id"
                   @update:value="UpdateGroup"
+                  filterable
                 >
                 </n-select>
               </n-form-item>
@@ -339,6 +341,7 @@ const delBtn = (index) => {
                   value-field="id"
                   v-model:value="form_data.student_id"
                   :disabled="props.type == 'update' || props.type == 'read'"
+                  filterable
                 >
                 </n-select>
               </n-form-item>
@@ -353,6 +356,7 @@ const delBtn = (index) => {
                   :options="coursesOptions"
                   label-field="name"
                   value-field="id"
+                  filterable
                 />
               </n-form-item>
             </n-grid-item>
@@ -365,6 +369,7 @@ const delBtn = (index) => {
                   label-field="name"
                   value-field="id"
                   v-model:value="form_data.pay_type_id"
+                  filterable
                 />
               </n-form-item>
             </n-grid-item>
@@ -432,6 +437,7 @@ const delBtn = (index) => {
                 "
                 label-field="name"
                 value-field="id"
+                filterable
               />
             </n-input-group>
           </div>
@@ -458,6 +464,7 @@ const delBtn = (index) => {
                       label-field="name"
                       value-field="id"
                       v-model:value="item.discount_id"
+                      filterable
                     />
                   </td>
                   <td style="text-align: right">
@@ -533,13 +540,12 @@ const delBtn = (index) => {
 
 <style scoped>
 .pay-box{
-  height: calc(100vh - 140px);
+  /* height: calc(100vh - 140px); */
   overflow: hidden;
   overflow-y: auto;
   padding-right: 6px;
 }
 .table-scroll {
-  min-height: 150px;
   max-height: 650px;
   overflow: hidden;
   overflow: auto;

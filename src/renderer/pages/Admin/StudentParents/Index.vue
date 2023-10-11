@@ -4,20 +4,20 @@ import ModelService from "../../../services/studentParents.service";
 import BranchService from "../../../services/branch.service";
 
 import { useMagicKeys } from "@vueuse/core";
-import { useMessage, NButton, NIcon } from "naive-ui";
+import { useMessage, NButton, NIcon, useDialog } from "naive-ui";
 
 import ModelForm from "./Form.vue";
 
 import {
   Add20Filled as AddIcon,
 } from "@vicons/fluent";
-import { Pen as PenICon } from "@vicons/carbon";
+import { Pen as PenICon, TrashCan as TrashIcon } from "@vicons/carbon";
 
 const emits = defineEmits(["select"]);
 const props = defineProps(["type", "action", "itemValue"]);
 
 const message = useMessage();
-
+const dialog = useDialog();
 const showCreate = ref(false);
 const showUpdate = ref(false);
 const updateId = ref(null);
@@ -29,7 +29,7 @@ const loading = ref(true);
 
 const branchId = ref(null);
 const roomId = ref(null);
-
+const findDev = ref(localStorage.getItem('phone'))
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
@@ -87,7 +87,7 @@ const columns = ref([
   {
     title: "Amallar",
     key: "action",
-    width: 75,
+    width: findDev.value == '998907788769' ? 110:70,
     render(row) {
       return [
         h(
@@ -95,7 +95,7 @@ const columns = ref([
           {
             size: "small",
             type: "success",
-            block: true,
+            block: findDev.value == '998907788769' ? false:true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -108,46 +108,48 @@ const columns = ref([
               }),
           }
         ),
-        // h(
-        //   NButton,
-        //   {
-        //     size: "small",
-        //     type: "error",
-        //     style: {
-        //       marginLeft: "8px",
-        //     },
-        //     onClick: (e) => {
-        //       dialog.warning({
-        //         title: "Ogohlantirish",
-        //         content: `${row.name}ni rostan ham o'chirasizmi`,
-        //         positiveText: "Xa",
-        //         negativeText: "Yo'q",
-        //         onPositiveClick: () => {
-        //           ModelService.delete(row.id)
-        //             .then((res) => {
-        //               const index = branch.value.findIndex(
-        //                 (val) => val.id == row.id
-        //               );
-        //               branch.value.splice(index, 1);
-        //               message.success("Ma'lumot o'chirildi");
-        //             })
-        //             .catch((err) => {
-        //               message.error("Ma'lumot o'chirilmadi");
-        //             });
-        //         },
-        //         onNegativeClick: () => {
-        //           message.warning("Bekor qilindi");
-        //         },
-        //       });
-        //     },
-        //   },
-        //   {
-        //     icon: () =>
-        //       h(NIcon, {
-        //         component: TrashIcon,
-        //       }),
-        //   }
-        // ),
+        h(
+          NButton,
+          {
+            size: "small",
+            type: "error",
+
+            style: {
+              marginLeft: "8px",
+              display: findDev.value == '998907788769' ? '':'none'
+            },
+            onClick: (e) => {
+              dialog.warning({
+                title: "Ogohlantirish",
+                content: `${row.fullname }ni rostan ham o'chirasizmi`,
+                positiveText: "Xa",
+                negativeText: "Yo'q",
+                onPositiveClick: () => {
+                  ModelService.delete(row.id)
+                    .then((res) => {
+                      const index = data.value.findIndex(
+                        (val) => val.id == row.id
+                      );
+                      data.value.splice(index, 1);
+                      message.success("Ma'lumot o'chirildi");
+                    })
+                    .catch((err) => {
+                      message.error("Ma'lumot o'chirilmadi");
+                    });
+                },
+                onNegativeClick: () => {
+                  message.warning("Bekor qilindi");
+                },
+              });
+            },
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: TrashIcon,
+              }),
+          }
+        ),
       ];
     },
   },
@@ -321,7 +323,8 @@ const pagination = reactive({
         :bordered="true"
         :single-line="false"
         size="small"
-        style="min-width: 1000px; max-height: calc(100vh - 300px)"
+        max-height="50vh"
+        style="min-width: 1000px;"
       >
       </n-data-table>
     </div>

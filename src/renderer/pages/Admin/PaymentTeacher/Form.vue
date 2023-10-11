@@ -120,13 +120,15 @@ const getAllGroups = (id) => {
         }
       });
     } else if (res.length == 0) {
-      allowPay.value = false;
-      notification.warning({
-        content: "Ogohlantirish",
-        meta: "To'lov qilish mumkin emas. Bu kurs bo'yicha darslar boshlanmagan.",
-        duration: 2500,
-        keepAliveOnHover: true,
-      });
+      if(props.type !='update'){
+        allowPay.value = false;
+        notification.warning({
+          content: "Ogohlantirish",
+          meta: "To'lov qilish mumkin emas. Bu kurs bo'yicha darslar boshlanmagan.",
+          duration: 2500,
+          keepAliveOnHover: true,
+        });
+      }
     }
   });
 };
@@ -226,6 +228,7 @@ onMounted(() => {
       getAllGroups(res.teacher_id);
       getAllTeachers(res.filial_id);
       getAllCourses(res.filial_id, res.teacher_id);
+      allowPay.value = true;
     });
   }
   getAllBranches();
@@ -390,7 +393,7 @@ const save = async () => {
           </n-grid-item>
         </n-grid>
         <n-scrollbar x-scrollable>
-          <n-table style="min-width: 500px;"  size="small" :bordered="true" :single-line="false">
+          <n-table   size="small" :bordered="true" :single-line="false">
             <thead>
               <tr>
                 <th style="width: 40px">№</th>
@@ -432,7 +435,6 @@ const save = async () => {
 
 <style scoped>
 .user-message{
-  height: calc(100vh - 120px);
   overflow: hidden;
   overflow-y: auto;
   padding-right: 6px;
