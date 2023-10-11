@@ -106,12 +106,7 @@ onMounted(() => {
       form_data.value = res;
     });
   }
-  if(findRole.value == "SuperAdmin"){
-    getAllBranches();
-  }
-  if(findRole.value != "SuperAdmin"){
-    getAllTeachers(findBranch.value)
-  }
+  getAllTeachers(findBranch.value)
 });
 
 const exit = () => {

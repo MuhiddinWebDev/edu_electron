@@ -3,9 +3,7 @@ import { ref, onMounted, inject } from "vue";
 import ModelService from "../../../services/users.service";
 import BranchService from "../../../services/branch.service";
 import { useMessage } from "naive-ui";
-import { 
-    Add16Filled as addicon
-} from "@vicons/fluent"
+import { Add16Filled as addicon } from "@vicons/fluent";
 //// icons import start
 import { Save24Filled as SaveIcon } from "@vicons/fluent";
 import { Exit as ExitIcon } from "@vicons/ionicons5";
@@ -18,8 +16,8 @@ const emit = defineEmits(["create", "update", "close"]);
 const formRef = ref(null);
 const message = useMessage();
 
-const findRole = ref(localStorage.getItem('role'))
-const branchID = ref(JSON.parse(localStorage.getItem('filial_id')))
+const findRole = ref(localStorage.getItem("role"));
+const branchID = ref(JSON.parse(localStorage.getItem("filial_id")));
 
 const branchOption = ref([]);
 const getAllBranches = () => {
@@ -30,10 +28,10 @@ const getAllBranches = () => {
 const form_data = ref({
   phone: "998",
   fullname: "",
-  role: 'Teacher',
+  role: "Teacher",
   password: "",
   confirmPassword: "",
-  filial_id: findRole.value != 'SuperAdmin' ? branchID.value : null,
+  filial_id: findRole.value != "SuperAdmin" ? branchID.value : null,
   lang: "uz",
 });
 const rules = {
@@ -41,10 +39,19 @@ const rules = {
     required: true,
     trigger: "blur",
     validator: (rule, value) => {
-      if (value.length <= 8) {
-        return new Error("Telefon raqam 8 tadan ko'p bo'lishi kerak   ");
+      if (value.length <= 11) {
+        return new Error("Telefon raqam to'liq kiriting!");
       } else if (value == "") {
         return new Error("Telefon raqam bo'sh ");
+      }
+    },
+  },
+  filial_id: {
+    required: true,
+    trigger: "blur",
+    validator: (rule, value) => {
+      if (value == null) {
+        return new Error("Filial tanlash majburiy!");
       }
     },
   },
@@ -94,19 +101,15 @@ const defaultDisabled = ref(0);
 const firstInput = ref(null);
 
 onMounted(() => {
-  firstInput.value?.focus();
   if (props.type == "update") {
     ModelService.getOne(props.id).then((res) => {
       form_data.value = res;
     });
   } else if (props.type == "create") {
     if (props.defaultObeject.actionId == 1) {
+      firstInput.value?.focus();
       form_data.value.fullname = props.defaultObeject.name;
       form_data.value.role = "User";
-      defaultDisabled.value = 1;
-    } else if (props.defaultObeject.actionId == 3) {
-      form_data.value.fullname = props.defaultObeject.name;
-      form_data.value.role = "Teacher";
       defaultDisabled.value = 1;
     }
   }
@@ -120,38 +123,39 @@ const changeLang = (lang) => {
   }
 };
 
-const spinner = ref(false)
+const spinner = ref(false);
 
 const save = async () => {
   try {
     if (props.type == "create") {
-        const result = await formRef.value?.validate();
-        spinner.value = true;
-        ModelService.create(form_data.value).then((res) => {
-                emit("create", res);
-                spinner.value = false;
-            })
-            .catch(() => {
-                spinner.value = false
+      const result = await formRef.value?.validate();
+      spinner.value = true;
+      ModelService.create(form_data.value)
+        .then((res) => {
+          emit("create", res);
+          spinner.value = false;
+        })
+        .catch(() => {
+          spinner.value = false;
         });
     } else if (props.type == "update") {
-        const result = await formRef.value?.validate();
-        spinner.value = true;
-        ModelService.updateAll(props.id, form_data.value)
-            .then((res) => {
-                emit("update", res);
-                spinner.value = false
-            })
-            .catch(() => {
-                spinner.value = false
+      const result = await formRef.value?.validate();
+      spinner.value = true;
+      ModelService.updateAll(props.id, form_data.value)
+        .then((res) => {
+          emit("update", res);
+          spinner.value = false;
+        })
+        .catch(() => {
+          spinner.value = false;
         });
     }
   } catch (e) {}
 };
-const exitBtn =  () =>{
-    spinner.value = true;
-    emit("close")
-}
+const exitBtn = () => {
+  spinner.value = true;
+  emit("close");
+};
 
 // swicht start
 
@@ -171,30 +175,15 @@ const railStyle = ({ focused, checked }) => {
   return style;
 };
 
-
 ///// phone number format and parse function
-function formatPhoneNumber(number) {
-  // Remove all non-numeric characters
-  const cleaned = ("" + number).replace(/\D/g, "");
 
-  // Check if the phone number is valid
-  const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
-
-  if (match) {
-    // Format the phone number as +998 XX YYY YYYY
-    return `+998 ${match[1]} ${match[2]} ${match[3]}`;
-  }
-
-  // If the phone number is not valid, return the original input
-  return number;
-}
 
 const phoneFormat = (value) => {
   let idx = !value || /^\d+$/.test(value);
   if (!idx) {
     message.warning("Iltimos raqam kiriting");
   }
-  return formatPhoneNumber(idx);
+  return idx;
 };
 //////////////////////////////////////////////
 //////////////////////////////////////////////
@@ -267,18 +256,19 @@ const keySave = (e) => {
             <n-gi>
               <n-form-item label="Telefon raqam" path="phone">
                 <n-input-group>
-                    <n-input-group-label>
-                        <n-icon>
-                            <addicon/>
-                        </n-icon>
-                    </n-input-group-label>
-                    <n-input
-                      :allow-input="phoneFormat"
-                      v-model:value="form_data.phone"
-                      :maxlength="30"
-                      show-count
-                      clearable
-                    />
+                  <n-input-group-label>
+                    <n-icon>
+                      <addicon />
+                    </n-icon>
+                  </n-input-group-label>
+                  <n-input
+                    :allow-input="phoneFormat"
+                    v-model:value="form_data.phone"
+                    :maxlength="12"
+                    :minlength="12"
+                    show-count
+                    clearable
+                  />
                 </n-input-group>
               </n-form-item>
             </n-gi>
@@ -295,7 +285,7 @@ const keySave = (e) => {
               </n-form-item>
             </n-gi>
 
-               <n-gi v-if="findRole == 'SuperAdmin'">
+            <n-gi v-if="findRole == 'SuperAdmin'">
               <n-form-item label="Filiali" path="filial_id">
                 <n-input-group>
                   <n-select
@@ -332,7 +322,7 @@ const keySave = (e) => {
                 </n-input-group>
               </n-form-item>
             </n-gi>
-            
+
             <n-gi>
               <n-form-item label="Tili" path="lang">
                 <n-switch
@@ -349,34 +339,30 @@ const keySave = (e) => {
           <div class="table-footer">
             <div class="table-footer_item">
               <n-spin :show="spinner">
-                <n-button 
-                @click="exitBtn" 
-                style="min-width: 120px" 
-                type="warning">
-                <template #icon>
-                    <n-icon>
-                    <ExitIcon />
-                    </n-icon>
-              </template>
-                Chiqish
-                </n-button
+                <n-button
+                  @click="exitBtn"
+                  style="min-width: 120px"
+                  type="warning"
                 >
+                  <template #icon>
+                    <n-icon>
+                      <ExitIcon />
+                    </n-icon>
+                  </template>
+                  Chiqish
+                </n-button>
               </n-spin>
             </div>
             <div class="table-footer_item">
               <n-spin :show="spinner">
-                <n-button 
-                @click="save" 
-                style="min-width: 120px" 
-                type="success">
-                <template #icon>
+                <n-button @click="save" style="min-width: 120px" type="success">
+                  <template #icon>
                     <n-icon>
-                    <SaveIcon />
+                      <SaveIcon />
                     </n-icon>
-                </template>
-                Saqlash
-                </n-button
-                >
+                  </template>
+                  Saqlash
+                </n-button>
               </n-spin>
             </div>
           </div>

@@ -48,10 +48,19 @@ const rules = {
     required: true,
     trigger: "blur",
     validator: (rule, value) => {
-      if (value.length <= 8) {
-        return new Error("Telefon raqam 8 tadan ko'p bo'lishi kerak   ");
+      if (value.length <= 11) {
+        return new Error("Telefon raqam to'liq kiriting!");
       } else if (value == "") {
         return new Error("Telefon raqam bo'sh ");
+      }
+    },
+  },
+  filial_id: {
+    required: true,
+    trigger: "blur",
+    validator: (rule, value) => {
+      if (value == null) {
+        return new Error("Filial tanlash majburiy!");
       }
     },
   },
@@ -99,21 +108,22 @@ const rules = {
 
 const defaultDisabled = ref(0);
 const firstInput = ref(null);
-const autoInput = (fullname, role, id)=>{
-  firstInput.value?.focus();
-  form_data.value.fullname = fullname;
-  form_data.value.role = role;
-  defaultDisabled.value = id;
-}
 
 onMounted(() => {
+  firstInput.value?.focus();
   if (props.type == "update") {
     ModelService.getOne(props.id).then((res) => {
       form_data.value = res;
     });
   } else if (props.type == "create") {
     if (props.defaultObeject.actionId == 1) {
-      autoInput(props.defaultObeject.name, "User", 1)
+      form_data.value.fullname = props.defaultObeject.name;
+      form_data.value.role = "User";
+      defaultDisabled.value = 1;
+    } else if (props.defaultObeject.actionId == 3) {
+      form_data.value.fullname = props.defaultObeject.name;
+      form_data.value.role = "Teacher";
+      defaultDisabled.value = 1;
     }
   }
   getBranches();
@@ -182,28 +192,13 @@ const railStyle = ({ focused, checked }) => {
 //swtich
 
 ///// phone number format and parse function
-function formatPhoneNumber(number) {
-  // Remove all non-numeric characters
-  const cleaned = ("" + number).replace(/\D/g, "");
-
-  // Check if the phone number is valid
-  const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
-
-  if (match) {
-    // Format the phone number as +998 XX YYY YYYY
-    return `+998 ${match[1]} ${match[2]} ${match[3]}`;
-  }
-
-  // If the phone number is not valid, return the original input
-  return number;
-}
 
 const phoneFormat = (value) => {
   let idx = !value || /^\d+$/.test(value);
   if (!idx) {
     message.warning("Iltimos raqam kiriting");
   }
-  return formatPhoneNumber(idx);
+  return idx;
 };
 //////////////////////////////////////////////
 //// index import start
@@ -279,7 +274,8 @@ const keyParent = (e)=>{
                   <n-input
                     :allow-input="phoneFormat"
                     v-model:value="form_data.phone"
-                    :maxlength="30"
+                    :maxlength="12"
+                    :minlength="12"
                     show-count
                     clearable
                   />
@@ -388,6 +384,7 @@ const keyParent = (e)=>{
       preset="card"
       style="max-width: calc(100% - 35px)"
       transform-orign="center"
+      size="small"
     >
       <div class="no-padding">
         <parent-index

@@ -39,10 +39,19 @@ const rules = {
     required: true,
     trigger: "blur",
     validator: (rule, value) => {
-      if (value.length <= 8) {
-        return new Error("Telefon raqam 8 tadan ko'p bo'lishi kerak   ");
+      if (value.length <= 11) {
+        return new Error("Telefon raqam to'liq kiriting!");
       } else if (value == "") {
         return new Error("Telefon raqam bo'sh ");
+      }
+    },
+  },
+  filial_id: {
+    required: true,
+    trigger: "blur",
+    validator: (rule, value) => {
+      if (value == null) {
+        return new Error("Filial tanlash majburiy!");
       }
     },
   },
@@ -171,28 +180,13 @@ const railStyle = ({ focused, checked }) => {
 };
 
 ///// phone number format and parse function
-function formatPhoneNumber(number) {
-  // Remove all non-numeric characters
-  const cleaned = ("" + number).replace(/\D/g, "");
-
-  // Check if the phone number is valid
-  const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
-
-  if (match) {
-    // Format the phone number as +998 XX YYY YYYY
-    return `+998 ${match[1]} ${match[2]} ${match[3]}`;
-  }
-
-  // If the phone number is not valid, return the original input
-  return number;
-}
 
 const phoneFormat = (value) => {
   let idx = !value || /^\d+$/.test(value);
   if (!idx) {
     message.warning("Iltimos raqam kiriting");
   }
-  return formatPhoneNumber(idx);
+  return idx;
 };
 //////////////////////////////////////////////
 ////// create items by index strat
@@ -272,7 +266,8 @@ const keySave = (e) => {
                   <n-input
                     :allow-input="phoneFormat"
                     v-model:value="form_data.phone"
-                    :maxlength="30"
+                    :maxlength="12"
+                    :minlength="12"
                     show-count
                     clearable
                   />
@@ -399,7 +394,6 @@ const keySave = (e) => {
 .auto-height {
   height: 100%;
 }
-
 .modal-parent {
   height: 100%;
 }
