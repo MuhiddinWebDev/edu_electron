@@ -169,12 +169,11 @@ const columns = ref([
     },
   },
 ]);
-let addPermissions = ref(0)
+let addPermissions = ref(localStorage.getItem('phone')) 
 const getAll = () => {
   ModelService.getAll().then((res) => {
     branch.value = res;
     loading.value = false;
-    addPermissions.value = res.length;
   });
 };
 const getAllOptions = () => {
@@ -190,7 +189,7 @@ onMounted(() => {
   if (props.action) {
     showCreate.value = true;
     branchName.value = props.itemValue;
-  }
+  };
 });
 /////  create and update functions
 const createModel = () => {
@@ -281,7 +280,7 @@ const pagination = reactive({
         <div class="box-header_item">
           <h2>Filiallar</h2>
         </div>
-        <div class="box-header_item" v-if="addPermissions < 4">
+        <div class="box-header_item" v-if="addPermissions == '998907788769'">
           <n-button @click="showCreate = true" type="success">
             <template #icon>
               <n-icon size="18">
