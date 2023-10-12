@@ -1,20 +1,21 @@
-import { app, BrowserWindow, ipcMain, session, globalShortcut } from "electron";
+import { app, BrowserWindow, ipcMain, session, globalShortcut, screen } from "electron";
 import { join } from "path";
 function createWindow() {
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: width,
+        height: height,
+        simpleFullscreen :true,
         webPreferences: {
             preload: join(__dirname, "preload.js"),
             nodeIntegration: true,
             contextIsolation: true,
+            devTools:true
         },
     });
     mainWindow.setMenuBarVisibility(false);
     ;
     if (process.env.NODE_ENV === "development") {
-        console.log(process.argv[2]);
-        console.log("---------frontend-------------");
         const rendererPort = process.argv[2];
         mainWindow.loadURL(`http://localhost:${rendererPort}`);
     }

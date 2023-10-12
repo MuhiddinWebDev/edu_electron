@@ -26,9 +26,9 @@ const error_store = useErrorStore()
 
 ////////////////////////////////
 // const BASE_URL = ref('http://81.95.226.11:64008/api/v1'); ////  Edu App LLC Yozyovon Tohirjon backend url
-const BASE_URL = ref('http://81.95.226.11:64007/api/v1'); ////  Edu App Default backend url
+// const BASE_URL = ref('http://81.95.226.11:64007/api/v1'); ////  Edu App Default backend url
 // const BASE_URL = ref('http://81.95.226.11:64003/api/v1'); /// Edu App Platon academy backend url
-// const BASE_URL = ref('http://localhost:8080/api/v1') // EduApp localhost test url
+const BASE_URL = ref('http://localhost:8080/api/v1') // EduApp localhost test url
 axios.defaults.baseURL = BASE_URL.value;
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
