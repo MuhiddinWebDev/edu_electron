@@ -110,40 +110,29 @@ const rules = {
 const genarate_rules = {};
 const roomID = ref(null);
 const LessonID = ref(null);
-const groupArryID = ref([]);
-const branchID = ref(null);
 const filterData = ref({
-  filial_id: branchID,
+  filial_id: form_data.value.filial_id,
 });
 
 const getAllGroups = (branch) => {
-  groupArryID.value = [];
-  ModelService.getAll().then((res) => {
-    groupArryID.value = res;
-  });
-  groupsOptions.value = [];
-  GroupService.searchModel(filterData.value).then((res) => {
-    res.forEach((item) => {
-      const index = groupArryID.value.findIndex(
-        (row) => row.group_id == item.id
-      );
-      groupsOptions.value.push({
-        id: item.id,
-        name: item.name,
-        disabled: index == -1 ? false : true,
-        branch: item.branch,
-      });
-    });
+  if(branch){
+    filterData.value.filial_id = branch
+  }
+  ModelService.getAllGroup(filterData.value).then((res) => {
+    groupsOptions.value = res
   });
 };
 const getAllCourse = (branch) => {
+  if(branch){
+    filterData.value.filial_id = branch
+  }
   CourseService.searchModel(filterData.value).then((res) => {
     coursesOptions.value = res;
   });
 };
 const getAllRooms = (branch) => {
-  if (branch) {
-    form_data.value.filial_id = branch;
+  if(branch){
+    filterData.value.filial_id = branch
   }
   RoomsService.searchModel(filterData.value).then((res) => {
     roomsOptions.value = res;
@@ -163,9 +152,7 @@ onMounted(() => {
       createLesson.value = true;
       daysWrapper.value = false;
     }
-    getAllGroups();
-    getAllCourse();
-    getAllRooms();
+    
     ModelService.getOne(props.id).then((res) => {
       form_data.value = res;
       genarate_date.value.course_id = res.course_id;
@@ -174,17 +161,26 @@ onMounted(() => {
       roomID.value = res.room_id;
       LessonID.value = res.id;
       LessonTable.value = res.lesson_table;
+      if(res.lesson_table.length == 0){
+        daysWrapper.value = true;
+        counter.lesson = true;
+        createLesson.value = false;
+      }else{
+        daysWrapper.value = false;
+        counter.lesson = false;
+        createLesson.value = true;
+      }
     });
   }
-  if (findRole.value == "SuperAdmin") {
-    getAllBranch();
-  }
-  if (findRole.value != "SuperAdmin") {
-    branchID.value = findBranch.value;
-    getAllGroups();
-    getAllCourse();
-    getAllRooms();
-  }
+  // if (findRole.value == "SuperAdmin") {
+  //   getAllBranch();
+  // }
+  // if (findRole.value != "SuperAdmin") {
+  // }
+  getAllGroups();
+  getAllCourse();
+  getAllRooms();
+  getAllBranch();
 });
 
 const exit = () => {
@@ -199,6 +195,7 @@ const save = async () => {
         emit("create", res);
       });
     } else if (props.type == "update") {
+      console.log(form_data.value)
       ModelService.lessonUpdate(props.id, form_data.value).then((res) => {
         emit("update", res);
       });
@@ -285,6 +282,7 @@ const timeFormat = ref({
 const isHourDisabled = (hour) => {
   let hours1 = timeFormat.value.getHours1;
   let hours2 = timeFormat.value.getHours2;
+
   return hours1 <= hour && hours2 > hour;
 };
 const isMinuteDisabled = (minute) => {
@@ -306,18 +304,14 @@ const getTimeAction = (room, weekday, teacher) => {
       res.forEach((row) => {
         let time1 = row.begin_date;
         let time2 = row.end_date;
-        let [hours1, minutes1] = time1
-          .split(":")
-          .map((str) => parseInt(str, 10));
-        let [hours2, minutes2] = time2
-          .split(":")
-          .map((str) => parseInt(str, 10));
+        let [hours1, minutes1] = time1.split(":").map((str) => parseInt(str, 10));
+        let [hours2, minutes2] = time2.split(":").map((str) => parseInt(str, 10));
         timeFormat.value.getHours1 = hours1;
         timeFormat.value.getHours2 = hours2;
         timeFormat.value.getMinutes1 = minutes1;
         timeFormat.value.getMinutes2 = minutes2;
-        isHourDisabled();
-        isMinuteDisabled();
+        isHourDisabled(hours2);
+        isMinuteDisabled(minutes2);
       });
     } else {
       resLength.value = 0;
@@ -333,18 +327,21 @@ const choosDays = (e) => {
         if (element.course_date == e) {
           let courseId = genarate_date.value.course_id;
           if (courseId != null) {
+
             CourseService.getOne(courseId).then((res) => {
               teacherID.value = res.teacher_id;
-              getTimeAction(roomID.value, element.weekday, res.teacher_id);
+              getTimeAction(roomID.value, element.course_date, res.teacher_id);
             });
+
           }
           if (resLength.value == null) {
-            var setHour1 = timeFormat.value.getHours2 + 0;
-            var setMin1 = timeFormat.value.getMinutes2 + 0;
 
-            var setHour2 = timeFormat.value.getHours2 + 2;
-            var setMin2 = timeFormat.value.getMinutes2 + 0;
+            let setHour1 = timeFormat.value.getHours2 + 0;
+            let setMin1 = timeFormat.value.getMinutes2 + 0;
 
+            let setHour2 = timeFormat.value.getHours2 + 2;
+            let setMin2 = timeFormat.value.getMinutes2 + 0;
+       
             AddDays.value.push({
               course_date: element.course_date,
               weekday: element.weekday,
@@ -422,20 +419,16 @@ const genarateSave = async () => {
       genarate_date.value.start_date = dayJS(course_start_day.value).format(
         "YYYY-MM-DD"
       );
-      spinBtn.value = false;
+      spinBtn.value = true;
       ModelService.genrateDays(genarate_date.value)
         .then((res) => {
-          setTimeout(() => {
-            LessonTable.value = res;
-            showLessonTable.value = true;
-            spinBtn.value = false;
-          }, 500);
+          LessonTable.value = res;
+          showLessonTable.value = true;
+          spinBtn.value = false;
         })
         .catch((err) => {
-          setTimeout(() => {
-            message.error("Nimadur xato ");
-            spinBtn.value = false;
-          }, 500);
+          message.error("Nimadur xato ");
+          spinBtn.value = false;
         });
     }
   } catch (e) {
@@ -447,9 +440,7 @@ const UpdateGenrateBtn = async () => {
   createLesson.value = false;
   counter.lesson = true;
   daysWrapper.value = true;
-  // ModelService.updateGenrateDays().then(() => {
-  //     console.log()
-  // })
+  
 };
 const spinLesson = ref(false);
 const LessonTableWrapper = ref({
@@ -571,6 +562,7 @@ const renderRoomSelect = ({ option }) => {
     [option.name]
   );
 };
+
 const renderRoom = (option) => {
   return h(
     "div",
@@ -594,6 +586,7 @@ const renderRoom = (option) => {
     ]
   );
 };
+
 const renderGroupSelect = ({ option }) => {
   return h(
     "div",
@@ -606,6 +599,7 @@ const renderGroupSelect = ({ option }) => {
     [option.name]
   );
 };
+
 const renderGroup = (option) => {
   return h(
     "div",
@@ -635,10 +629,9 @@ const UpdateBranch = (branch) => {
   form_data.value.room_id = null;
   form_data.value.group_id = null;
   if (branch) {
-    branchID.value = branch;
-    getAllGroups();
-    getAllCourse();
-    getAllRooms();
+    getAllGroups(branch);
+    getAllCourse(branch);
+    getAllRooms(branch);
   } else {
     coursesOptions.value = [];
     groupsOptions.value = [];
@@ -750,6 +743,7 @@ const UpdateGroup = (id) => {
               </n-form-item>
             </n-grid-item>
             <n-grid-item>
+              {{ form_data.room_id }}
               <n-form-item label="Xona" path="room_id">
                 <n-input-group>
                   <n-select
@@ -1104,7 +1098,7 @@ const UpdateGroup = (id) => {
                 <template #icon>
                   <exit-icon />
                 </template>
-                Chiqish
+                Chiqish1111
               </n-button>
             </div>
             <div class="btn-action_item">
@@ -1114,7 +1108,7 @@ const UpdateGroup = (id) => {
                     <save-icon />
                   </n-icon>
                 </template>
-                Saqlash
+                Saqlash111
               </n-button>
             </div>
             <div class="btn-action_item">

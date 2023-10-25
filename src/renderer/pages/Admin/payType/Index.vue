@@ -193,7 +193,7 @@ const pagination = reactive({
     <div class="box-wrapper">
       <div class="box-header">
         <h2>To'lov turi</h2>
-        <n-button @click="showCreate = true" type="success">
+        <n-button v-if="false" @click="showCreate = true" type="success">
           <template #icon>
             <n-icon size="18">
               <AddIcon />

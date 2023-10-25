@@ -22,16 +22,11 @@ const showCreate = ref(false);
 const showUpdate = ref(false);
 const updateId = ref(null);
 const data = ref([]);
-const roomName = ref("");
-const branchOption = ref([]);
+const parentFullname = ref("");
 const parentsOptions = ref([]);
 const loading = ref(true);
 
-const branchId = ref(null);
-const roomId = ref(null);
 const findDev = ref(localStorage.getItem('phone'))
-const findRole = ref(localStorage.getItem("role"));
-const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
 const formatUzbekPhoneNumber = (phoneNumber) => {
   const cleaned = phoneNumber.replace(/\D/g, "");
@@ -155,21 +150,19 @@ const columns = ref([
   },
 ]);
 
-const getAll = (room_id, branch_id) => {
- 
-  ModelService.getAll().then((res) => {
+const getAll = (parent_id) => {
+  let searchData = {
+    parent_id: parent_id
+  }
+  console.log(searchData)
+  ModelService.getAll(searchData).then((res) => {
     loading.value = false;
     data.value = res;
   });
 };
-const getAllBranches = () => {
-  BranchService.getAll().then((res) => {
-    branchOption.value = res;
-  });
-};
 
-const getAllParents = (room_id, branch_id) => {
- 
+
+const getAllParents = () => {
   ModelService.getAll().then((res) => {
     parentsOptions.value = res;
   });
@@ -178,12 +171,10 @@ const getAllParents = (room_id, branch_id) => {
 onMounted(() => {
   if (props.action) {
     showCreate.value = true;
-    roomName.value = props.itemValue;
+    parentFullname.value = props.itemValue;
   }
-  getAllBranches();
   getAll();
   getAllParents();
-
 });
 
 
@@ -191,11 +182,7 @@ onMounted(() => {
 const createModel = (res) => {
   showCreate.value = false;
   message.success("Ma'lumot qo'shildi");
-  if (findRole.value == "SuperAdmin") {
-    getAll(null, null);
-  } else {
-    getAll(null, findBranch.value);
-  }
+  getAll();
 };
 const showClose = (e) => {
   if (e == "create") {
@@ -208,12 +195,14 @@ const showClose = (e) => {
 const updateModel = (res) => {
   showUpdate.value = false;
   message.success("Ma'lumot yangilandi");
-  if (findRole.value == "SuperAdmin") {
-    getAll(null, null);
-  } else {
-    getAll(null, findBranch.value);
-  }
+  getAll();
 };
+//// search function start
+const UpdateParents = (parent_id)=>{
+  getAll(parent_id)
+}
+/// search function end
+
 
 //// selected rooms
 const rowProps = (row) => {
@@ -225,14 +214,8 @@ const rowProps = (row) => {
   };
 };
 //// search function start;
-const UpdateBranch = (branch_id) => {
-  roomId.value = null;
-  getAllParents(null, branch_id);
-};
 
-const searchBtn = () => {
-  getAll(roomId.value, branchId.value);
-};
+
 //// search function end;
 
 ///// window key event start
@@ -277,29 +260,13 @@ const pagination = reactive({
         </div>
       </div>
       <div class="search-action">
-        <div class="search-action_item" v-if="findRole == 'SuperAdmin'">
-          <n-input-group>
-            <n-input-group-label>Filial</n-input-group-label>
-            <n-select
-              v-model:value="branchId"
-              :options="branchOption"
-              @update:value="UpdateBranch"
-              label-field="name"
-              value-field="id"
-              placeholder="Qidiruv"
-              filterable
-              clearable
-            >
-            </n-select>
-          </n-input-group>
-        </div>
         <div class="search-action_item">
           <n-input-group>
             <n-input-group-label>Ota-onalar</n-input-group-label>
             <n-select
-              v-model:value="roomId"
               :options="parentsOptions"
               label-field="fullname"
+              @update:value="UpdateParents"
               value-field="id"
               placeholder="Qidiruv"
               filterable
@@ -308,9 +275,7 @@ const pagination = reactive({
             </n-select>
           </n-input-group>
         </div>
-        <div class="search-action_item">
-          <n-button @click="searchBtn" type="success">Ko'rish</n-button>
-        </div>
+      
       </div>
     </div>
     <div class="box-table">
@@ -346,7 +311,7 @@ const pagination = reactive({
         <ModelForm
           @create="createModel"
           type="create"
-          :defaultname="roomName"
+          :defaultname="parentFullname"
         />
       </n-card>
     </n-modal>

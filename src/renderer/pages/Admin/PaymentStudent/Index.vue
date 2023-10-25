@@ -44,11 +44,12 @@ const sendData = ref({
   student_id: null,
 })
 
-const getAllDef = () => {
+const getAllDef = (type) => {
   loading.value = true;
   ModelService.searchModel(sendData.value).then((res) => {
     Data.value = res;
     loading.value = false;
+  
   });
 };
 
@@ -228,10 +229,10 @@ onMounted(() => {
 ////
 ///  create and update functions
 const closeCreate = () => {
-  showCreate.value = false;
+  showClose('create')
 };
 const createModel = (res) => {
-  showCreate.value = false;
+  showClose('create')
   getAllDef();
 };
 const showClose = (e) => {
@@ -246,15 +247,15 @@ const showClose = (e) => {
   }
 };
 const closeUpdate = () => {
-  showUpdate.value = false;
+  showClose('update')
 };
 
 const closeCheck = ()=>{
-  showCheck.value = false;
+  showClose('check')
 }
 
 const updateModel = () => {
-  showUpdate.value = false;
+  showClose('update')
   getAllDef();
 };
 //// search by group and student =>

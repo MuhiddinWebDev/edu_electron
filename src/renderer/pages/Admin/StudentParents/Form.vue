@@ -155,7 +155,7 @@ const checkPhone = (e) => {
 //// branch index end
 </script>
 <template>
-  <div class="111">
+  <div class="modal-box">
     <n-form
       :style="{ height: '100%' }"
       ref="formRef"

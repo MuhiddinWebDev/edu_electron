@@ -3,7 +3,7 @@ import { h, ref, onMounted, inject, watch, reactive } from "vue";
 import ModelService from "../../../services/users.service";
 import BranchService from "../../../services/branch.service";
 import { useMagicKeys } from "@vueuse/core";
-import Dots from "../../../components/Dots/dots.vue";
+
 import {
   NButton,
   NIcon,
@@ -15,26 +15,32 @@ import {
 } from "naive-ui";
 import ModelForm from "./Form.vue";
 import ModelFormMore from "./MoreForm.vue";
+import ModelRead from "./Read.vue"
 import {
   Add20Filled as AddIcon,
   AddSquareMultiple16Filled as AddMoreIcon,
 } from "@vicons/fluent";
 import { Pen as PenICon } from "@vicons/carbon";
+import { RemoveRedEyeRound as EyeIcon } from "@vicons/material";
+
 
 const message = useMessage();
 const dialog = useDialog();
 const notification = useNotification();
+
 const showCreate = ref(false);
 const showCreateMore = ref(false);
 const showUpdate = ref(false);
+const showRead = ref(false);
 const updateId = ref(null);
+const readId = ref(null)
 const img_url = inject("img_url");
 const loadingRef = ref(true);
 const emits = defineEmits(["select"]);
 const props = defineProps(["action", "itemValue"]);
 const UserOptions = ref([]);
 const BranchOptions = ref([]);
-const programmer = ref(localStorage.getItem('phone'))
+
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
@@ -69,8 +75,6 @@ const getAllSort = (role) => {
   sendData.value.role = role;
   getAll(sendData.value);
 };
-
-
 
 const formatUzbekPhoneNumber = (phoneNumber) => {
   const cleaned = phoneNumber.replace(/\D/g, "");
@@ -129,13 +133,13 @@ const columns = ref([
     sortOrder: true,
     sorter: (row1, row2) => row1.branch.id - row2.branch.id,
   },
-  {
-    title: "Tili",
-    key: "lang",
-    resizable: true,
-    sortOrder: true,
-    sorter: "default",
-  },
+  // {
+  //   title: "Tili",
+  //   key: "lang",
+  //   resizable: true,
+  //   sortOrder: true,
+  //   sorter: "default",
+  // },
   {
     title: "Huquqi",
     key: "role",
@@ -221,18 +225,36 @@ const columns = ref([
     },
   },
   {
-    title: "Yangilash",
+    title: "Amallar",
     key: "action",
-    width: 80,
+    width: 110,
     render(row) {
       return [
         h(
           NButton,
           {
             size: "small",
+            type: "info",
+            onClick: (e) => {
+              showRead.value = true;
+              readId.value = row.id;
+            },
+            style:{
+              marginRight:'12px'
+            }
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: EyeIcon,
+              }),
+          }
+        ),
+        h(
+          NButton,
+          {
+            size: "small",
             type: "success",
-            block: true,
-            disabled: row.phone == '998907788769' && programmer.value != "998907788769" ? true: false,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -304,6 +326,8 @@ const modalClose = (e) => {
     showUpdate.value = false;
   } else if (e == "more-create") {
     showCreateMore.value = false;
+  }else if (e == 'read'){
+    showRead.value = false;
   }
 };
 
@@ -523,6 +547,9 @@ const pagination = reactive({
             ></n-select>
           </n-input-group>
         </div>
+        <div class="search-action_item">
+         <n-button></n-button>
+        </div>
       </div>
     </div>
     <div class="box-table">
@@ -599,6 +626,34 @@ const pagination = reactive({
           type="update"
           :id="updateId"
           @update="updateModel"
+        />
+      </n-card>
+    </n-modal>
+    <n-modal
+      transform-orign="center"
+      v-model:show="showRead"
+      :mask-closable="false"
+    >
+      <n-card
+        style="
+          max-width: 700px;
+          width: calc(100vw - 15px);
+          max-height: 900px;
+          overflow: hidden;
+          overflow-y: auto;
+        "
+        title="Foydalanuvchi ma'lumotlari"
+        :bordered="false"
+        size="large"
+        role="dialog"
+        aria-modal="true"
+        closable
+        @close="modalClose('read')"
+      >
+        <ModelRead
+          @close="modalClose('read')"
+          type="read"
+          :id="readId"
         />
       </n-card>
     </n-modal>

@@ -68,7 +68,7 @@ const keySave = (e) => {
 }
 </script>
 <template>
-    <div class="111">
+    <div class="modal-box">
         <n-form :style="{ height: '100%' }" ref="formRef" :model="form_data" :rules="rules">
             <n-spin :show="spinBtn">
                 <n-form-item label="Sana" path="date">

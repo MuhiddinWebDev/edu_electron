@@ -41,10 +41,19 @@ const rules = {
     required: true,
     trigger: "blur",
     validator: (rule, value) => {
-      if (value.length <= 8) {
-        return new Error("Telefon raqam 8 tadan ko'p bo'lishi kerak   ");
+      if (value.length <= 11) {
+        return new Error("Telefon raqam to'liq kiriting!");
       } else if (value == "") {
         return new Error("Telefon raqam bo'sh ");
+      }
+    },
+  },
+  filial_id: {
+    required: true,
+    trigger: "blur",
+    validator: (rule, value) => {
+      if (value == null) {
+        return new Error("Filial tanlash majburiy!");
       }
     },
   },
@@ -287,7 +296,8 @@ const keySave = (e) => {
                   <n-input
                     :allow-input="phoneFormat"
                     v-model:value="form_data.phone"
-                    :maxlength="30"
+                    :maxlength="12"
+                    :minlength="12"
                     show-count
                     clearable
                   />
@@ -353,7 +363,7 @@ const keySave = (e) => {
                 </n-input-group>
               </n-form-item>
             </n-gi>
-            <n-gi>
+            <!-- <n-gi>
               <n-form-item label="Tili" path="lang">
                 <n-switch
                   @update:value="changeLang"
@@ -364,7 +374,7 @@ const keySave = (e) => {
                   <template #unchecked> Russian </template>
                 </n-switch>
               </n-form-item>
-            </n-gi>
+            </n-gi> -->
           </n-grid>
           <div class="table-footer">
             <div class="table-footer_item">

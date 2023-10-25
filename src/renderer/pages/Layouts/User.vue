@@ -53,7 +53,7 @@ import {
   LogicalPartition as bulimIcon,
   UserProfileAlt as UserMain
 } from "@vicons/carbon";
-import AdminForm from "./AdminForm.vue";
+import Form from "./Form.vue";
 import ModelService from "../../services/users.service";
 import Loading from "../../components/Animation/Loading/Load.vue";
 import { useCounterStore } from "../../stores/counter";
@@ -369,7 +369,7 @@ const cutUsername = ref("");
 const getOneUser = () => {
   ModelService.getOne(user_id.value).then((res) => {
     user_info.value = res;
-    user_info.value.image = `${img_url}/${res.image}`;
+    user_info.value.image = `${img_url}${res.image}`;
     cutUsername.value = res.fullname;
     cutUsername.value = cutUsername.value.split(" ")[0];
     // cutUsername.value = cutUsername.value[0]
@@ -725,7 +725,7 @@ const windowWidth = ref(window.innerWidth);
         closable
         @close="showUpdate = false"
       >
-        <AdminForm
+        <Form
           @close="closeUpdate"
           type="update"
           :id="updateId"

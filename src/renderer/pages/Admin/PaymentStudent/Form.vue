@@ -540,12 +540,13 @@ const delBtn = (index) => {
 
 <style scoped>
 .pay-box{
-  /* height: calc(100vh - 140px); */
+  height: calc(100vh - 140px);
   overflow: hidden;
   overflow-y: auto;
   padding-right: 6px;
 }
 .table-scroll {
+  min-height: 150px;
   max-height: 650px;
   overflow: hidden;
   overflow: auto;

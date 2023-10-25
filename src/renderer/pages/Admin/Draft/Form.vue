@@ -1,21 +1,20 @@
 <script setup>
-import { ref, onMounted, inject } from "vue";
-import ModelService from "../../../services/rasxodBecouse.service";
+import { ref, onMounted } from "vue";
+import ModelService from "../../../services/draft.service";
 import BranchService from "../../../services/branch.service";
 // variables
 const props = defineProps(["type", "id", "defaultname"]);
-const emit = defineEmits(["create", "update", "close"]);
+const emit = defineEmits(["create", "update"]);
 const formRef = ref(null);
-const branchOption = ref([]);
 const spinBtn = ref(false);
+const branchs = ref([]);
 
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
-
 const form_data = ref({
   name: "",
-  filial_id: findRole.value == 'SuperAdmin' ? null: findBranch.value,
+  filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
 });
 const rules = {
   name: {
@@ -23,7 +22,7 @@ const rules = {
     trigger: "blur",
     validator: (rule, value) => {
       if (value == "") {
-        return new Error("Sababni nomi  bo'sh ");
+        return new Error("Xona nomi  bo'sh ");
       }
     },
   },
@@ -32,30 +31,34 @@ const rules = {
     trigger: "blur",
     validator: (rule, value) => {
       if (value == null) {
-        return new Error("Filial majburiy ");
+        return new Error("Filial nomi  tanlang ");
       }
     },
   },
 };
-const inputFocus = ref(null);
 
-const getAllBranches = () => {
-  BranchService.getAll().then((res) => {
-    branchOption.value = res;
+const getAllBranch = () => {
+  BranchService.getAll(props.id).then((res) => {
+    branchs.value = res;
   });
 };
-
+const firsInput = ref(null);
 onMounted(() => {
   if (props.type == "update") {
     ModelService.getOne(props.id).then((res) => {
       form_data.value = res;
     });
-  } else if (props.type == "create") {
+  }
+  if (props.defaultname) {
     form_data.value.name = props.defaultname;
   }
-  getAllBranches();
+  getAllBranch();
 });
-
+const spinTime = () => {
+  setTimeout(() => {
+    spinBtn.value = false;
+  }, 500);
+};
 const save = async () => {
   try {
     const result = await formRef.value?.validate();
@@ -64,29 +67,32 @@ const save = async () => {
       ModelService.create(form_data.value)
         .then((res) => {
           emit("create", res);
-          spinBtn.value = false;
+          spinTime();
         })
         .catch(() => {
-          spinBtn.value = false;
+          spinTime();
         });
     } else if (props.type == "update") {
       spinBtn.value = true;
       ModelService.update(props.id, form_data.value)
         .then((res) => {
           emit("update", res);
-          spinBtn.value = false;
+          spinTime();
         })
         .catch(() => {
-          spinBtn.value = false;
+          spinTime();
         });
     }
   } catch (e) {}
 };
+
+
 const keySave = (e) => {
   if (e.key == "Enter") {
     save();
   }
 };
+//// branch index end
 </script>
 <template>
   <div class="modal-box">
@@ -97,24 +103,30 @@ const keySave = (e) => {
       :rules="rules"
     >
       <n-spin :show="spinBtn">
-        <n-form-item label="Filial" path="filial_id" v-if="findRole == 'SuperAdmin'">
-          <n-select
-            @keydown="keySave"
-            v-model:value="form_data.filial_id"
-            :options="branchOption"
-            label-field="name"
-            value-field="id"
-            placeholder="Qidiruv"
-            filterable
-            clearable
-          >
-          </n-select>
+        <n-form-item
+          label="Filial"
+          path="filial_id"
+          v-if="findRole == 'SuperAdmin'"
+        >
+          <n-input-group>
+            <n-select
+              @keydown="keySave"
+              :options="branchs"
+              v-model:value="form_data.filial_id"
+              label-field="name"
+              value-field="id"
+              filterable
+              clearable
+            >
+            </n-select>
+           
+          </n-input-group>
         </n-form-item>
-        <n-form-item label="Sababni nomi" path="name">
+        <n-form-item label="SMS matni" path="name">
           <n-input
             @keydown="keySave"
+            type="textarea"
             v-model:value="form_data.name"
-            :maxlength="32"
             show-count
             clearable
           />
@@ -123,6 +135,7 @@ const keySave = (e) => {
       </n-spin>
     </n-form>
   </div>
+ 
 </template>
 
 <style scoped>

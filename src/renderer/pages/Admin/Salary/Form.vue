@@ -9,14 +9,15 @@ import { Save24Filled as SaveIcon } from "@vicons/fluent";
 import { Exit as ExitIcon } from "@vicons/ionicons5";
 import Dots from "../../../components/Dots/dots.vue";
 import UsersIndex from "../Users/Index.vue";
-
+import { useNotification, NButton, useMessage } from "naive-ui";
 const props = defineProps(["type", "id"]);
 const emit = defineEmits(["create", "update", "close"]);
 const formRef = ref("");
 const spinBtn = ref(false);
-
-const findRole = ref(localStorage.getItem('role'));
-const findBranch = ref(JSON.parse(localStorage.getItem('filial_id')));
+const notification = useNotification();
+const message = useMessage();
+const findRole = ref(localStorage.getItem("role"));
+const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
 ////// select options
 const employeeOptions = ref([]);
@@ -26,17 +27,47 @@ const branchOptions = ref([]);
 const form_data = ref({
   user_id: null,
   role: "",
-  price_type: null,
+  price_type: "Percentage",
   salary: null,
-  filial_id: findRole.value == 'SuperAdmin' ? null: findBranch.value,
+  filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
 });
 
-const getAllTeachers = (branch) => {
+const getAllTeachers = (branch, type, change) => {
   const sendData = {
-    filial_id: findRole.value == 'SuperAdmin' ? branch :  findBranch.value,
-  }
+    filial_id: branch ? branch : findBranch.value,
+    type: type,
+  };
   UserService.getSalaryTeachers(sendData).then((res) => {
     employeeOptions.value = res;
+    if (!res.length && change) {
+      let markAsRead = false;
+      const n = notification.info({
+        title: "Ogohlantirish",
+        content: `O'qituvchilar hammasiga ish haqqi biriktirilgan yoki ma'lumotlar qo'shilmagan`,
+        meta: "Eslatma",
+        action: () =>
+          h(
+            NButton,
+            {
+              text: true,
+              type: "primary",
+              onClick: () => {
+                markAsRead = true;
+                n.destroy();
+              },
+            },
+            {
+              default: () => "Tushundim",
+            }
+          ),
+        onClose: () => {
+          if (!markAsRead) {
+            message.warning("Iltimos Tushundim tugmasini bosin!");
+            return false;
+          }
+        },
+      });
+    }
   });
 };
 
@@ -90,23 +121,27 @@ const rules = {
   },
 };
 
-const getAllBranches = ()=>{
-  BranchService.getAll().then((res)=>{
-    branchOptions.value = res
-  })
-}
+const getAllBranches = () => {
+  BranchService.getAll().then((res) => {
+    branchOptions.value = res;
+  });
+};
 
-const updateBranch = (branch)=>{
-  getAllTeachers(branch);
-}
+const updateBranch = (branch) => {
+  form_data.value.user_id = null;
+  getAllTeachers(branch, props.type, true);
+};
 
 onMounted(() => {
+  getAllBranches();
   if (props.type == "update") {
     ModelService.getOne(props.id).then((res) => {
       form_data.value = res;
+      getAllTeachers(res.filial_id, "update");
     });
+  } else if (props.type == "create") {
+    getAllTeachers(null, "create");
   }
-  getAllTeachers(findBranch.value)
 });
 
 const exit = () => {
@@ -198,67 +233,73 @@ const renderUser = (option) => {
 //// render select function end
 
 ///// choose user function start
-const userName = ref('');
+const userName = ref("");
 const showUser = ref(false);
 const showUserForm = ref(null);
 
-const chooseUser = (data) =>{
+const chooseUser = (data) => {
+  form_data.value.filial_id = data.filial_id;
   form_data.value.user_id = data.id;
   showUser.value = false;
-  getAllTeachers();
-}
-const AdduserIndex = ()=>{
+  getAllTeachers(data.filial_id);
+};
+const AdduserIndex = () => {
   showUser.value = true;
   showUserForm.value = 2;
-}
-const UserKey = (e)=>{
-  if(e.code == "F4"){
+};
+const UserKey = (e) => {
+  if (e.code == "F4") {
     AdduserIndex();
-  }else if(e.code == "Insert"){
+  } else if (e.code == "Insert") {
     showUser.value = true;
     showUserForm.value = 3;
   }
-}
+};
 const UserSearch = (user) => {
   userName.value = user;
-}
+};
 ///// choose user function end
-
 </script>
 <template>
-  <div class="user-message">
+  <div class="form-modal">
     <n-form :model="form_data" ref="formRef" :rules="rules">
       <n-spin size="large" :show="spinBtn">
         <n-grid cols="1 s:1 m:2 l:2" responsive="screen" :x-gap="12" :y-gap="4">
-          <n-grid-item v-if="findRole =='SuperAdmin' ? true : false">
+          <n-grid-item v-if="findRole == 'SuperAdmin' ? true : false">
             <n-form-item label="Filial" path="filial_id">
               <n-input-group>
                 <n-select
                   :options="branchOptions"
                   label-field="name"
                   value-field="id"
+                  :disabled="props.type == 'update'"
                   v-model:value="form_data.filial_id"
-                  @update:value = "updateBranch"
+                  @update:value="updateBranch"
                   clearable
                   filterable
                 >
-                <template #action>
+                  <!-- <template #action>
                     <p style="text-align: center">Ro'yxatni ko'rish "F4"</p>
                   </template>
                   <template #empty>
                     <p style="text-align: center">Qo'shish uchun "Insert"</p>
-                  </template>
+                  </template> -->
                 </n-select>
-                <n-tooltip placement="right" trigger="hover">
+                <!-- <n-tooltip placement="right" trigger="hover">
                   <template #trigger>
-                    <n-button @click="AdduserIndex" type="success" :style="{ padding: '0px 8px' }">
+                    <n-button
+                      @click="AdduserIndex"
+                      :disabled="props.type=='update'"
+                      type="success"
+                      :style="{ padding: '0px 8px' }"
+                    >
                       <template #icon>
                         <Dots />
                       </template>
                     </n-button>
                   </template>
                   <span> Xodim qo'shish </span>
-                </n-tooltip>
+                </n-tooltip> -->
               </n-input-group>
             </n-form-item>
           </n-grid-item>
@@ -272,33 +313,39 @@ const UserSearch = (user) => {
                   @search="UserSearch"
                   label-field="fullname"
                   value-field="id"
+                  :disabled="props.type == 'update'"
                   :render-label="renderUser"
                   :render-tag="renderUserSelect"
                   v-model:value="form_data.user_id"
                   clearable
                   filterable
                 >
-                <template #action>
+                  <!-- <template #action>
                     <p style="text-align: center">Ro'yxatni ko'rish "F4"</p>
                   </template>
                   <template #empty>
                     <p style="text-align: center">Qo'shish uchun "Insert"</p>
-                  </template>
+                  </template> -->
                 </n-select>
-                <n-tooltip placement="right" trigger="hover">
+                <!-- <n-tooltip placement="right" trigger="hover">
                   <template #trigger>
-                    <n-button @click="AdduserIndex" type="success" :style="{ padding: '0px 8px' }">
+                    <n-button
+                      @click="AdduserIndex"
+                      :disabled="props.type=='update'"
+                      type="success"
+                      :style="{ padding: '0px 8px' }"
+                    >
                       <template #icon>
                         <Dots />
                       </template>
                     </n-button>
                   </template>
                   <span> Xodim qo'shish </span>
-                </n-tooltip>
+                </n-tooltip> -->
               </n-input-group>
             </n-form-item>
           </n-grid-item>
-        
+
           <n-grid-item>
             <n-form-item label="Oylik turi" path="price_type">
               <n-select
@@ -354,13 +401,14 @@ const UserSearch = (user) => {
         </div>
       </n-spin>
     </n-form>
-     <!-- User index start -->
-     <n-modal
+    <!-- User index start -->
+    <n-modal
       transform-orign="center"
       v-model:show="showUser"
       preset="card"
       style="width: calc(100% - 35px)"
-      size="small">
+      size="small"
+    >
       <UsersIndex
         @select="chooseUser"
         :action="showUserForm"

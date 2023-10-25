@@ -6,8 +6,9 @@ import { useMagicKeys } from "@vueuse/core";
 import UserService from "../../../services/users.service";
 import BranchService from "../../../services/branch.service";
 import ModelForm from "./Form.vue";
-import { TrashCan as TrashIcon, Pen as PenICon } from "@vicons/carbon";
+import { Pen as PenICon } from "@vicons/carbon";
 import { Add20Filled as AddIcon } from "@vicons/fluent";
+import { CleaningServicesFilled as CleanIcon } from "@vicons/material"
 const message = useMessage();
 const dialog = useDialog();
 const showCreate = ref(false);
@@ -18,7 +19,6 @@ const loading = ref(true);
 const branchOptions = ref([]);
 const emoployeeOptions = ref([]);
 const userID = ref(null);
-const branchID = ref(null);
 
 const findRole = ref(localStorage.getItem('role'));
 const findBranch = ref(JSON.parse(localStorage.getItem('filial_id')));
@@ -49,10 +49,16 @@ const getAllBranches = ()=>{
   })
 }
 
-const updateBranch = (e)=>{
+const updateBranch = (branch_id)=>{
+  searchData.value.filial_id = branch_id;
+  searchData.value.user_id = null;
   getAllOptions();
+  getAllDef();
 }
-
+const updateUser = (user_id)=>{
+  searchData.value.user_id = user_id;
+  getAllDef();
+}
 
 const columns = ref([
   {
@@ -219,7 +225,6 @@ const closeCreate = () => {
 };
 const createModel = (res) => {
   showCreate.value = false;
-  Getdata.value = [];
   getAllDef();
 };
 const showClose = (e) => {
@@ -234,11 +239,12 @@ const closeUpdate = () => {
 };
 const updateModel = () => {
   showUpdate.value = false;
-  Getdata.value = [];
   getAllDef();
 };
 //// search function start
-const searchFunction = () => {
+const clearBtn = () => {
+  searchData.value.filial_id = null;
+  searchData.value.user_id = null;
   getAllDef();
 };
 const ClearData = (e) => {
@@ -349,6 +355,7 @@ const pagination = reactive({
             <n-select
               @clear="ClearData"
               v-model:value="searchData.user_id"
+              @update:value="updateUser"
               placeholder="Qidiruv"
               clearable
               filterable
@@ -361,7 +368,12 @@ const pagination = reactive({
           </n-input-group>
         </div>
         <div class="search-action_item">
-          <n-button @click="searchFunction" type="success">Ko'rish</n-button>
+          <n-button @click="clearBtn" type="info">
+            <n-icon size="16">
+              <CleanIcon/>
+            </n-icon>
+            Tozalash
+          </n-button>
         </div>
       </div>
     </div>

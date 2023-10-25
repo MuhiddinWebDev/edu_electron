@@ -2,8 +2,8 @@ import axios from "axios";
 const END_POINT = "/student-parents";
 
 class Service {
-  getAll() {
-    return axios.get(END_POINT + "/").then((res) => {
+  getAll(data) {
+    return axios.post(END_POINT + "/all", data).then((res) => {
       return res;
     });
   }

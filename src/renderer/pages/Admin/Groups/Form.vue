@@ -204,7 +204,6 @@ const addUsers = ref([]);
 const delBtn = (id) => {
   const index = addUsers.value.findIndex((item) => item.user_id == id);
   addUsers.value.splice(index, 1);
-  form_data.value.count = addUsers.value.length; 
 };
 const chooseUser = (e) => {
   if (e != null) {

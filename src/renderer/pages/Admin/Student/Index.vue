@@ -13,15 +13,17 @@ import {
   useNotification,
 } from "naive-ui";
 import ModelForm from "./Form.vue";
-import ModelRead from "./Read.vue";
 import ModelFormMore from "./MoreForm.vue";
+import ModelRead from "./Read.vue"
 import {
   Add20Filled as AddIcon,
   AddSquareMultiple16Filled as AddMoreIcon,
 } from "@vicons/fluent";
-import { RemoveRedEyeRound as EyeIcon} from "@vicons/material";
 import { Pen as PenICon } from "@vicons/carbon";
-
+import {
+  RemoveRedEyeRound as EyeIcon,
+  CleaningServicesFilled as CleanIcon,
+} from "@vicons/material";
 const message = useMessage();
 const dialog = useDialog();
 const notification = useNotification();
@@ -29,9 +31,9 @@ const notification = useNotification();
 const showCreate = ref(false);
 const showCreateMore = ref(false);
 const showUpdate = ref(false);
-const showRead = ref(false);
+const showRead = ref(false)
 const updateId = ref(null);
-const readId = ref(null);
+const readId = ref(null)
 
 const img_url = inject("img_url");
 const loadingRef = ref(true);
@@ -76,19 +78,12 @@ const getAllSort = (role) => {
 
 const formatUzbekPhoneNumber = (phoneNumber) => {
   const cleaned = phoneNumber.replace(/\D/g, "");
-
-  // Check if the phone number is valid
   const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
 
   if (match) {
-    // Format the phone number as +998 XX YYY YYYY
-    return `998 ${match[1]}  ${match[2]}  ${match[3].slice(
-      0,
-      2
-    )} ${match[3].slice(2, 4)}`;
+    return `+998 ${match[1]}  ${match[2]}  ${match[3].slice(0,2)} ${match[3].slice(2, 4)}`;
   }
 
-  // If the phone number is not valid, return the original input
   return phoneNumber;
 };
 
@@ -121,7 +116,7 @@ const columns = ref([
     resizable: true,
     render(row) {
       const formatPhone = row.phone;
-      return "+" + formatUzbekPhoneNumber(formatPhone);
+      return formatUzbekPhoneNumber(formatPhone);
     },
   },
   {
@@ -136,14 +131,14 @@ const columns = ref([
     sortOrder: true,
     sorter: (row1, row2) => row1.branch.id - row2.branch.id,
   },
-  {
-    title: "Tili",
-    key: "lang",
-    resizable: true,
-    sortOrder: true,
-    sorter: "default",
-    width: 60,
-  },
+  // {
+  //   title: "Tili",
+  //   key: "lang",
+  //   resizable: true,
+  //   sortOrder: true,
+  //   sorter: "default",
+  //   width: 60,
+  // },
   {
     title: "Rasm",
     key: "image",
@@ -211,9 +206,9 @@ const columns = ref([
     },
   },
   {
-    title: "Yangilash",
+    title: "Amallar",
     key: "action",
-    width: 105,
+    width: 110,
     render(row) {
       return [
       h(
@@ -270,7 +265,14 @@ onMounted(() => {
     defaultObeject.value.actionId = props.action;
   } else if (props.action == 0) {
     getAllSort("User");
-  }else {
+  } else if (props.action == 2) {
+    getAllSort("Teacher");
+  } else if (props.action == 3) {
+    showCreate.value = true;
+    getAllSort("Teacher");
+    defaultObeject.value.name = props.itemValue;
+    defaultObeject.value.actionId = props.action;
+  } else {
     getAll(sendData.value);
   }
   getUserOptions(sendData.value);
@@ -298,14 +300,14 @@ const createMoreModel = () => {
 };
 
 //// create more functions end
-const closeModel = (e) => {
+const modalClose = (e) => {
   if (e == "create") {
     showCreate.value = false;
   } else if (e == "update") {
     showUpdate.value = false;
   } else if (e == "more-create") {
     showCreateMore.value = false;
-  }else if(e == 'read'){
+  }else if (e == 'read'){
     showRead.value = false;
   }
 };
@@ -356,6 +358,15 @@ watch(NumpadAdd, (v) => {
   else showCreate.value = false;
 });
 
+// const formatPhoneNumber = (number) => {
+//   const cleaned = ("" + number).replace(/\D/g, "");
+//   const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
+
+//   if (match) {
+//     return `+998 ${match[1]} ${match[2]} ${match[3]}`;
+//   }
+//   return number;
+// };
 //// window key event end
 
 //// render select function start
@@ -392,21 +403,14 @@ const renderUser = (option) => {
         },
         [
           h("div", null, [option.fullname]),
-          h("div", null, [
-            option.role == "User"
-              ? "Talaba"
-              : option.role == "Teacher"
-              ? "O'qituvchi"
-              : option.role == "Admin"
-              ? "Admin"
-              : "Super Admin",
-          ]),
+          h("div", null, [formatUzbekPhoneNumber(option.phone)]),
           h("div", null, ["Filial: " + option.branch.name]),
         ]
       ),
     ]
   );
 };
+
 
 //// render select function end
 const rowClassName = (row) => {
@@ -528,13 +532,14 @@ const pagination = reactive({
         "
         title="Talaba qo'shish"
         :bordered="false"
+        size="large"
         role="dialog"
         aria-modal="true"
         closable
-        @close="closeModel('create')"
+        @close="modalClose('create')"
       >
         <ModelForm
-          @close="closeModel('create')"
+          @close="modalClose('create')"
           @create="createModel"
           :defaultObeject="defaultObeject"
           type="create"
@@ -556,33 +561,20 @@ const pagination = reactive({
         "
         title="Talabani o'zgartirish"
         :bordered="false"
+        size="large"
         role="dialog"
         aria-modal="true"
         closable
-        @close="closeModel('update')"
+        @close="modalClose('update')"
       >
         <ModelForm
-          @close="closeModel('update')"
+          @close="modalClose('update')"
           type="update"
           :id="updateId"
           @update="updateModel"
         />
       </n-card>
     </n-modal>
-    <n-drawer
-      v-model:show="showCreateMore"
-      width="100vw"
-      height="calc(100vh - 120px)"
-      placement="top"
-    >
-      <n-drawer-content title="Talabalar qo'shish" closable>
-        <ModelFormMore
-          @close="closeModel('more-create')"
-          @create="createMoreModel"
-          type="create"
-        />
-      </n-drawer-content>
-    </n-drawer>
 
     <n-modal
       transform-orign="center"
@@ -597,20 +589,36 @@ const pagination = reactive({
           overflow: hidden;
           overflow-y: auto;
         "
-        title="Talaba ma'lumoti"
+        title="Talabani ma'lumotlari"
         :bordered="false"
+        size="large"
         role="dialog"
         aria-modal="true"
         closable
-        @close="closeModel('read')"
+        @close="modalClose('read')"
       >
         <ModelRead
-          @close="closeModel('read')"
+          @close="modalClose('read')"
           type="read"
           :id="readId"
         />
       </n-card>
     </n-modal>
+
+    <n-drawer
+      v-model:show="showCreateMore"
+      width="100vw"
+      height="calc(100vh - 120px)"
+      placement="top"
+    >
+      <n-drawer-content title="Talabalar qo'shish" closable>
+        <ModelFormMore
+          @close="modalClose('more-create')"
+          @create="createMoreModel"
+          type="create"
+        />
+      </n-drawer-content>
+    </n-drawer>
     <!-- create more end -->
   </section>
 </template>

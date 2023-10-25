@@ -101,15 +101,19 @@ const defaultDisabled = ref(0);
 const firstInput = ref(null);
 
 onMounted(() => {
+  firstInput.value?.focus();
   if (props.type == "update") {
     ModelService.getOne(props.id).then((res) => {
       form_data.value = res;
     });
   } else if (props.type == "create") {
     if (props.defaultObeject.actionId == 1) {
-      firstInput.value?.focus();
       form_data.value.fullname = props.defaultObeject.name;
       form_data.value.role = "User";
+      defaultDisabled.value = 1;
+    } else if (props.defaultObeject.actionId == 3) {
+      form_data.value.fullname = props.defaultObeject.name;
+      form_data.value.role = "Teacher";
       defaultDisabled.value = 1;
     }
   }
@@ -323,7 +327,7 @@ const keySave = (e) => {
               </n-form-item>
             </n-gi>
 
-            <n-gi>
+            <!-- <n-gi>
               <n-form-item label="Tili" path="lang">
                 <n-switch
                   @update:value="changeLang"
@@ -334,7 +338,7 @@ const keySave = (e) => {
                   <template #unchecked> Russian </template>
                 </n-switch>
               </n-form-item>
-            </n-gi>
+            </n-gi> -->
           </n-grid>
           <div class="table-footer">
             <div class="table-footer_item">

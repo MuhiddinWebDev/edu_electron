@@ -10,7 +10,7 @@ import { NButton, NIcon, useMessage, useDialog, NImage } from "naive-ui";
 import ModelForm from "./Form.vue";
 import ModelRead from "./Read.vue"
 import { Add20Filled as AddIcon } from "@vicons/fluent";
-import { Pen as PenICon } from "@vicons/carbon";
+import { TrashCan as TrashIcon, Pen as PenICon } from "@vicons/carbon";
 import { RemoveRedEyeRound as EyeIcon} from "@vicons/material";
 import { useCounterStore } from "../../../stores/counter";
 
@@ -19,6 +19,7 @@ const emits = defineEmits(["select"]);
 const props = defineProps(["type", "action", "itemValue"]);
 const counter = useCounterStore();
 const message = useMessage();
+const dialog = useDialog();
 
 const showCreate = ref(false);
 const showUpdate = ref(false);

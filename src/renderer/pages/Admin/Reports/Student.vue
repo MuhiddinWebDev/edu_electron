@@ -58,6 +58,7 @@ const showReport = () => {
   loading.value = true;
   ReportService.studentReport(sendData).then((res) => {
     reportData.value = res;
+    console.log(res)
     loading.value = false;
   });
 };

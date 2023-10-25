@@ -134,7 +134,7 @@ const parse = (input) => {
 /////////////////////////
 </script>
 <template>
-  <div class="111">
+  <div class="modal-box">
     <n-form
       :style="{ height: '100%' }"
       ref="formRef"

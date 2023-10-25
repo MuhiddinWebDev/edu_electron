@@ -9,7 +9,7 @@ class Service {
   }
 
   getSalaryTeachers(data) {
-    return axios.post(END_POINT + "/salaryTeachers", data).then((res) => {
+    return axios.post(END_POINT + "/salaryTeachers", data ).then((res) => {
       return res;
     });
   }

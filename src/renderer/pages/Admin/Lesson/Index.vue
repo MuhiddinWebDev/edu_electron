@@ -69,9 +69,7 @@ const getAllBranch = () => {
     branchOptions.value = res;
   });
 };
-const searchModel = (course, group) => {
-  loading.value = true;
-};
+
 const columns = ref([
   {
     title: "№",

@@ -110,7 +110,7 @@ onMounted(() => {
 
 ///// append user end
 const checkValidation = (value, name, id) => {
-  if (value == null || value == "" || (id == 2 && value.length <= 8)) {
+  if (value == null || value == "" || (id == 2 && value.length <= 11)) {
     return "error";
   }
 };
@@ -220,16 +220,16 @@ const keyParent = (e) => {
                 label-field="name"
                 value-field="id"
                 placeholder="Tanlang"
-                style="min-width: 150px"
+                style="min-width: 180px"
               />
             </n-input-group>
           </div>
-          <div class="table-header_item">
+          <!-- <div class="table-header_item">
             <n-switch :rail-style="railStyle">
               <template #checked> Russian </template>
               <template #unchecked> Uzbek </template>
             </n-switch>
-          </div>
+          </div> -->
 
           <div class="table-header_item">
             <n-button @click="oneAdd" type="success">
@@ -252,7 +252,7 @@ const keyParent = (e) => {
                 <th>Ota ona</th>
                 <th>Parol</th>
                 <th>Qayta parol</th>
-                <th>Tili</th>
+                <!-- <th>Tili</th> -->
                 <th v-if="findRole == 'SuperAdmin'">Filial</th>
                 <th>Amal</th>
               </tr>
@@ -279,7 +279,7 @@ const keyParent = (e) => {
                     <n-input
                       :allow-input="phoneFormat"
                       v-model:value="item.phone"
-                      :maxlength="30"
+                      :maxlength="12"
                       :status="checkValidation(item.phone, 'Telefon', 2)"
                       show-count
                       clearable
@@ -342,7 +342,7 @@ const keyParent = (e) => {
                     clearable
                   />
                 </td>
-                <td>
+                <!-- <td>
                   <n-switch
                     @update:value="updateLang($event, item.id)"
                     :rail-style="railStyle"
@@ -350,7 +350,7 @@ const keyParent = (e) => {
                     <template #checked> Russian </template>
                     <template #unchecked> Uzbek </template>
                   </n-switch>
-                </td>
+                </td> -->
                 <td v-if="findRole == 'SuperAdmin'">
                   <n-select
                     :options="branchOption"

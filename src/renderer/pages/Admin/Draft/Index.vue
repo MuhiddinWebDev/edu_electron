@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, reactive, h } from "vue";
-import ModelService from "../../../services/room.service";
+import ModelService from "../../../services/draft.service";
 import BranchService from "../../../services/branch.service";
 
 import { useMagicKeys } from "@vueuse/core";
@@ -26,14 +26,13 @@ const dialog = useDialog();
 const showCreate = ref(false);
 const showUpdate = ref(false);
 const updateId = ref(null);
+
 const data = ref([]);
-const roomName = ref("");
+const draftName = ref("");
 const branchOption = ref([]);
-const roomOption = ref([]);
 const loading = ref(true);
 
 const branchId = ref(null);
-const roomId = ref(null);
 
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
@@ -44,6 +43,7 @@ const columns = ref([
     title: "№",
     key: "index",
     width: 50,
+    align:'center',
     render(row) {
       return data.value.findIndex((item) => item.id == row.id) + 1;
     },
@@ -53,8 +53,9 @@ const columns = ref([
     title: "Nomi",
     key: "name",
     resizable: true,
-    sortOrder: true,
-    sorter: "default",
+    render(row){
+      return  row.name.length > 80 ? row.name.slice(1, 80) + '...': row.name;
+    }
   },
   {
     title: "Filial",
@@ -66,7 +67,7 @@ const columns = ref([
   {
     title: "Amallar",
     key: "action",
-    width: 75,
+    width: 110,
     render(row) {
       return [
         h(
@@ -74,7 +75,6 @@ const columns = ref([
           {
             size: "small",
             type: "success",
-            block: true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -87,60 +87,56 @@ const columns = ref([
               }),
           }
         ),
-        // h(
-        //   NButton,
-        //   {
-        //     size: "small",
-        //     type: "error",
-        //     style: {
-        //       marginLeft: "8px",
-        //     },
-        //     onClick: (e) => {
-        //       dialog.warning({
-        //         title: "Ogohlantirish",
-        //         content: `${row.name}ni rostan ham o'chirasizmi`,
-        //         positiveText: "Xa",
-        //         negativeText: "Yo'q",
-        //         onPositiveClick: () => {
-        //           ModelService.delete(row.id)
-        //             .then((res) => {
-        //               const index = branch.value.findIndex(
-        //                 (val) => val.id == row.id
-        //               );
-        //               branch.value.splice(index, 1);
-        //               message.success("Ma'lumot o'chirildi");
-        //             })
-        //             .catch((err) => {
-        //               message.error("Ma'lumot o'chirilmadi");
-        //             });
-        //         },
-        //         onNegativeClick: () => {
-        //           message.warning("Bekor qilindi");
-        //         },
-        //       });
-        //     },
-        //   },
-        //   {
-        //     icon: () =>
-        //       h(NIcon, {
-        //         component: TrashIcon,
-        //       }),
-        //   }
-        // ),
+        h(
+          NButton,
+          {
+            size: "small",
+            type: "error",
+            style: {
+              marginLeft: "8px",
+            },
+            onClick: (e) => {
+              dialog.warning({
+                title: "Ogohlantirish",
+                content: `Rostan ham o'chirasizmi`,
+                positiveText: "Xa",
+                negativeText: "Yo'q",
+                onPositiveClick: () => {
+                  ModelService.delete(row.id)
+                    .then((res) => {
+                      const index = data.value.findIndex((val) => val.id == row.id);
+                      data.value.splice(index, 1);
+                    })
+                    .catch((err) => {
+                      message.error("Ma'lumot o'chirilmadi");
+                    });
+                },
+                onNegativeClick: () => {
+                  message.warning("Bekor qilindi");
+                },
+              });
+            },
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: TrashIcon,
+              }),
+          }
+        ),
       ];
     },
   },
 ]);
 
-const searchData = (room_id, branch_id)=>{
+const searchData = (branch_id)=>{
   return {
-    id:room_id,
     filial_id: findRole.value == 'SuperAdmin' ? branch_id : findBranch.value,
   }
 }
 
-const getAllData = (room_id, branch_id) => {
-  ModelService.searchModel(searchData(room_id,branch_id)).then((res) => {
+const getAllData = (branch_id) => {
+  ModelService.getAll(searchData(branch_id)).then((res) => {
     loading.value = false;
     data.value = res;
   });
@@ -151,60 +147,17 @@ const getAllBranches = () => {
   });
 };
 
-const getAllRooms = (room_id, branch_id) => {
-  ModelService.searchModel(searchData(room_id,branch_id)).then((res) => {
-    roomOption.value = res;
-  });
-};
+
 
 onMounted(() => {
   if (props.action) {
     showCreate.value = true;
-    roomName.value = props.itemValue;
+    draftName.value = props.itemValue;
   }
   getAllData()
   getAllBranches();
-  getAllRooms();
 });
 
-//// render select function start
-const renderRoomSelect = ({ option }) => {
-  return h(
-    "div",
-    {
-      style: {
-        display: "flex",
-        alignItems: "center",
-      },
-    },
-    [option.name]
-  );
-};
-
-const renderRoom = (option) => {
-  return h(
-    "div",
-    {
-      style: {
-        display: "flex",
-        alignItems: "center",
-      },
-    },
-    [
-      h(
-        "div",
-        {
-          style: {
-            marginLeft: "8px",
-            padding: "4px 0",
-          },
-        },
-        [h("div", null, [option.name]), h("div", null, [option.branch.name])]
-      ),
-    ]
-  );
-};
-//// render select function end
 /////  create and update functions
 const createModel = (res) => {
   showCreate.value = false;
@@ -221,8 +174,7 @@ const showClose = (e) => {
 
 const updateModel = (res) => {
   showUpdate.value = false;
-  message.success("Ma'lumot yangilandi");
-  getAllData();
+  getAllData()
 };
 
 //// selected rooms
@@ -236,19 +188,14 @@ const rowProps = (row) => {
 };
 //// search function start;
 const UpdateBranch = (branch_id) => {
-  roomId.value = null;
-  getAllRooms(null, branch_id);
-  getAllData(null, branch_id);
+  getAllData(branch_id);
 };
 
-const updateRoom = (room_id)=>{
-  getAllData(room_id, branchId.value);
-}
+
 
 const clearBtn = () => {
   branchId.value = null;
-  roomId.value=null;
-  getAllData(null, null)
+  getAllData(null)
 };
 //// search function end;
 
@@ -280,7 +227,7 @@ const pagination = reactive({
     <div class="box-wrapper">
       <div class="box-header">
         <div class="box-header_item">
-          <h2>Xonalar</h2>
+          <h2>SMS namunalar</h2>
         </div>
         <div class="box-header_item">
           <n-button @click="showCreate = true" type="success">
@@ -310,24 +257,7 @@ const pagination = reactive({
             </n-select>
           </n-input-group>
         </div>
-        <div class="search-action_item">
-          <n-input-group>
-            <n-input-group-label>Xona</n-input-group-label>
-            <n-select
-              v-model:value="roomId"
-              :options="roomOption"
-              @update:value="updateRoom"
-              :render-label="renderRoom"
-              :render-tag="renderRoomSelect"
-              label-field="name"
-              value-field="id"
-              placeholder="Qidiruv"
-              filterable
-              clearable
-            >
-            </n-select>
-          </n-input-group>
-        </div>
+  
         <div class="search-action_item">
           <n-button @click="clearBtn" type="info">
             <n-icon>
@@ -359,7 +289,7 @@ const pagination = reactive({
       <n-card
         transform-orign="center"
         style="max-width: 500px; width: calc(100vw - 35px)"
-        title="Xona qo'shish"
+        title="SMS namuna qo'shish"
         :bordered="false"
         size="medium"
         role="dialog"
@@ -370,7 +300,7 @@ const pagination = reactive({
         <ModelForm
           @create="createModel"
           type="create"
-          :defaultname="roomName"
+          :defaultname="draftName"
         />
       </n-card>
     </n-modal>
@@ -378,7 +308,7 @@ const pagination = reactive({
       <n-card
         transform-orign="center"
         style="max-width: 500px; width: calc(100vw - 35px)"
-        title="Xonani o'zgartirish"
+        title="SMS namunani o'zgartirish"
         :bordered="false"
         size="medium"
         role="dialog"

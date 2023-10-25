@@ -1,43 +1,64 @@
-<script setup >
-import { watch } from "vue";
-import { storeToRefs } from "pinia";
+<script setup>
+import { watch, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useNotification, useLoadingBar, useMessage } from "naive-ui";
-import { useErrorStore } from "./stores/error";
+import { useNotification, useLoadingBar } from "naive-ui";
+import { useErrorStore } from "./stores/errors";
 import { useCounterStore } from "./stores/counter";
+import BranchService from "./services/branch.service";
 
-const loadItem = useCounterStore();
-const errorStore = useErrorStore();
-const { error, error_code } = storeToRefs(errorStore);
 const router = useRouter();
 const route = useRoute();
-const message = useMessage();
 const loadingBar = useLoadingBar();
+const notification = useNotification();
+const loadItem = useCounterStore();
+const findBranch = ref(JSON.parse(localStorage.getItem('filial_id')));
+const branchName =ref("");
+const Default_title = ref("Education");
+
+const getBranch = async () =>{
+  if(findBranch.value){
+    BranchService.getOne(findBranch.value).then((response) => {
+      branchName.value = response.name;
+    }).catch((err)=>{
+      branchName.value = ""
+    })
+  }
+}
+
 router.beforeEach(() => {
-	loadingBar.start();
-	loadItem.loadAction = true;
+  loadingBar.start();
+  loadItem.loadAction = true;
+  getBranch()
 });
 router.afterEach(() => {
-	loadingBar.finish();
-	loadItem.loadAction = false;
-	let path_val = route.name;
-	document.title = path_val + " - Admin" || Default_title;
+  loadingBar.finish();
+  let path_val = route.name;
+  document.title = path_val + ` | ${branchName.value}` || Default_title;
+  loadItem.loadAction = false;
 });
-watch(error, (val) => {
-	if (val != "") {
-		if (errorStore.error_code == 400) message.error(val[0].param + "  " + val[0].msg);
-		else if (errorStore.error_code == 500 || errorStore.error_code == 402) {
-			message.error(val);
-		} else if (errorStore.error_code == 402) {
-			message.error(val);
-		}
-	}
-	setTimeout(() => {
-		errorStore.error = "";
-	}, 2000);
+router.onError(() => {
+  loadingBar.error();
 });
+const error_store = useErrorStore();
+
+watch(
+  () => error_store.error_text,
+  (val) => {
+    if (val != "") {
+      notification.error({
+        content: "Xatolik",
+        meta: val.toString(),
+        duration: 4000,
+        keepAliveOnHover: true,
+      });
+    }
+    setTimeout(() => {
+      error_store.error_text = "";
+    }, 1000);
+  }
+);
 </script>
 
 <template>
-	<router-view></router-view>
+  <router-view></router-view>
 </template>

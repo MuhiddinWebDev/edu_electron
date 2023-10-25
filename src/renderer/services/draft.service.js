@@ -1,13 +1,12 @@
 import axios from "axios";
-const END_POINT = "/filial";
+const END_POINT = "/draft";
 
 class Service {
   getAll(data) {
-    return axios.post(END_POINT + "/all", data).then((res) => {
+    return axios.post(END_POINT + "/all", data ).then((res) => {
       return res;
     });
   }
-
 
   create(data) {
     return axios.post(END_POINT + "/", data).then((res) => {
@@ -15,13 +14,11 @@ class Service {
     });
   }
 
-
   update(id, data) {
     return axios.patch(END_POINT + `/id/${id}`, data).then((res) => {
       return res;
     });
   }
-
 
   getOne(id) {
     return axios.get(END_POINT + `/id/${id}`).then((res) => {
@@ -29,11 +26,6 @@ class Service {
     });
   }
 
-  
-  delete(id) {
-    return axios.delete(END_POINT + `/id/${id}`).then((res) => {
-      return res;
-    });
-  }
+
 }
 export default new Service();

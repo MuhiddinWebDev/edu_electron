@@ -12,21 +12,32 @@ import {
   NSwitch,
   useNotification,
 } from "naive-ui";
+
 import ModelForm from "./Form.vue";
 import ModelFormMore from "./MoreForm.vue";
+import ModelRead from "./Read.vue";
+
 import {
   Add20Filled as AddIcon,
   AddSquareMultiple16Filled as AddMoreIcon,
 } from "@vicons/fluent";
+import {
+  RemoveRedEyeRound as EyeIcon,
+  CleaningServicesFilled as CleanIcon,
+} from "@vicons/material";
 import { Pen as PenICon } from "@vicons/carbon";
 
 const message = useMessage();
 const dialog = useDialog();
 const notification = useNotification();
+
 const showCreate = ref(false);
 const showCreateMore = ref(false);
 const showUpdate = ref(false);
+const showRead = ref(false)
 const updateId = ref(null);
+const readId = ref(null);
+
 const img_url = inject("img_url");
 const loadingRef = ref(true);
 const emits = defineEmits(["select"]);
@@ -71,19 +82,14 @@ const getAllSort = (role) => {
 
 const formatUzbekPhoneNumber = (phoneNumber) => {
   const cleaned = phoneNumber.replace(/\D/g, "");
-
-  // Check if the phone number is valid
   const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
 
   if (match) {
-    // Format the phone number as +998 XX YYY YYYY
-    return `998 ${match[1]}  ${match[2]}  ${match[3].slice(
+    return `+998 ${match[1]}  ${match[2]}  ${match[3].slice(
       0,
       2
     )} ${match[3].slice(2, 4)}`;
   }
-
-  // If the phone number is not valid, return the original input
   return phoneNumber;
 };
 
@@ -116,7 +122,7 @@ const columns = ref([
     resizable: true,
     render(row) {
       const formatPhone = row.phone;
-      return "+" + formatUzbekPhoneNumber(formatPhone);
+      return formatUzbekPhoneNumber(formatPhone);
     },
   },
   {
@@ -126,31 +132,13 @@ const columns = ref([
     sortOrder: true,
     sorter: (row1, row2) => row1.branch.id - row2.branch.id,
   },
-  {
-    title: "Tili",
-    key: "lang",
-    resizable: true,
-    sortOrder: true,
-    sorter: "default",
-  },
-  {
-    title: "Huquqi",
-    key: "role",
-    resizable: true,
-    sortOrder: true,
-    sorter: "default",
-    render(row) {
-      if (row.role == "User") {
-        return "Talaba";
-      } else if (row.role == "Teacher") {
-        return "O'qituvchi";
-      } else if (row.role == "Admin") {
-        return "Admin";
-      } else if (row.role == "SuperAdmin") {
-        return "Super Admin";
-      }
-    },
-  },
+  // {
+  //   title: "Tili",
+  //   key: "lang",
+  //   resizable: true,
+  //   sortOrder: true,
+  //   sorter: "default",
+  // },
   {
     title: "Rasm",
     key: "image",
@@ -220,15 +208,34 @@ const columns = ref([
   {
     title: "Yangilash",
     key: "action",
-    width: 80,
+    width: 110,
     render(row) {
       return [
         h(
           NButton,
           {
             size: "small",
+            type: "info",
+            onClick: (e) => {
+              showRead.value = true;
+              readId.value = row.id;
+            },
+            style:{
+              marginRight:'12px'
+            }
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: EyeIcon,
+              }),
+          }
+        ),
+        h(
+          NButton,
+          {
+            size: "small",
             type: "success",
-            block: true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -385,6 +392,7 @@ const renderUser = (option) => {
         },
         [
           h("div", null, [option.fullname]),
+          h("div", null, [formatUzbekPhoneNumber(option.phone)]),
           h("div", null, ["Filial: " + option.branch.name]),
         ]
       ),
@@ -440,14 +448,15 @@ const pagination = reactive({
             </template>
             Ko'proq qo'shish
             <span class="Insert-key">
-              <n-icon size="14"> <AddIcon /> </n-icon
+              <n-icon size="14">
+                <AddIcon /> </n-icon
             ></span>
           </n-button>
         </div>
       </div>
       <div class="search-action">
         <div class="search-action_item" v-if="findRole == 'SuperAdmin'">
-          <n-input-group >
+          <n-input-group>
             <n-input-group-label>Filial</n-input-group-label>
             <n-select
               @update:value="selectBranch"
@@ -455,7 +464,6 @@ const pagination = reactive({
               value-field="id"
               v-model:value="sendData.filial_id"
               label-field="name"
-  
               filterable
               clearable
             ></n-select>
@@ -472,7 +480,6 @@ const pagination = reactive({
               :render-tag="renderUserSelect"
               value-field="id"
               label-field="fullname"
-  
               filterable
               clearable
             ></n-select>
@@ -542,6 +549,29 @@ const pagination = reactive({
           type="update"
           :id="updateId"
           @update="updateModel"
+        />
+      </n-card>
+    </n-modal>
+    <!-- Read info modal -->
+    <n-modal
+      transform-orign="center"
+      v-model:show="showRead"
+      :mask-closable="false"
+    >
+      <n-card
+        style="max-width: 700px; width: calc(100vw - 15px)"
+        title="Admin ma'lumotlari"
+        :bordered="false"
+        size="large"
+        role="dialog"
+        aria-modal="true"
+        closable
+        @close="modalClose('read')"
+      >
+        <ModelRead
+          @close="modalClose('read')"
+          type="read"
+          :id="readId"
         />
       </n-card>
     </n-modal>

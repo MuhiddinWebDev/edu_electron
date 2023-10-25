@@ -332,7 +332,7 @@ const keyParent = (e)=>{
                 </n-input-group>
               </n-form-item>
             </n-grid-item>
-            <n-grid-item>
+            <!-- <n-grid-item>
               <n-form-item label="Tili" path="lang">
                 <n-switch
                   @update:value="changeLang"
@@ -343,7 +343,7 @@ const keyParent = (e)=>{
                   <template #unchecked> Russian </template>
                 </n-switch>
               </n-form-item>
-            </n-grid-item>
+            </n-grid-item> -->
           </n-grid>
           <div class="table-footer">
             <div class="table-footer_item">

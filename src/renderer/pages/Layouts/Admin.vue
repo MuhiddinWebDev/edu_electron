@@ -2,8 +2,8 @@
 import { ref, h, onMounted, defineEmits, watch, inject } from "vue";
 import { useFullscreen } from "@vueuse/core";
 import { useRouter } from "vue-router";
-import { NIcon } from "naive-ui";
 import LoadingUI from "../../components/Animation/Loading/Load.vue"
+import { NIcon } from "naive-ui";
 import { useMessage, useDialog } from "naive-ui";
 import {
   LineHorizontal320Filled as threeBtn,
@@ -47,7 +47,7 @@ import {
   ReportData as ReportIcon,
   UserProfileAlt as UserMain,
 } from "@vicons/carbon";
-import AdminForm from "./AdminForm.vue";
+import Form from "./Form.vue";
 import ModelService from "../../services/users.service";
 import BranchService from "../../services/branch.service";
 import { useCounterStore } from "../../stores/counter";
@@ -55,7 +55,6 @@ import { useCounterStore } from "../../stores/counter";
 const { isFullscreen, enter, exit, toggle } = useFullscreen();
 const router = useRouter();
 const badge = ref("5");
-const settingBtn = ref(false);
 const message = useMessage();
 const dialog = useDialog();
 const profileSetting = ref(false);
@@ -69,9 +68,7 @@ function renderIcon(icon) {
 }
 
 const userSetting = (e) => {
-  if (e == "settings") {
-    settingBtn.value = true;
-  } else if (e == "logout") {
+  if (e == "logout") {
     dialog.info({
       title: "Ma'lumot",
       content: "Tizimdan chiqmoqchimisiz?",
@@ -93,13 +90,21 @@ const userSetting = (e) => {
 };
 
 const saveSetting = (e) => {
-  message.success("Save");
+  message.success("Saqlandi");
   if (e == "profile") {
     profileSetting.value = false;
-  } else if (e == "setting") {
-    settingBtn.value = false;
   }
 };
+
+
+const findDevoloper = ()=>{
+  let findMe = localStorage.getItem('phone');
+  if(findMe == '998907788769'){
+    return true
+  }
+  return false;
+}
+
 
 const menuOptions = [
   {
@@ -129,6 +134,11 @@ const menuOptions = [
       {
         label: "Darslar",
         key: "Darslar",
+        icon: renderIcon(ClassIcon),
+      },
+      {
+        label: "SMS xabarlar",
+        key: "SMS xabarlar",
         icon: renderIcon(ClassIcon),
       },
       {
@@ -234,6 +244,11 @@ const menuOptions = [
         key: "Xarajat sabablari",
         icon: renderIcon(couseText),
       },
+      {
+        label: "SMS namuna",
+        key: "SMS namuna",
+        icon: renderIcon(couseText),
+      },
       // {
       //   label:"CRM",
       //   key: "CRM",
@@ -255,7 +270,7 @@ const menuOptions = [
     label: "Sozlamalar",
     key: "read",
     icon: renderIcon(SettingIcon),
-    show: localStorage.getItem('fullname') == 'Dasturchi',
+    show: findDevoloper(),
     children: [
       {
         type: "group",
@@ -284,11 +299,7 @@ const userOption = [
     key: "profile",
     icon: renderIcon(UserIcon),
   },
-  {
-    label: "Sozlamalar",
-    key: "settings",
-    icon: renderIcon(SettingIcon),
-  },
+
   {
     label: "Chiqish",
     key: "logout",
@@ -584,7 +595,7 @@ window.addEventListener("resize", () => {
             >
               <div class="user">
                 <div class="user-avatar" v-if="user_info.image.length > 0">
-                  <n-avatar size="small" round :src="img_url +'/'+ user_info.image">
+                  <n-avatar size="small" round :src="img_url + user_info.image">
                     <!-- <n-icon  size="24">
                       <UserIcon />
                     </n-icon> -->
@@ -626,69 +637,41 @@ window.addEventListener("resize", () => {
           </n-tabs>
         </div>
         <div class="router-box">
-          <RouterView />
+          <RouterView >
+          </RouterView>
           <LoadingUI v-if="counter.loadAction"/>
         </div>
-        <n-drawer
-          resizable
-          v-model:show="settingBtn"
-          :default-width="420"
-          :style="{ height: '100vh' }"
-        >
-          <n-drawer-content closable>
-            <template #header> Sozlamalar </template>
-            <template #footer>
-              <n-button @click="saveSetting('setting')" type="success"
-                >Saqlash</n-button
-              >
-            </template>
-            <n-divider title-placement="center"> Theme mode </n-divider>
-            <div class="setting">
-              <div class="setting-item">
-                <p>Theme type</p>
-                <n-switch v-model:value="ThemeAction" size="large">
-                  <template #checked-icon>
-                    <n-icon>
-                      <moon-icon />
-                    </n-icon>
-                  </template>
-                  <template #unchecked-icon>
-                    <n-icon>
-                      <sun-icon />
-                    </n-icon>
-                  </template>
-                </n-switch>
-              </div>
-              <div class="setting-item">
-                <p>Menu</p>
-                <n-switch v-model:value="collapsed" size="large"></n-switch>
-              </div>
-            </div>
-            <n-divider title-placement="center"> Menu layout mode </n-divider>
-            <div class="setting">
-              <div class="setting-item">
-                <p>Menu postion left</p>
-                <n-tooltip trigger="hover">
-                  <template #trigger>
-                    <n-button type="success" @click="leftClick">
-                      Left
-                    </n-button>
-                  </template>
-                  The menu will be placed at the left
-                </n-tooltip>
-              </div>
-            </div>
-            <n-divider title-placement="center"> Theme system color </n-divider>
-            <div class="setting-color">
-              <div class="setting-color_item"></div>
-            </div>
-          </n-drawer-content>
-        </n-drawer>
-        <n-drawer
+       
+      </n-layout>
+    </n-layout>
+  </div>
+  <!-- Modal service update end create -->
+  <section>
+    <n-modal v-model:show="showUpdate" :mask-closable="false">
+      <n-card
+        class="auto-reponsive"
+        title="Profil  o'zgartirish"
+        :bordered="false"
+        size="large"
+        role="dialog"
+        aria-modal="true"
+        closable
+        @close="showUpdate = false"
+      >
+        <Form
+          @close="closeUpdate"
+          type="update"
+          :id="updateId"
+          @update="updateUser"
+        />
+      </n-card>
+    </n-modal>
+    <!-- info modal right -->
+    <n-drawer
           resizable
           v-model:show="profileSetting"
           :default-width="420"
-          :style="{ height: '100vh', color: ThemeAction ? '#fff':'#000'}"
+          :style="{ height: '100vh' }"
         >
           <n-drawer-content closable>
             <template #header>
@@ -696,18 +679,18 @@ window.addEventListener("resize", () => {
                 <n-icon size="24">
                   <UserIcon />
                 </n-icon>
-                <p >Profil</p>
+                <p>Profil</p>
               </div>
             </template>
             <template #footer>
-              <n-button @click="saveSetting('profile')" type="success"
-                >Saqlash va berkitish</n-button
-              >
+              <n-button @click="saveSetting('profile')" type="success">
+                Saqlash va berkitish
+              </n-button>
             </template>
             <div class="profile">
               <div class="profile-user" @click="openUpdate">
                 <div class="profile-user_avatar">
-                  <n-avatar round :size="68" :src=" img_url + '/' + user_info.image" />
+                  <n-avatar round :size="68" :src="img_url + user_info.image" />
                   <div class="profile-camera">
                     <n-icon size="16">
                       <cameraIcon />
@@ -752,30 +735,6 @@ window.addEventListener("resize", () => {
                                 </div> -->
           </n-drawer-content>
         </n-drawer>
-      </n-layout>
-    </n-layout>
-  </div>
-  <!-- Modal service update end create -->
-  <section>
-    <n-modal v-model:show="showUpdate" :mask-closable="false">
-      <n-card
-        class="auto-reponsive"
-        title="Profil  o'zgartirish"
-        :bordered="false"
-        size="large"
-        role="dialog"
-        aria-modal="true"
-        closable
-        @close="showUpdate = false"
-      >
-        <AdminForm
-          @close="closeUpdate"
-          type="update"
-          :id="updateId"
-          @update="updateUser"
-        />
-      </n-card>
-    </n-modal>
   </section>
   <!-- Phone responsive -->
   <section class="phone-responsive" v-if="windowWidth <= 768">
@@ -806,6 +765,9 @@ window.addEventListener("resize", () => {
   </section>
 </template>
 <style scoped>
+.router-box{
+  position: relative !important;
+}
 .auto-reponsive {
   max-width: 600px;
   max-height: 900px;
@@ -815,8 +777,5 @@ window.addEventListener("resize", () => {
 .profile-button {
   display: flex;
   justify-content: flex-end;
-}
-.router-box{
-  position: relative !important;
 }
 </style>

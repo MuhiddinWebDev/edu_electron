@@ -51,10 +51,10 @@ onMounted(() => {
       form_data.value = res;
     });
   }
-  if (props.type == "create") {
+  if (props.defaultname) {
     form_data.value.name = props.defaultname;
+    firsInput.value?.focus();
   }
-  firsInput.value?.focus();
   getAllBranch();
 });
 const spinTime = () => {
@@ -120,7 +120,7 @@ const keySave = (e) => {
 //// branch index end
 </script>
 <template>
-  <div class="111">
+  <div class="modal-box">
     <n-form
       :style="{ height: '100%' }"
       ref="formRef"

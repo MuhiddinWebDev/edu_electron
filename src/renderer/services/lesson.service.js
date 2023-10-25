@@ -7,7 +7,11 @@ class Service {
       return res;
     });
   }
- 
+  getAllGroup(data) {
+    return axios.post(END_POINT + "/group", data).then((res) => {
+      return res;
+    });
+  }
   searchTable(lesson) {
     return axios.get(END_POINT + `/search-table?lesson_id=${lesson}`).then((res) => {
       return res;

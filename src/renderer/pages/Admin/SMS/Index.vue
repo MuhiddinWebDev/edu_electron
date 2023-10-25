@@ -157,6 +157,7 @@ const getAllRooms = (room_id, branch_id) => {
   });
 };
 
+
 onMounted(() => {
   if (props.action) {
     showCreate.value = true;
@@ -209,7 +210,11 @@ const renderRoom = (option) => {
 const createModel = (res) => {
   showCreate.value = false;
   message.success("Ma'lumot qo'shildi");
-  getAllData();
+  if (findRole.value == "SuperAdmin") {
+    getAll(null, null);
+  } else {
+    getAll(null, findBranch.value);
+  }
 };
 const showClose = (e) => {
   if (e == "create") {
@@ -222,7 +227,11 @@ const showClose = (e) => {
 const updateModel = (res) => {
   showUpdate.value = false;
   message.success("Ma'lumot yangilandi");
-  getAllData();
+  if (findRole.value == "SuperAdmin") {
+    getAll(null, null);
+  } else {
+    getAll(null, findBranch.value);
+  }
 };
 
 //// selected rooms
@@ -280,7 +289,7 @@ const pagination = reactive({
     <div class="box-wrapper">
       <div class="box-header">
         <div class="box-header_item">
-          <h2>Xonalar</h2>
+          <h2>SMS xabarlar</h2>
         </div>
         <div class="box-header_item">
           <n-button @click="showCreate = true" type="success">
@@ -293,7 +302,7 @@ const pagination = reactive({
           </n-button>
         </div>
       </div>
-      <div class="search-action">
+      <!-- <div class="search-action">
         <div class="search-action_item" v-if="findRole == 'SuperAdmin'">
           <n-input-group>
             <n-input-group-label>Filial</n-input-group-label>
@@ -336,10 +345,11 @@ const pagination = reactive({
             Tozalash
           </n-button>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="box-table">
-      <n-data-table
+    
+      <!-- <n-data-table
         :row-props="rowProps"
         :pagination="pagination"
         :loading="loading"
@@ -350,7 +360,7 @@ const pagination = reactive({
         size="small"
         style="min-width: 1000px; max-height: calc(100vh - 300px)"
       >
-      </n-data-table>
+      </n-data-table> -->
     </div>
   </div>
   <!-- Modal create and Update -->
@@ -358,10 +368,9 @@ const pagination = reactive({
     <n-modal v-model:show="showCreate" :mask-closable="false">
       <n-card
         transform-orign="center"
-        style="max-width: 500px; width: calc(100vw - 35px)"
-        title="Xona qo'shish"
+        style="width: calc(100vw - 35px); max-width: 900px;"
+        title="Xabar yozish"
         :bordered="false"
-        size="medium"
         role="dialog"
         aria-modal="true"
         closable
@@ -370,11 +379,10 @@ const pagination = reactive({
         <ModelForm
           @create="createModel"
           type="create"
-          :defaultname="roomName"
         />
       </n-card>
     </n-modal>
-    <n-modal v-model:show="showUpdate" :mask-closable="false">
+    <!-- <n-modal v-model:show="showUpdate" :mask-closable="false">
       <n-card
         transform-orign="center"
         style="max-width: 500px; width: calc(100vw - 35px)"
@@ -388,7 +396,7 @@ const pagination = reactive({
       >
         <ModelForm type="update" :id="updateId" @update="updateModel" />
       </n-card>
-    </n-modal>
+    </n-modal> -->
   </section>
 </template>
 

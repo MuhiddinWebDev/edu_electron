@@ -325,7 +325,7 @@ const keySave = (e) => {
               </n-form-item>
             </n-gi>
 
-            <n-gi>
+            <!-- <n-gi>
               <n-form-item label="Tili" path="lang">
                 <n-switch
                   @update:value="changeLang"
@@ -336,7 +336,7 @@ const keySave = (e) => {
                   <template #unchecked> Russian </template>
                 </n-switch>
               </n-form-item>
-            </n-gi>
+            </n-gi> -->
           </n-grid>
           <div class="table-footer">
             <div class="table-footer_item">
@@ -394,6 +394,7 @@ const keySave = (e) => {
 .auto-height {
   height: 100%;
 }
+
 .modal-parent {
   height: 100%;
 }
