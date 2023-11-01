@@ -25,9 +25,8 @@ const error_store = useErrorStore()
 
 
 ////////////////////////////////
-// const BASE_URL = ref('http://81.95.226.11:64008/api/v1'); ////  Edu App LLC Yozyovon Tohirjon backend url
 const BASE_URL = ref('http://89.232.184.175:3005/api/v1'); ////  Edu App Default backend url
-// const BASE_URL = ref('http://81.95.226.11:64003/api/v1'); /// Edu App Platon academy backend url
+// const BASE_URL = ref('http://89.232.184.175:3001/api/v1') // EduApp for BDM****************
 // const BASE_URL = ref('http://localhost:8080/api/v1') // EduApp localhost test url
 axios.defaults.baseURL = BASE_URL.value;
 axios.interceptors.request.use(function (config) {
@@ -84,7 +83,7 @@ app.use(VWave, {
 })
 
 app.provide('dayJS', dayjs);
-app.provide('img_url', `${BASE_URL.value}/uploads/user`)
+app.provide('img_url', `${BASE_URL.value}/uploads/user/`)
 app.provide('site_img', `${BASE_URL.value}/uploads/image/`)
 app.provide('course_img', `${BASE_URL.value}/uploads/course/`)
 app.provide('course_video', `${BASE_URL.value}/uploads/coursePlan/`)

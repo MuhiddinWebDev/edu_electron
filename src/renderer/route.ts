@@ -36,13 +36,11 @@ const router = createRouter({
 					name: "Asosiy sahifa",
 					component: () => import("./pages/Admin/Setting/Setting.vue"),
 				},
-
 				{
-					path: '/software-setting',
+					path: "/software-setting",
 					name: "Dastur to'lovi",
 					component: () => import("./pages/Admin/Software/Index.vue"),
-				  },
-
+				},
 				{
 					path: "/report-all",
 					name: "Hisobotlar ",
@@ -199,6 +197,16 @@ const router = createRouter({
 					component: () => import("./pages/Admin/Messages/Index.vue"),
 				},
 				{
+					path: "/send-messages",
+					name: "SMS xabarlar",
+					component: () => import("./pages/Admin/SMS/Index.vue"),
+				},
+				{
+					path: "/messages-draft",
+					name: "SMS namuna",
+					component: () => import("./pages/Admin/Draft/Index.vue"),
+				},
+				{
 					path: "/quiz",
 					name: "Savol-Javob",
 					component: () => import("./pages/Admin/Quiz/Index.vue"),
@@ -326,7 +334,7 @@ const router = createRouter({
 			component: () => import("./pages/Log/LoginIndex.vue"),
 		},
 		{
-			path: '/software-payment',
+			path: "/software-payment",
 			name: "Software Payment",
 			component: () => import("./pages/Layouts/Software.vue"),
 		},
@@ -334,7 +342,7 @@ const router = createRouter({
 			path: "/:pathMatch(.*)*",
 			name: "not-found",
 			component: () => import("./pages/NotFound.vue"),
-		}
+		},
 	],
 });
 
@@ -345,7 +353,7 @@ router.beforeEach((to, from, next) => {
 	const role = localStorage.getItem("role");
 	// trying to access a restricted page + not logged in
 	// redirect to login page
-	if (authRequired && !loggedIn && to.path != '/software-payment') {
+	if (authRequired && !loggedIn && to.path != "/software-payment") {
 		next("/login");
 	} else {
 		next();
