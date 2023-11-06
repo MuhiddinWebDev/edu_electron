@@ -1,14 +1,29 @@
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, inject } from "vue";
 import ModelService from "../../../services/message.service";
+import DraftService from "../../../services/draft.service";
+import BranchService from "../../../services/branch.service";
+import { useMessage, useNotification } from "naive-ui";
+import { Copy20Regular as copyIcon } from "@vicons/fluent";
+import DraftIndex from "../Draft/Index.vue";
 // variables
 const props = defineProps(["type", "id"]);
 const emit = defineEmits(["create", "update"]);
+const message = useMessage();
+const notification = useNotification();
 const formRef = ref(null);
 const spinBtn = ref(false);
+const dayJS = inject('dayJS')
+const tabData = ref([]);
+const activeTab = ref("All")
+const loading = ref(true);
+const showDraft = ref(false);
+const draftData = ref([]); 
+const branchOptions = ref([]);
 
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
+
 const tabTitle = ref([
   {
     name: "Hammasi",
@@ -43,21 +58,59 @@ const searchData = (key) => {
     key: key,
   };
 };
-const tabData = ref([]);
-const loading = ref(true);
+
+
+const form_data = ref({
+  datetime: new Date().getTime(),
+  text: null,
+  name:null,
+  selected:[],
+  filial_id:findBranch.value
+});
+
+const rules = {
+  filial_id: {
+    required: true,
+    trigger: "blur",
+    validator: (rule, value) => {
+      if (value == null) {
+        return new Error("Filialni tanlang ");
+      }
+    },
+  },
+  text: {
+    required: true,
+    trigger: "blur",
+    validator: (rule, value) => {
+      if (value == null || value =='') {
+        return new Error("Xabar matni kiritish majburiy!");
+      }
+    },
+  },
+}
+
 const getAllUsers = (key) => {
-  ModelService.getAll(searchData(key)).then((res) => {
+  ModelService.getUsers(searchData(key)).then((res) => {
     tabData.value = res;
     loading.value = false;
   });
 };
+
+const getAllBranches = ()=>{
+  BranchService.getAll().then((res)=>{
+    branchOptions.value = res;
+  })
+}
 
 const formatUzbekPhoneNumber = (phoneNumber) => {
   if (phoneNumber) {
     const cleaned = phoneNumber.replace(/\D/g, "");
     const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
     if (match) {
-      return `998 ${match[1]}  ${match[2]}  ${match[3].slice(0,2)} ${match[3].slice(2, 4)}`;
+      return `998 ${match[1]}  ${match[2]}  ${match[3].slice(
+        0,
+        2
+      )} ${match[3].slice(2, 4)}`;
     }
     return phoneNumber;
   }
@@ -124,6 +177,7 @@ const tableColFun = (key) => {
       resizable: true,
     },
   ];
+  form_data.value.selected =[]
 };
 
 const rowKey = (row, key) => {
@@ -135,10 +189,60 @@ const updaeTabpane = (key) => {
   tableColFun(key);
 };
 
+const updateBranch = (branch)=>{
+  findBranch.value= branch;
+  getAllUsers(activeTab.value)
+}
+
+const btnDraft = () => {
+  showDraft.value = true;
+  DraftService.getAll().then((res) => {
+    draftData.value = res;
+  });
+};
+
+const chooseOne = (id) => {
+  showDraft.value = false;
+  DraftService.getOne(id).then((res) => {
+    form_data.value.text = res.name;
+  });
+};
+
+const chooseDraft = (id) => {
+  chooseOne(id);
+};
+
 onMounted(() => {
   getAllUsers("All");
   tableColFun("All");
+  getAllBranches();
 });
+
+const sendMessage = async () => {
+  try {
+    
+    const index = tabTitle.value.findIndex((item)=> item.key == activeTab.value);
+    form_data.value.name = tabTitle.value[index].name;
+    const result = await formRef.value?.validate();
+    if(form_data.value.selected.length == 0){
+      message.warning('Shaxslarni tanglang!!!')
+    }else{
+      ModelService.create(form_data.value).then((res)=>{
+        notification.success({
+          title: 'Muvofaqqiyatli',
+          content: `Xabarlar ${form_data.value.name}ga jo'natildi`,
+          duration: 2500,
+          keepAliveOnHover: true,
+          meta: dayJS
+        })
+        emit('create')
+      })
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // ///// pagination start
 // const pagination = reactive({
@@ -159,95 +263,165 @@ onMounted(() => {
 </script>
 <template>
   <div class="modal-box">
-    <n-tabs type="bar" animated @update:value="updaeTabpane">
-      <n-tab-pane
-        v-for="(item, index) in tabTitle"
-        :name="item.key"
-        :tab="item.name"
-      >
-        <div class="tab-pane_item" v-if="userTabs.includes(item.key)">
-          <n-scrollbar style="max-height: 420px">
-            <n-data-table
-              :loading="loading"
-              :columns="columns"
-              :data="tabData"
-              :bordered="true"
-              :single-line="false"
-              :row-key="rowKey"
-              size="small"
+    <n-form 
+      ref="formRef"
+      :model="form_data"
+      :rules="rules"
+    >
+      <div class="modal-box-header">
+        <n-form-item label="Sana" path="datetime">
+          <n-date-picker
+            :style="{ width: '100%' }"
+            :disabled="true"
+            type="datetime"
+            v-model:value="form_data.datetime"
+          ></n-date-picker>
+        </n-form-item>
+        <n-form-item label="Filial" path="filial_id">
+          <n-select
+              :options="branchOptions"
+              v-model:value="form_data.filial_id"
+              @update:value="updateBranch"
+              label-field="name"
+              value-field="id"
+              filterable
             >
-            </n-data-table>
-          </n-scrollbar>
-        </div>
-        <div class="tab-pane_item" v-else-if="item.key == 'Course'">
-          <n-scrollbar style="max-height: 420px">
-            <n-collapse>
-              <n-collapse-item
-                v-for="(item, index) in tabData"
-                :key="index"
-                :title="item.name"
-                :name="index"
+            </n-select>
+        </n-form-item>
+      </div>
+      <n-tabs v-model:value="activeTab" type="bar" animated @update:value="updaeTabpane">
+        <n-tab-pane
+          v-for="(item, index) in tabTitle"
+          :name="item.key"
+          :tab="item.name"
+        >
+          <div class="tab-pane_item" v-if="userTabs.includes(item.key)">
+              <n-data-table
+                :loading="loading"
+                :columns="columns"
+                :data="tabData"
+                :bordered="true"
+                :single-line="false"
+                :row-key="rowKey"
+                v-model:checked-row-keys="form_data.selected"
+                size="small"
+                :max-height="250"
               >
-                <n-collapse>
-                  <n-collapse-item
-                    v-for="(child, idx) in item.group"
-                    :key="index"
-                    :title="child.name"
-                    :name="idx"
-                  >
-                    <n-data-table
-                      :loading="loading"
-                      :columns="columns"
-                      :data="child.group_table"
-                      :bordered="true"
-                      :single-line="false"
-                      :row-key="rowKey"
-                      size="small"
-                    >
-                    </n-data-table>
-                  </n-collapse-item>
-                </n-collapse>
-              </n-collapse-item>
-            </n-collapse>
-          </n-scrollbar>
-        </div>
-        <div class="tab-pane_item" v-else-if="item.key == 'Group'">
-          <n-scrollbar style="max-height: 420px">
-            <n-collapse>
-              <n-collapse-item
-                v-for="(item, index) in tabData"
-                :title="item.name"
-                :key="index"
-                :name="index"
-              >
-                <n-data-table
-                  :loading="loading"
-                  :columns="columns"
-                  :data="item.group_table"
-                  :bordered="true"
-                  :single-line="false"
-                  :row-key="rowKey"
-                  size="small"
+              </n-data-table>
+          </div>
+          <div class="tab-pane_item" v-else-if="item.key == 'Course'">
+            <n-scrollbar style="max-height: 280px">
+              <n-collapse>
+                <n-collapse-item
+                  v-for="(item, index) in tabData"
+                  :key="index"
+                  :title="item.name"
+                  :name="index"
                 >
-                </n-data-table>
-              </n-collapse-item>
-            </n-collapse>
-          </n-scrollbar>
+                  <n-collapse>
+                    <n-collapse-item
+                      v-for="(child, idx) in item.group"
+                      :key="index"
+                      :title="child.name"
+                      :name="idx"
+                    >
+                      <n-data-table
+                        :loading="loading"
+                        :columns="columns"
+                        :data="child.group_table"
+                        v-model:checked-row-keys="form_data.selected"
+                        :bordered="true"
+                        :single-line="false"
+                        :row-key="rowKey"
+                        :max-height="250"
+                        size="small"
+                      >
+                      </n-data-table>
+                    </n-collapse-item>
+                  </n-collapse>
+                </n-collapse-item>
+              </n-collapse>
+            </n-scrollbar>
+          </div>
+          <div class="tab-pane_item" v-else-if="item.key == 'Group'">
+            <n-scrollbar style="max-height: 280px">
+              <n-collapse>
+                <n-collapse-item
+                  v-for="(item, index) in tabData"
+                  :title="item.name"
+                  :key="index"
+                  :name="index"
+                >
+                  <n-data-table
+                    :loading="loading"
+                    :columns="columns"
+                    :data="item.group_table"
+                    :bordered="true"
+                    :single-line="false"
+                    :row-key="rowKey"
+                    size="small"
+                  >
+                  </n-data-table>
+                </n-collapse-item>
+              </n-collapse>
+            </n-scrollbar>
+          </div>
+        </n-tab-pane>
+      </n-tabs>
+      <div class="message-text">
+        <div class="message-draft">
+          <n-button type="info" @click="btnDraft">
+            <n-icon size="20">
+              <copyIcon />
+            </n-icon>
+            SMS namuna
+          </n-button>
         </div>
-      </n-tab-pane>
-    </n-tabs>
-    <div class="message-text">
-      <label for="Xabar">Xabar</label>
-      <n-input type="textarea" />
-    </div>
-    <n-spin :show="spinBtn">
-      <n-button type="success">Jo'natish</n-button>
-    </n-spin>
+        <n-form-item label="Xabar matni" path="text">
+          <n-input type="textarea" v-model:value="form_data.text" />
+        </n-form-item>
+       
+      </div>
+      <div class="btn-action">
+        <n-spin :show="spinBtn">
+          <n-button type="success" @click="sendMessage">Jo'natish</n-button>
+        </n-spin>
+      </div>
+    </n-form>
+    <section class="draft-index">
+      <n-modal
+        v-model:show="showDraft"
+        preset="card"
+        style="max-width: calc(100% - 35px)"
+        transform-orign="center"
+      >
+        <div class="no-padding">
+          <DraftIndex @select="chooseDraft" />
+        </div>
+      </n-modal>
+    </section>
   </div>
 </template>
 
 <style scoped>
+.message-draft{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
 .message-text {
   padding: 12px 0px;
+  position: relative;
+}
+.btn-action {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.modal-box-header{
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  align-items: center;
+  gap:12px;
 }
 </style>

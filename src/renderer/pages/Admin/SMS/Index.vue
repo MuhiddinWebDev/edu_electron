@@ -1,13 +1,13 @@
 <script setup>
-import { ref, onMounted, watch, reactive, h } from "vue";
-import ModelService from "../../../services/room.service";
+import { ref, onMounted, watch, reactive, h, inject } from "vue";
+import ModelService from "../../../services/message.service";
 import BranchService from "../../../services/branch.service";
 
 import { useMagicKeys } from "@vueuse/core";
-import { useMessage, useDialog, NButton, NIcon } from "naive-ui";
+import { NButton, NIcon } from "naive-ui";
 
 import ModelForm from "./Form.vue";
-
+import ModelRead from "./Read.vue";
 import {
   Add20Filled as AddIcon,
 } from "@vicons/fluent";
@@ -15,25 +15,21 @@ import {
   RemoveRedEyeRound as EyeIcon,
   CleaningServicesFilled as CleanIcon,
 } from "@vicons/material";
-import { TrashCan as TrashIcon, Pen as PenICon } from "@vicons/carbon";
-
-const emits = defineEmits(["select"]);
-const props = defineProps(["type", "action", "itemValue"]);
-
-const message = useMessage();
-const dialog = useDialog();
 
 const showCreate = ref(false);
-const showUpdate = ref(false);
-const updateId = ref(null);
+const showRead = ref(false);
+
+const dayJS = inject('dayJS')
+
+const readId = ref(null);
 const data = ref([]);
-const roomName = ref("");
+
 const branchOption = ref([]);
-const roomOption = ref([]);
+const messageOption = ref([]);
 const loading = ref(true);
 
 const branchId = ref(null);
-const roomId = ref(null);
+const sms_type = ref(null);
 
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
@@ -48,13 +44,27 @@ const columns = ref([
       return data.value.findIndex((item) => item.id == row.id) + 1;
     },
   },
-
   {
-    title: "Nomi",
+    title:'Sana',
+    key:'datetime',
+    render(row){
+      return dayJS(row.datetime * 1000).format('YYYY-MM-DD HH:mm:ss')
+    }
+  },
+  {
+    title: "Kimga",
     key: "name",
     resizable: true,
     sortOrder: true,
     sorter: "default",
+  },
+  {
+    title: "Matni",
+    key: "text",
+    resizable: true,
+    render(row){
+      return row.text.slice(0, 75) +'...'
+    }
   },
   {
     title: "Filial",
@@ -64,83 +74,43 @@ const columns = ref([
     sorter: (row1, row2) => row1.branch.id - row2.branch.id,
   },
   {
-    title: "Amallar",
+    title: "Amal",
     key: "action",
-    width: 75,
+    width: 55,
     render(row) {
       return [
         h(
           NButton,
           {
             size: "small",
-            type: "success",
+            type: "info",
             block: true,
             onClick: (e) => {
-              showUpdate.value = true;
-              updateId.value = row.id;
+              showRead.value = true;
+              readId.value = row.id;
             },
           },
           {
             icon: () =>
               h(NIcon, {
-                component: PenICon,
+                component: EyeIcon,
               }),
           }
         ),
-        // h(
-        //   NButton,
-        //   {
-        //     size: "small",
-        //     type: "error",
-        //     style: {
-        //       marginLeft: "8px",
-        //     },
-        //     onClick: (e) => {
-        //       dialog.warning({
-        //         title: "Ogohlantirish",
-        //         content: `${row.name}ni rostan ham o'chirasizmi`,
-        //         positiveText: "Xa",
-        //         negativeText: "Yo'q",
-        //         onPositiveClick: () => {
-        //           ModelService.delete(row.id)
-        //             .then((res) => {
-        //               const index = branch.value.findIndex(
-        //                 (val) => val.id == row.id
-        //               );
-        //               branch.value.splice(index, 1);
-        //               message.success("Ma'lumot o'chirildi");
-        //             })
-        //             .catch((err) => {
-        //               message.error("Ma'lumot o'chirilmadi");
-        //             });
-        //         },
-        //         onNegativeClick: () => {
-        //           message.warning("Bekor qilindi");
-        //         },
-        //       });
-        //     },
-        //   },
-        //   {
-        //     icon: () =>
-        //       h(NIcon, {
-        //         component: TrashIcon,
-        //       }),
-        //   }
-        // ),
       ];
     },
   },
 ]);
 
-const searchData = (room_id, branch_id)=>{
+const searchData = (name, branch_id)=>{
   return {
-    id:room_id,
+    name:name,
     filial_id: findRole.value == 'SuperAdmin' ? branch_id : findBranch.value,
   }
 }
 
-const getAllData = (room_id, branch_id) => {
-  ModelService.searchModel(searchData(room_id,branch_id)).then((res) => {
+const getAllData = (name, branch_id) => {
+  ModelService.getAll(searchData(name,branch_id)).then((res) => {
     loading.value = false;
     data.value = res;
   });
@@ -151,113 +121,39 @@ const getAllBranches = () => {
   });
 };
 
-const getAllRooms = (room_id, branch_id) => {
-  ModelService.searchModel(searchData(room_id,branch_id)).then((res) => {
-    roomOption.value = res;
-  });
-};
-
-
 onMounted(() => {
-  if (props.action) {
-    showCreate.value = true;
-    roomName.value = props.itemValue;
-  }
+  
   getAllData()
   getAllBranches();
-  getAllRooms();
 });
 
-//// render select function start
-const renderRoomSelect = ({ option }) => {
-  return h(
-    "div",
-    {
-      style: {
-        display: "flex",
-        alignItems: "center",
-      },
-    },
-    [option.name]
-  );
-};
-
-const renderRoom = (option) => {
-  return h(
-    "div",
-    {
-      style: {
-        display: "flex",
-        alignItems: "center",
-      },
-    },
-    [
-      h(
-        "div",
-        {
-          style: {
-            marginLeft: "8px",
-            padding: "4px 0",
-          },
-        },
-        [h("div", null, [option.name]), h("div", null, [option.branch.name])]
-      ),
-    ]
-  );
-};
-//// render select function end
 /////  create and update functions
 const createModel = (res) => {
   showCreate.value = false;
-  message.success("Ma'lumot qo'shildi");
-  if (findRole.value == "SuperAdmin") {
-    getAll(null, null);
-  } else {
-    getAll(null, findBranch.value);
-  }
+  getAllData()
 };
 const showClose = (e) => {
   if (e == "create") {
     showCreate.value = false;
-  } else if (e == "update") {
-    showUpdate.value = false;
+  } else if (e == "read") {
+    showRead.value = false;
   }
 };
 
-const updateModel = (res) => {
-  showUpdate.value = false;
-  message.success("Ma'lumot yangilandi");
-  if (findRole.value == "SuperAdmin") {
-    getAll(null, null);
-  } else {
-    getAll(null, findBranch.value);
-  }
-};
 
-//// selected rooms
-const rowProps = (row) => {
-  return {
-    style: "cursor: pointer;",
-    onClick: () => {
-      emits("select", row.id);
-    },
-  };
-};
+
 //// search function start;
 const UpdateBranch = (branch_id) => {
-  roomId.value = null;
-  getAllRooms(null, branch_id);
-  getAllData(null, branch_id);
+  getAllData(branch_id);
 };
 
-const updateRoom = (room_id)=>{
-  getAllData(room_id, branchId.value);
+const updateName = (name)=>{
+  getAllData(name,branchId.value);
 }
 
 const clearBtn = () => {
   branchId.value = null;
-  roomId.value=null;
-  getAllData(null, null)
+  getAllData(null)
 };
 //// search function end;
 
@@ -302,7 +198,7 @@ const pagination = reactive({
           </n-button>
         </div>
       </div>
-      <!-- <div class="search-action">
+      <div class="search-action">
         <div class="search-action_item" v-if="findRole == 'SuperAdmin'">
           <n-input-group>
             <n-input-group-label>Filial</n-input-group-label>
@@ -319,15 +215,13 @@ const pagination = reactive({
             </n-select>
           </n-input-group>
         </div>
-        <div class="search-action_item">
+        <!-- <div class="search-action_item">
           <n-input-group>
-            <n-input-group-label>Xona</n-input-group-label>
+            <n-input-group-label>Nomi</n-input-group-label>
             <n-select
-              v-model:value="roomId"
-              :options="roomOption"
-              @update:value="updateRoom"
-              :render-label="renderRoom"
-              :render-tag="renderRoomSelect"
+              v-model:value="sms_type"
+              :options="messageOption"
+              @update:value="updateName"
               label-field="name"
               value-field="id"
               placeholder="Qidiruv"
@@ -336,7 +230,7 @@ const pagination = reactive({
             >
             </n-select>
           </n-input-group>
-        </div>
+        </div> -->
         <div class="search-action_item">
           <n-button @click="clearBtn" type="info">
             <n-icon>
@@ -345,12 +239,11 @@ const pagination = reactive({
             Tozalash
           </n-button>
         </div>
-      </div> -->
+      </div>
     </div>
     <div class="box-table">
     
-      <!-- <n-data-table
-        :row-props="rowProps"
+      <n-data-table
         :pagination="pagination"
         :loading="loading"
         :columns="columns"
@@ -358,9 +251,10 @@ const pagination = reactive({
         :bordered="true"
         :single-line="false"
         size="small"
-        style="min-width: 1000px; max-height: calc(100vh - 300px)"
+        max-height="calc(100vh - 300px)"
+        style="min-width: 400px;"
       >
-      </n-data-table> -->
+      </n-data-table>
     </div>
   </div>
   <!-- Modal create and Update -->
@@ -382,21 +276,21 @@ const pagination = reactive({
         />
       </n-card>
     </n-modal>
-    <!-- <n-modal v-model:show="showUpdate" :mask-closable="false">
+    <n-modal v-model:show="showRead" :mask-closable="false">
       <n-card
         transform-orign="center"
-        style="max-width: 500px; width: calc(100vw - 35px)"
-        title="Xonani o'zgartirish"
+        style="width: calc(100vw - 35px); max-width: 900px;"
+        title="Xabar"
         :bordered="false"
         size="medium"
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('update')"
+        @close="showClose('read')"
       >
-        <ModelForm type="update" :id="updateId" @update="updateModel" />
+        <ModelRead type="read" :id="readId" />
       </n-card>
-    </n-modal> -->
+    </n-modal>
   </section>
 </template>
 

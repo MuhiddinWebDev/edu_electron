@@ -37,18 +37,22 @@ watch(
   }
 );
 
-const getAllKassa = (data) => {
+const getAllReports = async (data) => {
   let kirimData = [];
   let chiqimData = [];
-  ReportService.kassaSverka(data).then((res) => {
+  let dataDays = [];
+  await ReportService.kassaSverka(data).then((res) => {
     for (let i = 0; i < res.data.length; i++) {
       let el = res.data[i];
       kirimData.push(el.kirim);
       chiqimData.push(el.chiqim);
+      dataDays.push(dayJS(el.datetime * 1000).format('YYYY-MM-DD'))
     }
-    // option.value.series[0].data = kirimData;
-    // option2.value.series[0].data = chiqimData;
+    option.value.series[0].data = kirimData;
+    option.value.series[1].data = chiqimData;
+    option.value.xAxis[0].data = dataDays;
   });
+ 
 };
 
 const option = ref({
@@ -75,7 +79,7 @@ const option = ref({
   xAxis: [
     {
       type: "category",
-      data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      data: [],
       axisPointer: {
         type: "shadow",
       },
@@ -86,13 +90,12 @@ const option = ref({
       type: "value",
       name: "Kassa",
       min: 0,
-      max: 250,
-      interval: 50,
+      max: 1000000,
+      interval: 100000,
       axisLabel: {
         formatter: "{value} so'm",
       },
     },
-  
   ],
   series: [
     {
@@ -103,9 +106,7 @@ const option = ref({
           return value + " so'm";
         },
       },
-      data: [
-        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3,
-      ],
+      data: [],
     },
     {
       name: "Chiqim",
@@ -115,49 +116,57 @@ const option = ref({
           return value + " so'm";
         },
       },
-      data: [
-        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3,
-      ],
+      data: [],
     },
-    
   ],
 });
 
-const option2 = ref({
-  // title: {
-  //   text: 'Referer of a Website',
-  //   subtext: 'Fake Data',
-  //   left: 'center'
-  // },
-  tooltip: {
-    trigger: 'item'
-  },
-  legend: {
-    orient: 'vertical',
-    left: 'right'
-  },
-  series: [
-    {
-      name: 'Access From',
-      type: 'pie',
-      radius: '50%',
-      data: [
-        { value: 1048, name: 'Search Engine' },
-        { value: 735, name: 'Direct' },
-        { value: 580, name: 'Email' },
-        { value: 484, name: 'Union Ads' },
-        { value: 300, name: 'Video Ads' }
-      ],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
-        }
-      }
-    }
-  ]
-});
+// const option2 = ref({
+//   tooltip: {
+//     trigger: "item",
+//   },
+//   legend: {
+//     orient: "horizontal",
+//     top: "5%",
+//     left: "center",
+//   },
+//   series: [
+//     {
+//       name: "Kassa",
+//       type: "pie",
+//       radius: ["40%", "70%"],
+//       avoidLabelOverlap: false,
+//       itemStyle: {
+//         borderRadius: 15,
+//         borderColor: "#ccc",
+//         borderWidth: 1,
+//       },
+//       label: {
+//         fontSize: 15,
+//         fontWeight: "bold",
+//       },
+//       data: [
+//         { value: 0, name: "Kassa" },
+//         { value: 735, name: "Xarajat" },
+//         { value: 580, name: "Talaba" },
+//         { value: 484, name: "O'qituvchi" },
+//         { value: 300, name: "Kurs" },
+//       ],
+//       emphasis: {
+//         itemStyle: {
+//           shadowBlur: 10,
+//           shadowOffsetX: 0,
+//           shadowColor: "rgba(0, 0, 0, 0.5)",
+//         },
+//         label: {
+//           show: true,
+//           fontSize: 40,
+//           fontWeight: "bold",
+//         },
+//       },
+//     },
+//   ],
+// });
 
 const days = () => {
   const today = new Date();
@@ -166,6 +175,7 @@ const days = () => {
 
   const thisMonth = new Date(today.getFullYear(), today.getMonth());
   const range_date = [thisMonth.getTime(), today.getTime()];
+  
   let sendData = {
     start_date: Math.floor(range_date[0] / 1000),
     end_date: Math.floor(range_date[1] / 1000),
@@ -175,15 +185,15 @@ const days = () => {
 
   const lastDayOfMonth = new Date(year, month, 0);
   const daysInMonth = lastDayOfMonth.getDate();
-
-  // for (let i = 1; i <= daysInMonth; i++) {
-  //   let el = dayJS(new Date(year, month, i).getTime()).format("YYYY-MM-DD");
-  //   option.value.xAxis.data.push(el);
+  // for(let i = 1; i <= daysInMonth; i++){
+    // let el = dayJS(new Date(year, month -1 , i).getTime()).format("YYYY-MM-DD");
+    // option.value.xAxis[0].data.push(el)
   // }
-  getAllKassa(sendData);
+
+  getAllReports(sendData);
 };
-onMounted(() => {
-  days();
+onMounted(async () => {
+  await days();
   if (counter.theme) {
     autoTheme.value = "dark";
   } else {
@@ -197,9 +207,9 @@ onMounted(() => {
     <div class="d-grid-item">
       <v-chart class="chart" :option="option" autoresize></v-chart>
     </div>
-    <div class="d-grid-item">
+    <!-- <div class="d-grid-item">
       <v-chart class="chart" :option="option2" autoresize></v-chart>
-    </div>
+    </div> -->
   </div>
 </template>
 <style scoped>

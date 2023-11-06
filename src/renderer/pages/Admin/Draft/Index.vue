@@ -37,7 +37,6 @@ const branchId = ref(null);
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
-
 const columns = ref([
   {
     title: "№",
@@ -54,7 +53,7 @@ const columns = ref([
     key: "name",
     resizable: true,
     render(row){
-      return  row.name.length > 80 ? row.name.slice(1, 80) + '...': row.name;
+      return  row.name.length > 80 ? row.name.slice(0, 80) + '...': row.name;
     }
   },
   {
@@ -190,8 +189,6 @@ const rowProps = (row) => {
 const UpdateBranch = (branch_id) => {
   getAllData(branch_id);
 };
-
-
 
 const clearBtn = () => {
   branchId.value = null;

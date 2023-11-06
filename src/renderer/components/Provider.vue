@@ -4,9 +4,21 @@ import { useRouter } from "vue-router";
 import App from '../App.vue'
 import { darkTheme, lightTheme } from 'naive-ui'
 import PaymentService from "../services/softwarePayment.service";
-
+import packageJson from "../../../package.json" 
 const themes = ref(lightTheme);
 const router = useRouter();
+const action = ref(true);
+const version = ref('')
+const changeTheme = (e) => {
+  if (e) {
+    themes.value = darkTheme;
+    action.value = false
+  } else {
+    themes.value = lightTheme;
+    action.value = true
+  }
+
+}
 const uzUz = {
   name: "uz-UZ",
   global: {
@@ -205,23 +217,13 @@ const menuStyle ={
     "groupTextColorInverted": "#fff"
   },
   Drawer: {
-    "textColor":  "rgba(255, 255, 255, 1)",
-    "titleTextColor": "rgba(255, 255, 255, 1)",
-    "headerPadding": "12px",
     "bodyPadding": "4px 6px"
+  },
+  Divider:{
+    color:'#ccc'
   }
 }
-const action = ref(true);
-const changeTheme = (e) => {
-  if (e) {
-    themes.value = darkTheme;
-    action.value = false
-  } else {
-    themes.value = lightTheme;
-    action.value = true
-  }
 
-}
 const getSoftwareData = ()=>{
   PaymentService.checkDate().then((res)=>{
     if(!res.live){
@@ -232,6 +234,7 @@ const getSoftwareData = ()=>{
 }
 onMounted(()=>{
   getSoftwareData();
+  version.value = packageJson.version;
 })
 </script>
 <template>
@@ -243,6 +246,9 @@ onMounted(()=>{
             <n-loading-bar-provider>
               <div class="app-box">
                 <App  @themeupdate="changeTheme" />
+                <div class="software-version">
+                  <b>Dastur versiyasi: {{ version }}</b>
+                </div>
               </div>
             </n-loading-bar-provider>
           </n-notification-provider>
