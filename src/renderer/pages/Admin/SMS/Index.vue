@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, watch, reactive, h, inject } from "vue";
+import { ref, onMounted, watch, reactive, h } from "vue";
 import ModelService from "../../../services/message.service";
 import BranchService from "../../../services/branch.service";
 
 import { useMagicKeys } from "@vueuse/core";
-import { NButton, NIcon } from "naive-ui";
+import { useMessage, useDialog, NButton, NIcon } from "naive-ui";
 
 import ModelForm from "./Form.vue";
 import ModelRead from "./Read.vue";
@@ -16,11 +16,11 @@ import {
   CleaningServicesFilled as CleanIcon,
 } from "@vicons/material";
 
+
+const message = useMessage();
+
 const showCreate = ref(false);
 const showRead = ref(false);
-
-const dayJS = inject('dayJS')
-
 const readId = ref(null);
 const data = ref([]);
 
@@ -44,13 +44,7 @@ const columns = ref([
       return data.value.findIndex((item) => item.id == row.id) + 1;
     },
   },
-  {
-    title:'Sana',
-    key:'datetime',
-    render(row){
-      return dayJS(row.datetime * 1000).format('YYYY-MM-DD HH:mm:ss')
-    }
-  },
+
   {
     title: "Kimga",
     key: "name",
@@ -102,15 +96,14 @@ const columns = ref([
   },
 ]);
 
-const searchData = (name, branch_id)=>{
+const searchData = (branch_id)=>{
   return {
-    name:name,
     filial_id: findRole.value == 'SuperAdmin' ? branch_id : findBranch.value,
   }
 }
 
-const getAllData = (name, branch_id) => {
-  ModelService.getAll(searchData(name,branch_id)).then((res) => {
+const getAllData = (branch_id) => {
+  ModelService.getAll(searchData(branch_id)).then((res) => {
     loading.value = false;
     data.value = res;
   });
@@ -147,9 +140,7 @@ const UpdateBranch = (branch_id) => {
   getAllData(branch_id);
 };
 
-const updateName = (name)=>{
-  getAllData(name,branchId.value);
-}
+
 
 const clearBtn = () => {
   branchId.value = null;
@@ -231,7 +222,7 @@ const pagination = reactive({
             </n-select>
           </n-input-group>
         </div> -->
-        <div class="search-action_item">
+        <div class="search-action_item" v-if="findRole == 'SuperAdmin'">
           <n-button @click="clearBtn" type="info">
             <n-icon>
               <CleanIcon/>
