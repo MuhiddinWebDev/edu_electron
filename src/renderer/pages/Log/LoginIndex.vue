@@ -9,6 +9,10 @@ import { PhoneFilled as phoneIcon } from "@vicons/carbon";
 import { LockClosed24Filled as lockIcon } from "@vicons/fluent";
 
 import axios from "axios";
+
+import { useCounterStore } from "../../stores/counter";
+
+const counter = useCounterStore();
 const router = useRouter();
 const showUI = ref(false)
 ///// sign in functionality
@@ -190,8 +194,13 @@ const localLogin = () => {
     }
   }
 };
+
+
 const getSoftwareData = () => {
-  PaymentService.checkDate()
+  let data = {
+    soft_id:counter.soft_id
+  }
+  PaymentService.checkDate(data)
     .then((res) => {
       if (!res.live) {
         router.push({ path: "/software-payment" });

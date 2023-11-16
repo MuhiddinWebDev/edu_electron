@@ -4,9 +4,12 @@ import { useRouter } from "vue-router";
 import App from '../App.vue'
 import { darkTheme, lightTheme } from 'naive-ui'
 import PaymentService from "../services/softwarePayment.service";
-import packageJson from "../../../package.json" 
+import packageJson from "../../../package.json";
+import { useCounterStore } from "../stores/counter";
+
 const themes = ref(lightTheme);
 const router = useRouter();
+const counter = useCounterStore();
 const action = ref(true);
 const version = ref('')
 const changeTheme = (e) => {
@@ -225,7 +228,10 @@ const menuStyle ={
 }
 
 const getSoftwareData = ()=>{
-  PaymentService.checkDate().then((res)=>{
+  let data = {
+    soft_id:counter.soft_id
+  }
+  PaymentService.checkDate(data).then((res)=>{
     if(!res.live){
       router.push({path:'/software-payment'});
       localStorage.clear();
