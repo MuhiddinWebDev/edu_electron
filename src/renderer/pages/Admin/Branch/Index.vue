@@ -44,6 +44,8 @@ const showUpdate = ref(false);
 const showRead = ref(false);
 const updateId = ref(null);
 const readId = ref(null);
+const findRole = ref(localStorage.getItem('phone'))
+
 const searchData = ref({
   filial_id: null,
   region_id: null,
@@ -200,7 +202,7 @@ const columns = ref([
   },
 ]);
 
-let addPermissions = ref(0);
+let addPermissions = ref(false);
 const getAllBranchs = (branch_id, region_id, district_id) => {
   searchData.value = {
     filial_id: branch_id,
@@ -210,7 +212,7 @@ const getAllBranchs = (branch_id, region_id, district_id) => {
   ModelService.getAll(searchData.value).then((res) => {
     branch.value = res;
     loading.value = false;
-    addPermissions.value = res.length;
+    
   });
 };
 const getRegionOption = () => {
@@ -233,6 +235,7 @@ onMounted(() => {
     showCreate.value = true;
     branchName.value = props.itemValue;
   }
+  addPermissions.value = findRole.value == '998907788769' ? true:false;
 });
 /////  create and update functions
 const createModel = () => {
@@ -312,7 +315,7 @@ const pagination = reactive({
         <div class="box-header_item">
           <h2>Filiallar</h2>
         </div>
-        <div class="box-header_item" v-if="addPermissions < 4">
+        <div class="box-header_item" v-if="addPermissions">
           <n-button @click="showCreate = true" type="success">
             <template #icon>
               <n-icon size="18">
