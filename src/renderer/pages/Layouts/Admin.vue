@@ -2,7 +2,8 @@
 import { ref, h, onMounted, defineEmits, watch, inject } from "vue";
 import { useFullscreen } from "@vueuse/core";
 import { useRouter } from "vue-router";
-import LoadingUI from "../../components/Animation/Loading/Load.vue"
+import LoadingUI from "../../components/Animation/Loading/Load.vue";
+import logoIcon from "../../assets/logo/edu_512.png"
 import { NIcon } from "naive-ui";
 import { useMessage, useDialog } from "naive-ui";
 import {
@@ -487,7 +488,7 @@ window.addEventListener("resize", () => {
         >
           <n-avatar
             size="small"
-            src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
+            :src="logoIcon"
           ></n-avatar>
           <h1 v-if="!collapsed">{{ branchName }}</h1>
         </div>
@@ -518,7 +519,7 @@ window.addEventListener("resize", () => {
           <div class="header-item" v-if="topMenu">
             <n-avatar
               size="small"
-              src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
+              :src="logoIcon"
             ></n-avatar>
             <h2>{{ branchName }}</h2>
           </div>
