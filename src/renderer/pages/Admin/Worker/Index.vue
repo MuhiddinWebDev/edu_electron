@@ -307,6 +307,8 @@ const modalClose = (e) => {
     showUpdate.value = false;
   } else if (e == "more-create") {
     showCreateMore.value = false;
+  }else if(e == 'read'){
+    showRead.value = false
   }
 };
 

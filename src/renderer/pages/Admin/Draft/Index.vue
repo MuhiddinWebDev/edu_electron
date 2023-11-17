@@ -7,7 +7,7 @@ import { useMagicKeys } from "@vueuse/core";
 import { useMessage, useDialog, NButton, NIcon } from "naive-ui";
 
 import ModelForm from "./Form.vue";
-
+import ModelRead from "./Read.vue";
 import {
   Add20Filled as AddIcon,
 } from "@vicons/fluent";
@@ -18,13 +18,15 @@ import {
 import { TrashCan as TrashIcon, Pen as PenICon } from "@vicons/carbon";
 
 const emits = defineEmits(["select"]);
-const props = defineProps(["type", "action", "itemValue"]);
+const props = defineProps(["type", "action", "itemValue",'branch_id']);
 
 const message = useMessage();
 const dialog = useDialog();
 
 const showCreate = ref(false);
 const showUpdate = ref(false);
+const showRead = ref(false);
+const readId = ref(null)
 const updateId = ref(null);
 
 const data = ref([]);
@@ -66,9 +68,29 @@ const columns = ref([
   {
     title: "Amallar",
     key: "action",
-    width: 110,
+    width: 150,
     render(row) {
       return [
+      h(
+          NButton,
+          {
+            size: "small",
+            type: "info",
+            onClick: (e) => {
+              showRead.value = true;
+              readId.value = row.id;
+            },
+            style:{
+              marginRight:'12px'
+            }
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: EyeIcon,
+              }),
+          }
+        ),
         h(
           NButton,
           {
@@ -153,12 +175,12 @@ onMounted(() => {
     showCreate.value = true;
     draftName.value = props.itemValue;
   }
-  getAllData()
+  getAllData(props.branch_id);
   getAllBranches();
 });
 
 /////  create and update functions
-const createModel = (res) => {
+const createModel = () => {
   showCreate.value = false;
   message.success("Ma'lumot qo'shildi");
   getAllData();
@@ -168,10 +190,12 @@ const showClose = (e) => {
     showCreate.value = false;
   } else if (e == "update") {
     showUpdate.value = false;
+  }else if(e == 'read'){
+    showRead.value = false;
   }
 };
 
-const updateModel = (res) => {
+const updateModel = () => {
   showUpdate.value = false;
   getAllData()
 };
@@ -181,7 +205,9 @@ const rowProps = (row) => {
   return {
     style: "cursor: pointer;",
     onClick: () => {
-      emits("select", row.id);
+      if(!showUpdate.value){
+        emits("select", row.id);
+      }
     },
   };
 };
@@ -314,6 +340,21 @@ const pagination = reactive({
         @close="showClose('update')"
       >
         <ModelForm type="update" :id="updateId" @update="updateModel" />
+      </n-card>
+    </n-modal>
+    <n-modal v-model:show="showRead" :mask-closable="false">
+      <n-card
+        transform-orign="center"
+        style="max-width: 500px; width: calc(100vw - 35px)"
+        title="SMS namuna"
+        :bordered="false"
+        size="medium"
+        role="dialog"
+        aria-modal="true"
+        closable
+        @close="showClose('read')"
+      >
+        <ModelRead type="read" :id="readId"/>
       </n-card>
     </n-modal>
   </section>

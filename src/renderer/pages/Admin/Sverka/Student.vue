@@ -106,7 +106,6 @@ const rowProps = (row) => {
               v-model:value="range_date"
               type="daterange"
               :style="{ width: '100%' }"
-              clearable
             />
           </n-input-group>
         </div>

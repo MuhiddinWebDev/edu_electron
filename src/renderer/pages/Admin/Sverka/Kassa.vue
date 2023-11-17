@@ -92,7 +92,6 @@ const rowProps = (row) => {
             <n-date-picker
               v-model:value="range_date"
               type="daterange"
-              clearable
               :style="{width:'100%'}"
             />
           </n-input-group>

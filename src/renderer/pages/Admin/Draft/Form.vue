@@ -86,12 +86,6 @@ const save = async () => {
   } catch (e) {}
 };
 
-
-const keySave = (e) => {
-  if (e.key == "Enter") {
-    save();
-  }
-};
 //// branch index end
 </script>
 <template>
@@ -110,7 +104,6 @@ const keySave = (e) => {
         >
           <n-input-group>
             <n-select
-              @keydown="keySave"
               :options="branchs"
               v-model:value="form_data.filial_id"
               label-field="name"
@@ -124,7 +117,6 @@ const keySave = (e) => {
         </n-form-item>
         <n-form-item label="SMS matni" path="name">
           <n-input
-            @keydown="keySave"
             type="textarea"
             v-model:value="form_data.name"
             show-count

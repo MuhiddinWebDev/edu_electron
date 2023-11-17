@@ -57,7 +57,7 @@ const columns = ref([
     key: "text",
     resizable: true,
     render(row){
-      return row.text.slice(0, 75) +'...'
+      return row.text.length > 75 ? row.text.slice(0, 75) +'...' : row.text
     }
   },
   {
@@ -189,8 +189,8 @@ const pagination = reactive({
           </n-button>
         </div>
       </div>
-      <div class="search-action">
-        <div class="search-action_item" v-if="findRole == 'SuperAdmin'">
+      <div class="search-action" v-if="findRole == 'SuperAdmin'" >
+        <div class="search-action_item" >
           <n-input-group>
             <n-input-group-label>Filial</n-input-group-label>
             <n-select

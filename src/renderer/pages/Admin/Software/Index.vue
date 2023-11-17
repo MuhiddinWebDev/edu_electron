@@ -21,11 +21,6 @@ const dayJS = inject('dayJS')
 const data = ref([]);
 const loading = ref(true);
 
-
-
-const findRole = ref(localStorage.getItem("role"));
-const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
-
 const columns = ref([
   {
     title: "№",
@@ -89,8 +84,6 @@ const getAll = () => {
     data.value = res;
   });
 };
-
-
 
 onMounted(() => {
   getAll()

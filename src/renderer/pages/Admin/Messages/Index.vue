@@ -192,7 +192,7 @@ const searchUser = ()=>{
             <div class="search-action">
                 <div class="search-action_item">
                     <n-input-group>
-                        <n-input-group-label>Foydalanuvchi</n-input-group-label>
+                        <n-input-group-label>Xabar</n-input-group-label>
                         <n-select v-model:value="UserId" placeholder="Qidiruv"  clearable filterable
                             :options="UserOptions" label-field="fullname" value-field="id"></n-select>
                     </n-input-group>

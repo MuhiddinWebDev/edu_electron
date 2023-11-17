@@ -55,7 +55,7 @@ const form_data = ref({
   course_id: null,
   room_id: null,
   filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
-  next_lesson: "122",
+  next_lesson: "test",
 });
 const genarate_date = ref({
   start_date: "",
@@ -172,11 +172,7 @@ onMounted(() => {
       }
     });
   }
-  // if (findRole.value == "SuperAdmin") {
-  //   getAllBranch();
-  // }
-  // if (findRole.value != "SuperAdmin") {
-  // }
+ 
   getAllGroups();
   getAllCourse();
   getAllRooms();
@@ -486,7 +482,7 @@ const SavLessonTable = async () => {
 /////////////////////////
 ////// genarate days functions
 const dateDisabled = (val) => {
-  return val < Date.now();
+  return val <= Date.now();
 };
 ///////
 //////////////// lesson tables functions add show actions
@@ -832,7 +828,6 @@ const UpdateGroup = (id) => {
               <n-form-item label="Boshlanish sanasi" path="start_date">
                 <n-date-picker
                   :style="{ width: '100%' }"
-                  :is-date-disabled="dateDisabled"
                   v-model:value="course_start_day"
                 ></n-date-picker>
               </n-form-item>

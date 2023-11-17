@@ -228,9 +228,16 @@ const sendMessage = async () => {
       message.warning('Shaxslarni tanglang!!!')
     }else{
       ModelService.create(form_data.value).then((res)=>{
-        notification.success({
-          title: 'Muvofaqqiyatli',
-          content: `Xabarlar ${form_data.value.name}ga jo'natildi`,
+        // notification.success({
+        //   title: 'Muvofaqqiyatli',
+        //   content: `Xabarlar ${form_data.value.name}ga jo'natildi`,
+        //   duration: 2500,
+        //   keepAliveOnHover: true,
+        //   meta: dayJS
+        // })
+        notification.warning({
+          title: 'Ogohlantirish',
+          content: `SMS tarifga ulanmagan`,
           duration: 2500,
           keepAliveOnHover: true,
           meta: dayJS
@@ -396,7 +403,7 @@ const sendMessage = async () => {
         transform-orign="center"
       >
         <div class="no-padding">
-          <DraftIndex @select="chooseDraft" />
+          <DraftIndex @select="chooseDraft" :branch_id="form_data.filial_id" />
         </div>
       </n-modal>
     </section>
