@@ -53,9 +53,6 @@ axios.interceptors.response.use(function (response) {
   return response.data;
 },
   function (error) {
-    // if (error.message == 'Network Error') {
-    //   error_store.error_text = "Baza bilan aloqa uzildi!"
-    // }
     if (error.code == 'ERR_NETWORK') {
       router.push({ name: 'Login' });
       localStorage.clear();
@@ -63,7 +60,6 @@ axios.interceptors.response.use(function (response) {
       error_store.error_text = error.response.data.message
     } else if (error.response.status == 401) {
       error_store.error_text = error.response.data.message
-      router.push({ name: 'Login' });
     } else if (error.response.status == 500) {
       error_store.error_text = error.response.data.message
     } else {

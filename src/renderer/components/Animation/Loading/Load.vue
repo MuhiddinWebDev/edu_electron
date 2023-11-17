@@ -46,9 +46,8 @@ const themeAction = ref( JSON.parse(localStorage.getItem('theme')));
 
 .jelly-triangle {
   --uib-size: 60px;
-  --uib-speed: 1s;
+  --uib-speed: 0.7s;
   --uib-color: #18a058;
-
   position: relative;
   height: var(--uib-size);
   width: var(--uib-size);
@@ -64,6 +63,7 @@ const themeAction = ref( JSON.parse(localStorage.getItem('theme')));
   height: 33%;
   background: var(--uib-color);
   border-radius: 100%;
+  z-index: 100;
 }
 
 .jelly-triangle__dot {
