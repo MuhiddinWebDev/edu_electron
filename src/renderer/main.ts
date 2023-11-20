@@ -56,7 +56,7 @@ axios.interceptors.response.use(function (response) {
     if (error.code == 'ERR_NETWORK') {
       router.push({ name: 'Login' });
       localStorage.clear();
-    } else if (error.response.status == 400) {
+    }else if (error.response.status == 400) {
       error_store.error_text = error.response.data.message
     } else if (error.response.status == 401) {
       error_store.error_text = error.response.data.message

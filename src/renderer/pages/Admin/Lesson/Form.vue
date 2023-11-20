@@ -134,6 +134,7 @@ const getAllRooms = (branch) => {
   if(branch){
     filterData.value.filial_id = branch
   }
+  console.log(branch)
   RoomsService.searchModel(filterData.value).then((res) => {
     roomsOptions.value = res;
   });
@@ -144,6 +145,10 @@ const getAllBranch = () => {
   });
 };
 onMounted(() => {
+ 
+  getAllGroups();
+  getAllCourse();
+  getAllBranch();
   if (props.type == "update") {
     if (counter.lesson == true) {
       createLesson.value = false;
@@ -161,6 +166,7 @@ onMounted(() => {
       roomID.value = res.room_id;
       LessonID.value = res.id;
       LessonTable.value = res.lesson_table;
+      getAllRooms(res.filial_id)
       if(res.lesson_table.length == 0){
         daysWrapper.value = true;
         counter.lesson = true;
@@ -171,12 +177,9 @@ onMounted(() => {
         createLesson.value = true;
       }
     });
+  }else if(props.type =='create'){
+    getAllRooms();
   }
- 
-  getAllGroups();
-  getAllCourse();
-  getAllRooms();
-  getAllBranch();
 });
 
 const exit = () => {
@@ -739,7 +742,6 @@ const UpdateGroup = (id) => {
               </n-form-item>
             </n-grid-item>
             <n-grid-item>
-              {{ form_data.room_id }}
               <n-form-item label="Xona" path="room_id">
                 <n-input-group>
                   <n-select
@@ -1093,7 +1095,7 @@ const UpdateGroup = (id) => {
                 <template #icon>
                   <exit-icon />
                 </template>
-                Chiqish1111
+                Chiqish
               </n-button>
             </div>
             <div class="btn-action_item">
@@ -1103,7 +1105,7 @@ const UpdateGroup = (id) => {
                     <save-icon />
                   </n-icon>
                 </template>
-                Saqlash111
+                Saqlash
               </n-button>
             </div>
             <div class="btn-action_item">
