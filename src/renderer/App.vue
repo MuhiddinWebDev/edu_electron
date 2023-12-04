@@ -24,6 +24,9 @@ router.afterEach(() => {
 	loadItem.loadAction = false;
 	let path_val = route.name;
 	document.title = path_val + " - Admin" || Default_title;
+  if(path_val == undefined){
+    route.push({ name:'Login'})
+  }
 });
 watch(error_text, (val) => {
 	if (val != "") {

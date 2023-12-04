@@ -2,30 +2,30 @@ import { createRouter, createWebHistory } from "vue-router";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: "/",
-      name: "Addmissions",
-      redirect: "/login",
-      component: () => import("./pages/Admission/Index.vue"),
-      children: [
-        {
-          path: "/main-home",
-          name: "main-home",
-          component: () => import("./pages/Admission/Home.vue"),
-        },
-        {
-          path: '/main-courses',
-          name: 'main-courses',
-          component: () => import("./pages/Admission/Courses.vue")
-        },
-        {
-          path: '/main-connect',
-          name: 'main-connect',
-          component: () => import("./pages/Admission/Connect.vue")
-        },
+    // {
+    //   path: "/",
+    //   name: "Addmissions",
+    //   redirect: "/login",
+    //   component: () => import("./pages/Admission/Index.vue"),
+    //   children: [
+    //     {
+    //       path: "/main-home",
+    //       name: "main-home",
+    //       component: () => import("./pages/Admission/Home.vue"),
+    //     },
+    //     {
+    //       path: '/main-courses',
+    //       name: 'main-courses',
+    //       component: () => import("./pages/Admission/Courses.vue")
+    //     },
+    //     {
+    //       path: '/main-connect',
+    //       name: 'main-connect',
+    //       component: () => import("./pages/Admission/Connect.vue")
+    //     },
 
-      ],
-    },
+    //   ],
+    // },
     {
       path: '/Admin',
       name: 'Admin',
@@ -347,7 +347,6 @@ router.beforeEach((to, from, next) => {
   const publicPages = ['/Login']
   const authRequired = !publicPages.includes(to.path)
   const loggedIn = localStorage.getItem('token')
-  const role = localStorage.getItem('role');
   // trying to access a restricted page + not logged in
   // redirect to login page
   if (authRequired && !loggedIn && to.path != '/software-payment') {
