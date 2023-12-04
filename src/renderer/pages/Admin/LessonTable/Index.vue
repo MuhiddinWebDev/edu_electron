@@ -1,195 +1,188 @@
 <script setup>
 import { ref, onMounted, inject, watch } from "vue";
+
 import ModelService from "../../../services/lesson.service";
 import BranchService from "../../../services/branch.service";
+import CourseService from "../../../services/course.service";
+import GroupService from "../../../services/groups.service";
+
+import AttandanceForm from "../ToAttandance/Form.vue"
 
 import { useMagicKeys } from "@vueuse/core";
 import {
   ChevronRight16Filled as rightArrow,
   ChevronLeft16Filled as leftArrow,
 } from "@vicons/fluent";
+
+
 const dayJS = inject("dayJS");
 const today = ref(new Date());
-const dayOfWeek = ref(null);
-const monday = ref(null);
-const saturday = ref(null);
-const startWeek = ref(today.value.getTime());
-const endWeek = ref(today.value.getTime());
+//// to attandance value
+const showCreateAttandance = ref(false);
+const showUpdateAttandance = ref(false);
+const tableRow = ref({})
+//// to attandance value
+
+
+const searchAct = ref({
+  start:today.value.getTime(),
+  end:today.value.getTime(),
+  filial_id:JSON.parse(localStorage.getItem("filial_id")),
+  course_id:null,
+  group_id:null,
+})
+
 const branchOptions = ref([]);
+const courseOptions = ref([]);
+const groupOptions = ref([])
+
 const loading = ref(true);
 const lessonTable = ref([]);
-const branchName = ref('')
-const findRole = ref( localStorage.getItem('role'));
-const findBranch = ref(JSON.parse(localStorage.getItem('filial_id')));
+const branchName = ref("");
+const findRole = ref(localStorage.getItem("role"));
 
-const MondayData = ref({
-  weekday: "",
-  date: "",
-  data_table: [],
-});
-const TuesdayData = ref({
-  weekday: "",
-  date: "",
-  data_table: [],
-});
-const WednesdayData = ref({
-  weekday: "",
-  date: "",
-  data_table: [],
-});
-const ThursdayData = ref({
-  weekday: "",
-  date: "",
-  data_table: [],
-});
-const FridayData = ref({
-  weekday: "",
-  date: "",
-  data_table: [],
-});
-const SaturdayData = ref({
-  weekday: "",
-  date: "",
-  data_table: [],
-});
-const SundayData = ref({
-  weekday: "",
-  date: "",
-  data_table: [],
-});
 
-const clearData = () => {
-  MondayData.value.data_table = [];
-  TuesdayData.value.data_table = [];
-  WednesdayData.value.data_table = [];
-  ThursdayData.value.data_table = [];
-  FridayData.value.data_table = [];
-  SaturdayData.value.data_table = [];
-  SundayData.value.data_table = [];
-};
-const getAll = (start, end, branch) => {
-  loading.value = true
-  clearData();
-  const data_table ={
-    start: start,
-    end: end,
-    filial_id:branch
+const getAll = (start,end,branch, course,group) => {
+  loading.value = true;
+
+  let lastSearch = {
+    start:dayJS(start).format("YYYY-MM-DD"),
+    end:dayJS(end).format("YYYY-MM-DD"),
+    filial_id:branch,
+    course_id:course,
+    group_id:group,
   }
-  ModelService.getAllTable(data_table).then((res) => {
+  ModelService.getAllTable(lastSearch).then((res) => {
     lessonTable.value = res;
     loading.value = false;
-    res.forEach((item) => {
-      if (item.weekday == "Monday") {
-        MondayData.value.weekday = item.weekday;
-        MondayData.value.date = item.date;
-        MondayData.value.data_table.push(item);
-      } else if (item.weekday == "Tuesday") {
-        TuesdayData.value.weekday = item.weekday;
-        TuesdayData.value.date = item.date;
-        TuesdayData.value.data_table.push(item);
-      } else if (item.weekday == "Wednesday") {
-        WednesdayData.value.weekday = item.weekday;
-        WednesdayData.value.date = item.date;
-        WednesdayData.value.data_table.push(item);
-      } else if (item.weekday == "Thursday") {
-        ThursdayData.value.weekday = item.weekday;
-        ThursdayData.value.date = item.date;
-        ThursdayData.value.data_table.push(item);
-      } else if (item.weekday == "Friday") {
-        FridayData.value.weekday = item.weekday;
-        FridayData.value.date = item.date;
-        FridayData.value.data_table.push(item);
-      } else if (item.weekday == "Saturday") {
-        SaturdayData.value.weekday = item.weekday;
-        SaturdayData.value.date = item.date;
-        SaturdayData.value.data_table.push(item);
-      } else if (item.weekday == "Sunday") {
-        SundayData.value.weekday = item.weekday;
-        SundayData.value.date = item.date;
-        SundayData.value.data_table.push(item);
-      }
-    });
   });
 };
-const getAllBranches = ()=>{
-  BranchService.getAll().then((res)=>{
+
+const getAllCourse = (filial_id)=> {
+  let searchData = {
+    filial_id: filial_id
+  }
+
+  CourseService.searchModel(searchData).then((res)=>{
+    courseOptions.value = res
+  })
+}
+
+const getAllGroup = (filial_id)=>{
+  let searchData = {
+    filial_id: filial_id
+  }
+  GroupService.searchModel(searchData).then((res)=>{
+    groupOptions.value = res
+  })
+}
+
+const getAllBranches = () => {
+  BranchService.getAll().then((res) => {
     branchOptions.value = res;
   });
-}
-const findBranchName = (branch)=>{
-  BranchService.getOne(branch).then((res)=>{
+};
+
+const findBranchName = (branch) => {
+  BranchService.getOne(branch).then((res) => {
     branchName.value = res.name;
   });
+};
+
+const currentWeek = (branch) => {
+  const today = new Date();
+
+  const daysSinceMonday = today.getDay() - 1; 
+  const monday = new Date(today);
+
+  monday.setDate(today.getDate() - daysSinceMonday);
+
+  const daysUntilSunday = 6 - daysSinceMonday;
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() + daysUntilSunday);
+
+  searchAct.value.start = new Date(monday).getTime();
+  searchAct.value.end = new Date(sunday).getTime();
+ 
+  getAll(monday, sunday, branch);
+};
+
+/// to attandance functions
+const closeAttandance = ()=>{
+  showCreateAttandance.value = false;
 }
-const currentWeek = (branch, xDate,yDate)=>{
-  dayOfWeek.value = today.value.getDay();
-  monday.value = new Date(today.value);
-  saturday.value = new Date(monday.value);
-  ////////////////////////////////
-  monday.value.setDate(today.value.getDate() - dayOfWeek.value + 1);
-  saturday.value.setDate(monday.value.getDate() + 6);
-  ////////////////////////////////
-  startWeek.value = monday.value.getTime();
-  endWeek.value = saturday.value.getTime();
-  let startStr = dayJS(startWeek.value).format("YYYY-MM-DD");
-  let endStr = dayJS(endWeek.value).format("YYYY-MM-DD");
-  getAll(startStr, endStr, branch);
+
+const ableToAttandance = ()=>{
+  showCreateAttandance.value = false;
+  getAll(searchAct.value.start, searchAct.value.end, searchAct.value.filial_id, searchAct.value.course_id ,searchAct.value.group_id);
 }
-const countWeek = ref(1);
+
+const showClose = ()=>{
+  showCreateAttandance.value = false;
+}
+
+const clickTableRow = (item)=>{
+  tableRow.value = item;
+  // if(!item.done){
+  // }
+  showCreateAttandance.value = true;
+}
+/// to attandance functions
+
+
 onMounted(() => {
-  currentWeek(findBranch.value);
-  findBranchName(findBranch.value);
-  if(findRole.value =='SuperAdmin'){
-    getAllBranches();
-  }
+  currentWeek(searchAct.value.filial_id);
+  findBranchName(searchAct.value.filial_id);
+  getAllGroup(searchAct.value.filial_id);
+  getAllCourse(searchAct.value.filial_id);
+  getAllBranches();
 });
 
 ///// search functions starting
 
-const ArrowClick = (e)=>{
-  const startWeekDate = new Date(startWeek.value);
-  const endWeekDate = new Date(endWeek.value);
+const ArrowClick = (e) => {
+  const startWeekDate = new Date(searchAct.value.start);
+  const endWeekDate = new Date(searchAct.value.start);
 
   // Calculate the new start and end dates
   const newStartWeekDate = new Date(startWeekDate);
   const newEndWeekDate = new Date(endWeekDate);
-  if(e == 'left'){
-    newStartWeekDate.setDate(newStartWeekDate.getDate() - countWeek.value * 7);
-    newEndWeekDate.setDate(newEndWeekDate.getDate() - countWeek.value * 7);
-  }else{
-    newStartWeekDate.setDate(newStartWeekDate.getDate() + countWeek.value * 7);
-    newEndWeekDate.setDate(newEndWeekDate.getDate() + countWeek.value * 7);
+  if (e == "left") {
+    newStartWeekDate.setDate(newStartWeekDate.getDate() - 7);
+    newEndWeekDate.setDate(newEndWeekDate.getDate() - 1);
+  } else {
+    newStartWeekDate.setDate(newStartWeekDate.getDate() + 7);
+    newEndWeekDate.setDate(newEndWeekDate.getDate() + 13);
   }
-  startWeek.value = newStartWeekDate.getTime();
-  endWeek.value = newEndWeekDate.getTime();
+  searchAct.value.start = newStartWeekDate.getTime();
+  searchAct.value.end = newEndWeekDate.getTime();
 
-  let startStr = dayJS(startWeek.value).format("YYYY-MM-DD");
-  let endStr = dayJS(endWeek.value).format("YYYY-MM-DD");
-  let branch = findBranch.value;
+  getAll(searchAct.value.start, searchAct.value.end, searchAct.value.filial_id);
+};
+const updateBranch = (branch) => {
+  getAll(searchAct.value.start, searchAct.value.end, branch);
+  findBranchName(branch);
+};
+const updateCourse = (course)=>{
+  getAll(searchAct.value.start, searchAct.value.end, searchAct.value.filial_id, course, searchAct.value.group_id);
 
-  getAll(startStr, endStr, branch);
 }
-const updateBranch = (branch)=> {
-  let startStr = dayJS(startWeek.value).format("YYYY-MM-DD");
-  let endStr = dayJS(endWeek.value).format("YYYY-MM-DD");
-  getAll(startStr, endStr, branch);
-  findBranchName(branch)
+const updateGroup = (group)=>{
+  getAll(searchAct.value.start, searchAct.value.end, searchAct.value.filial_id, searchAct.value.course_id ,group);
 }
 /// search keydown event start
 const { arrowright, arrowleft /* keys you want to monitor */ } = useMagicKeys();
 watch(arrowright, (v) => {
   if (v) {
-    ArrowClick('right')
+    ArrowClick("right");
   }
 });
 watch(arrowleft, (v) => {
   if (v) {
-    ArrowClick('left')
-
+    ArrowClick("left");
   }
 });
 //// search keydown event end
-
 </script>
 
 <template>
@@ -211,7 +204,7 @@ watch(arrowleft, (v) => {
             <n-input-group-label>Boshlanish sanasi</n-input-group-label>
             <n-date-picker
               :disabled="true"
-              v-model:value="startWeek"
+              v-model:value="searchAct.start"
               :style="{ width: '100%' }"
             ></n-date-picker>
           </n-input-group>
@@ -221,7 +214,7 @@ watch(arrowleft, (v) => {
             <n-input-group-label>Tugash sanasi</n-input-group-label>
             <n-date-picker
               :disabled="true"
-              v-model:value="endWeek"
+              v-model:value="searchAct.end"
               :style="{ width: '100%' }"
             ></n-date-picker>
           </n-input-group>
@@ -237,9 +230,9 @@ watch(arrowleft, (v) => {
           <n-input-group>
             <n-input-group-label>Filial</n-input-group-label>
             <n-select
-              v-model:value="findBranch"
+              v-model:value="searchAct.filial_id"
               :options="branchOptions"
-              @update:value = "updateBranch"
+              @update:value="updateBranch"
               label-field="name"
               value-field="id"
               placeholder="Qidiruv"
@@ -247,271 +240,334 @@ watch(arrowleft, (v) => {
             ></n-select>
           </n-input-group>
         </div>
+        <div class="search-action_item" >
+          <n-input-group>
+            <n-input-group-label>Kurs</n-input-group-label>
+            <n-select
+              v-model:value="searchAct.course_id"
+              :options="courseOptions"
+              @update:value="updateCourse"
+              label-field="name"
+              value-field="id"
+              placeholder="Qidiruv"
+              filterable
+              clearable
+            ></n-select>
+          </n-input-group>
+        </div>
+        <div class="search-action_item" >
+          <n-input-group>
+            <n-input-group-label>Guruh</n-input-group-label>
+            <n-select
+              v-model:value="searchAct.group_id"
+              :options="groupOptions"
+              @update:value="updateGroup"
+              label-field="name"
+              value-field="id"
+              placeholder="Qidiruv"
+              filterable
+              clearable
+            ></n-select>
+          </n-input-group>
+        </div>
+        <h2 style="padding: 4px 20px">{{ branchName }} dars jadvali</h2>
       </div>
     </div>
     <n-spin :show="loading">
-      <h2 style="padding:4px 20px">{{ branchName }} dars jadvali</h2>
-      <div class="box-table" :class="lessonTable.length == 0 ? 'box-table_active' : ''">
-        <div class="box-table_item" v-if="MondayData.data_table.length > 0">
+      <div
+        class="box-table"
+        :class="lessonTable.length == 0 ? 'box-table_active' : ''"
+      >
+        <div class="box-table_item">
           <n-card :style="{ height: '100%' }" :bordered="false" size="small">
-            <template #header-extra>
-              {{ MondayData.date }}
-            </template>
             <template #header>
-              <p v-if="MondayData.weekday == 'Monday'">Dushanba</p>
+              <p>Dushanba</p>
             </template>
+            <template #header-extra> {{ lessonTable.Monday?.length ? lessonTable.Monday[0].date: null  }} </template>
             <n-divider :style="{ margin: '4px 0px' }"></n-divider>
             <div class="time-table">
               <div
                 class="time-table-content"
-                v-for="(item, index) in MondayData.data_table"
+                v-for="(item, index) in lessonTable.Monday"
               >
-                <div class="time-table-content_title">
-                  <p>
-                    {{ index + 1 }}. <span>{{ item.course_name }}</span>
-                  </p>
-                  <n-tag
-                    :bordered="false"
-                    round
-                    :color="{ color: '#18a058', textColor: '#fff' }"
-                  >
-                    {{ item.group_name }}
-                  </n-tag>
-                </div>
-                <div class="time-table-content_item">
-                  <p>{{ item.room_name }}</p>
-                  <p>/</p>
-                  <p :title="item.teacher_name">{{ item.teacher_name }}</p>
-                  <p>/</p>
-                  <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                <div
+                  @click="clickTableRow(item)"
+                  class="time-table-row"
+                  :class="item.done ? 'status-success ' : 'status-warning'"
+                >
+                  <div class="time-table-content_title">
+                    <p>
+                      {{ index + 1 }}. <span>{{ item.course }}</span>
+                    </p>
+                    <n-tag
+                      :bordered="false"
+                      round
+                      :color="{ color: '#2080f0', textColor: '#fff' }"
+                    >
+                      {{ item.group }}
+                    </n-tag>
+                  </div>
+                  <div class="time-table-content_item">
+                    <p>{{ item.room }}</p>
+                    <p>/</p>
+                    <p :title="item.teacher">{{ item.teacher }}</p>
+                    <p>/</p>
+                    <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </n-card>
         </div>
 
-        <div class="box-table_item" v-if="TuesdayData.data_table.length > 0">
+        <div class="box-table_item">
           <n-card :style="{ height: '100%' }" :bordered="false" size="small">
-            <template #header-extra>
-              {{ TuesdayData.date }}
-            </template>
+            
             <template #header>
               <p>Seshanba</p>
             </template>
+            <template #header-extra> {{ lessonTable.Tuesday?.length ? lessonTable.Tuesday[0].date: null  }} </template>
+
             <n-divider :style="{ margin: '4px 0px' }"></n-divider>
             <div class="time-table">
               <div
                 class="time-table-content"
-                v-for="(item, index) in TuesdayData.data_table"
+                v-for="(item, index) in lessonTable.Tuesday"
               >
-                <div class="time-table-content_title">
-                  <p>
-                    {{ index + 1 }}. <span>{{ item.course_name }}</span>
-                  </p>
-                  <n-tag
-                    :bordered="false"
-                    round
-                    :color="{ color: '#18a058', textColor: '#fff' }"
-                  >
-                    {{ item.group_name }}
-                  </n-tag>
-                </div>
-                <div class="time-table-content_item">
-                  <p>{{ item.room_name }}</p>
-                  <p>/</p>
-                  <p :title="item.teacher_name">{{ item.teacher_name }}</p>
-                  <p>/</p>
-                  <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                <div
+                  @click="clickTableRow(item)"
+                  class="time-table-row"
+                  :class="item.done ? 'status-success ' : 'status-warning'"
+                >
+                  <div class="time-table-content_title">
+                    <p>
+                      {{ index + 1 }}. <span>{{ item.course }}</span>
+                    </p>
+                    <n-tag
+                      :bordered="false"
+                      round
+                      :color="{ color: '#2080f0', textColor: '#fff' }"
+                    >
+                      {{ item.group }}
+                    </n-tag>
+                  </div>
+                  <div class="time-table-content_item">
+                    <p>{{ item.room }}</p>
+                    <p>/</p>
+                    <p :title="item.teacher">{{ item.teacher }}</p>
+                    <p>/</p>
+                    <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </n-card>
         </div>
 
-        <div class="box-table_item" v-if="WednesdayData.data_table.length > 0">
+        <div class="box-table_item">
           <n-card :style="{ height: '100%' }" :bordered="false" size="small">
-            <template #header-extra>
-              {{ WednesdayData.date }}
-            </template>
             <template #header>
               <p>Chorshanba</p>
             </template>
+            <template #header-extra> {{ lessonTable.Wednesday?.length ? lessonTable.Wednesday[0].date: null  }} </template>
             <n-divider :style="{ margin: '4px 0px' }"></n-divider>
             <div class="time-table">
               <div
                 class="time-table-content"
-                v-for="(item, index) in WednesdayData.data_table"
+                v-for="(item, index) in lessonTable.Wednesday"
               >
-                <div class="time-table-content_title">
-                  <p>
-                    {{ index + 1 }}. <span>{{ item.course_name }}</span>
-                  </p>
-                  <n-tag
-                    :bordered="false"
-                    round
-                    :color="{ color: '#18a058', textColor: '#fff' }"
-                  >
-                    {{ item.group_name }}
-                  </n-tag>
-                </div>
-                <div class="time-table-content_item">
-                  <p>{{ item.room_name }}</p>
-                  <p>/</p>
-                  <p :title="item.teacher_name">{{ item.teacher_name }}</p>
-                  <p>/</p>
-                  <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                <div
+                  @click="clickTableRow(item)"
+                  class="time-table-row"
+                  :class="item.done ? 'status-success ' : 'status-warning'"
+                >
+                  <div class="time-table-content_title">
+                    <p>
+                      {{ index + 1 }}. <span>{{ item.course }}</span>
+                    </p>
+                    <n-tag
+                      :bordered="false"
+                      round
+                      :color="{ color: '#2080f0', textColor: '#fff' }"
+                    >
+                      {{ item.group }}
+                    </n-tag>
+                  </div>
+                  <div class="time-table-content_item">
+                    <p>{{ item.room }}</p>
+                    <p>/</p>
+                    <p :title="item.teacher">{{ item.teacher }}</p>
+                    <p>/</p>
+                    <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </n-card>
         </div>
 
-        <div class="box-table_item" v-if="ThursdayData.data_table.length > 0">
+        <div class="box-table_item">
           <n-card :style="{ height: '100%' }" :bordered="false" size="small">
-            <template #header-extra>
-              {{ ThursdayData.date }}
-            </template>
             <template #header>
               <p>Payshanba</p>
             </template>
+            <template #header-extra> {{ lessonTable.Thursday?.length ? lessonTable.Thursday[0].date: null  }} </template>
             <n-divider :style="{ margin: '4px 0px' }"></n-divider>
             <div class="time-table">
               <div
                 class="time-table-content"
-                v-for="(item, index) in ThursdayData.data_table"
+                v-for="(item, index) in lessonTable.Thursday"
               >
-                <div class="time-table-content_title">
-                  <p>
-                    {{ index + 1 }}. <span>{{ item.course_name }}</span>
-                  </p>
-                  <n-tag
-                    :bordered="false"
-                    round
-                    :color="{ color: '#18a058', textColor: '#fff' }"
-                  >
-                    {{ item.group_name }}
-                  </n-tag>
-                </div>
-                <div class="time-table-content_item">
-                  <p>{{ item.room_name }}</p>
-                  <p>/</p>
-                  <p :title="item.teacher_name">{{ item.teacher_name }}</p>
-                  <p>/</p>
-                  <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                <div
+                  @click="clickTableRow(item)"
+                  class="time-table-row"
+                  :class="item.done ? 'status-success ' : 'status-warning'"
+                >
+                  <div class="time-table-content_title">
+                    <p>
+                      {{ index + 1 }}. <span>{{ item.course }}</span>
+                    </p>
+                    <n-tag
+                      :bordered="false"
+                      round
+                      :color="{ color: '#2080f0', textColor: '#fff' }"
+                    >
+                      {{ item.group }}
+                    </n-tag>
+                  </div>
+                  <div class="time-table-content_item">
+                    <p>{{ item.room }}</p>
+                    <p>/</p>
+                    <p :title="item.teacher">{{ item.teacher }}</p>
+                    <p>/</p>
+                    <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </n-card>
         </div>
 
-        <div class="box-table_item" v-if="FridayData.data_table.length > 0">
+        <div class="box-table_item">
           <n-card :style="{ height: '100%' }" :bordered="false" size="small">
-            <template #header-extra>
-              {{ FridayData.date }}
-            </template>
             <template #header>
               <p>Juma</p>
             </template>
+            <template #header-extra> {{ lessonTable.Friday?.length ? lessonTable.Friday[0].date: null  }} </template>
             <n-divider :style="{ margin: '4px 0px' }"></n-divider>
             <div class="time-table">
               <div
                 class="time-table-content"
-                v-for="(item, index) in FridayData.data_table"
+                v-for="(item, index) in lessonTable.Friday"
               >
-                <div class="time-table-content_title">
-                  <p>
-                    {{ index + 1 }}. <span>{{ item.course_name }}</span>
-                  </p>
-                  <n-tag
-                    :bordered="false"
-                    round
-                    :color="{ color: '#18a058', textColor: '#fff' }"
-                  >
-                    {{ item.group_name }}
-                  </n-tag>
-                </div>
-                <div class="time-table-content_item">
-                  <p>{{ item.room_name }}</p>
-                  <p>/</p>
-                  <p :title="item.teacher_name">{{ item.teacher_name }}</p>
-                  <p>/</p>
-                  <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                <div
+                  @click="clickTableRow(item)"
+                  class="time-table-row"
+                  :class="item.done ? 'status-success ' : 'status-warning'"
+                >
+                  <div class="time-table-content_title">
+                    <p>
+                      {{ index + 1 }}. <span>{{ item.course }}</span>
+                    </p>
+                    <n-tag
+                      :bordered="false"
+                      round
+                      :color="{ color: '#2080f0', textColor: '#fff' }"
+                    >
+                      {{ item.group }}
+                    </n-tag>
+                  </div>
+                  <div class="time-table-content_item">
+                    <p>{{ item.room }}</p>
+                    <p>/</p>
+                    <p :title="item.teacher">{{ item.teacher }}</p>
+                    <p>/</p>
+                    <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </n-card>
         </div>
 
-        <div class="box-table_item" v-if="SaturdayData.data_table.length > 0">
+        <div class="box-table_item">
           <n-card :style="{ height: '100%' }" :bordered="false" size="small">
-            <template #header-extra>
-              {{ SaturdayData.date }}
-            </template>
             <template #header>
               <p>Shanba</p>
             </template>
+            <template #header-extra> {{ lessonTable.Saturday?.length ? lessonTable.Saturday[0].date: null  }} </template>
             <n-divider :style="{ margin: '4px 0px' }"></n-divider>
             <div class="time-table">
               <div
                 class="time-table-content"
-                v-for="(item, index) in SaturdayData.data_table"
+                v-for="(item, index) in lessonTable.Saturday"
               >
-                <div class="time-table-content_title">
-                  <p>
-                    {{ index + 1 }}. <span>{{ item.course_name }}</span>
-                  </p>
-                  <n-tag
-                    :bordered="false"
-                    round
-                    :color="{ color: '#18a058', textColor: '#fff' }"
-                  >
-                    {{ item.group_name }}
-                  </n-tag>
-                </div>
-                <div class="time-table-content_item">
-                  <p>{{ item.room_name }}</p>
-                  <p>/</p>
-                  <p :title="item.teacher_name">{{ item.teacher_name }}</p>
-                  <p>/</p>
-                  <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                <div
+                  @click="clickTableRow(item)"
+                  class="time-table-row"
+                  :class="item.done ? 'status-success ' : 'status-warning'"
+                >
+                  <div class="time-table-content_title">
+                    <p>
+                      {{ index + 1 }}. <span>{{ item.course }}</span>
+                    </p>
+                    <n-tag
+                      :bordered="false"
+                      round
+                      :color="{ color: '#2080f0', textColor: '#fff' }"
+                    >
+                      {{ item.group }}
+                    </n-tag>
+                  </div>
+                  <div class="time-table-content_item">
+                    <p>{{ item.room }}</p>
+                    <p>/</p>
+                    <p :title="item.teacher">{{ item.teacher }}</p>
+                    <p>/</p>
+                    <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </n-card>
         </div>
 
-        <div class="box-table_item" v-if="SundayData.data_table.length > 0">
+        <div class="box-table_item">
           <n-card :style="{ height: '100%' }" :bordered="false" size="small">
-            <template #header-extra>
-              {{ SundayData.date }}
-            </template>
             <template #header>
               <p>Yakshanba</p>
             </template>
+            <template #header-extra> {{ lessonTable.Sunday?.length ? lessonTable.Sunday[0].date: null  }} </template>
             <n-divider :style="{ margin: '4px 0px' }"></n-divider>
             <div class="time-table">
               <div
                 class="time-table-content"
-                v-for="(item, index) in SundayData.data_table"
+                v-for="(item, index) in lessonTable.Sunday"
               >
-                <div class="time-table-content_title">
-                  <p>
-                    {{ index + 1 }}. <span>{{ item.course_name }}</span>
-                  </p>
-                  <n-tag
-                    :bordered="false"
-                    round
-                    :color="{ color: '#18a058', textColor: '#fff' }"
-                  >
-                    {{ item.group_name }}
-                  </n-tag>
-                </div>
-                <div class="time-table-content_item">
-                  <p>{{ item.room_name }}</p>
-                  <p>/</p>
-                  <p :title="item.teacher_name">{{ item.teacher_name }}</p>
-                  <p>/</p>
-                  <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                <div
+                  @click="clickTableRow(item)"
+                  class="time-table-row"
+                  :class="item.done ? 'status-success ' : 'status-warning'"
+                >
+                  <div class="time-table-content_title">
+                    <p>
+                      {{ index + 1 }}. <span>{{ item.course }}</span>
+                    </p>
+                    <n-tag
+                      :bordered="false"
+                      round
+                      :color="{ color: '#2080f0', textColor: '#fff' }"
+                    >
+                      {{ item.group }}
+                    </n-tag>
+                  </div>
+                  <div class="time-table-content_item">
+                    <p>{{ item.room }}</p>
+                    <p>/</p>
+                    <p :title="item.teacher">{{ item.teacher }}</p>
+                    <p>/</p>
+                    <p>{{ item.begin_date }} - {{ item.end_date }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -524,10 +580,40 @@ watch(arrowleft, (v) => {
         </div>
       </div>
     </n-spin>
+    <n-modal
+      transform-orign="center"
+      v-model:show="showCreateAttandance"
+      :mask-closable="false"
+    >
+      <n-card
+        style="max-width: 1000px; width: calc(100vw - 20px)"
+        title="Davomat olish"
+        :bordered="false"
+        role="dialog"
+        aria-modal="true"
+        closable
+        @close="showClose('create')"
+      >
+        <AttandanceForm
+          @close="closeAttandance"
+          @by-table="ableToAttandance"
+          :table-row="tableRow"
+          type="by-table"
+        />
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <style scoped>
+.time-table-row {
+  padding: 4px 8px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+.time-table-row:hover{
+  background-color: cadetblue;
+}
 .time-table-content_title {
   display: flex;
   align-items: center;
@@ -565,8 +651,9 @@ watch(arrowleft, (v) => {
 
 .box-table {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
   gap: 8px 12px;
+  max-height: calc(100vh - 270px);
 }
 
 .box-table_active {

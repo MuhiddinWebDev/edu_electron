@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted, h, watch, inject } from "vue";
+//// API service
 import ModelService from "../../../services/rasxod.service";
 import UserService from "../../../services/users.service";
 import BranchService from "../../../services/branch.service";
 import BecourseService from "../../../services/rasxodBecouse.service";
+import PayTypeService from "../../../services/payType.service";
+//// API service
 ////// Indexs import start
 import UsersIndex from "../Users/Index.vue";
 import BranchIndex from "../Branch/Index.vue";
@@ -11,15 +14,19 @@ import BecouseIndex from "../RasxodBecouse/Index.vue";
 /////  Indexe import end
 import Dots from "../../../components/Dots/dots.vue";
 import { useMagicKeys } from "@vueuse/core";
+
 import {
   Save24Filled as SaveIcon,
   Add20Filled as AddIcon,
 } from "@vicons/fluent";
+import { useMessage } from "naive-ui"
 import { Exit as ExitIcon } from "@vicons/ionicons5";
 import { DeleteForeverRound as delIcon } from "@vicons/material";
+
 const props = defineProps(["type", "id"]);
 const emit = defineEmits(["create", "update", "close"]);
 const dayJS = inject("dayJS");
+const message = useMessage()
 const currentUser = ref(JSON.parse(localStorage.getItem("id")));
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
@@ -27,14 +34,14 @@ const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 const form_data = ref({
   datetime: new Date().getTime(),
   summa: 0,
-  user_id: findRole.value == 'SuperAdmin'? null : currentUser.value,
-  filial_id: findRole.value == 'SuperAdmin'? null : findBranch.value,
+  user_id: findRole.value == "SuperAdmin" ? null : currentUser.value,
+  filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
   text: "",
+  pay_type_id: 1,
   rasxod_table: [],
 });
 const formRef = ref("");
 const showFeedback = ref(false);
-
 
 const rules = {
   summa: {
@@ -54,6 +61,17 @@ const rules = {
       if (value == null) {
         showFeedback.value = true;
         return new Error("Iltimos shaxsni tanlang");
+
+      }
+    },
+  },
+  pay_type_id: {
+    required: true,
+    trigger: "blur",
+    validator: (rule, value) => {
+      if (value == null) {
+        showFeedback.value = true;
+        return new Error("Iltimos to'lov turni tanlang");
       }
     },
   },
@@ -72,6 +90,7 @@ const rules = {
 const UserOptions = ref([]);
 const BranchOptions = ref([]);
 const BecouseOptions = ref([]);
+const payTypeOptions = ref([]);
 //// select options variables
 /// getAll response functions start
 const getAllUsers = (id) => {
@@ -82,6 +101,11 @@ const getAllUsers = (id) => {
     UserOptions.value = res;
   });
 };
+const getAllPayType = () => {
+  PayTypeService.getAll().then((res) => {
+    payTypeOptions.value = res;
+  });
+};
 const getAllBranches = () => {
   BranchService.getAll().then((res) => {
     BranchOptions.value = res;
@@ -89,8 +113,8 @@ const getAllBranches = () => {
 };
 const getAllBecouse = (id) => {
   let senData = {
-    filial_id: findRole.value == "SuperAdmin"? id : findBranch.value,
-  }
+    filial_id: findRole.value == "SuperAdmin" ? id : findBranch.value,
+  };
   BecourseService.searchModel(senData).then((res) => {
     BecouseOptions.value = res;
   });
@@ -112,12 +136,13 @@ onMounted(() => {
       getAllBecouse(res.filial_id);
     });
   }
- 
+
   //// get user id by localstorge  start
   //// get user id end
   getAllUsers();
   getAllBranches();
   getAllBecouse();
+  getAllPayType();
 });
 const exit = () => {
   emit("close");
@@ -132,10 +157,7 @@ const AddRasxod = () => {
     comment: "",
   });
 };
-const delBtn = (id) => {
-  const index = form_data.value.rasxod_table.findIndex((item) => item.id == id);
-  form_data.value.rasxod_table.splice(index, 1);
-};
+
 //// rasxod table functions start
 const employeeRole = ($event, index) => {
   let id = $event;
@@ -152,6 +174,12 @@ const calcSumma = (summa) => {
     price += item.price ? item.price : 0;
   });
   form_data.value.summa = price;
+};
+
+const delBtn = (id) => {
+  const index = form_data.value.rasxod_table.findIndex((item) => item.id == id);
+  form_data.value.rasxod_table.splice(index, 1);
+  calcSumma()
 };
 //// rasxod table functions end
 //// render select function start
@@ -201,21 +229,37 @@ const renderUser = (option) => {
     ]
   );
 };
-//// render select function end
+const checkAction = ref(false)
+const checkValidation = (item)=>{
+  if(item != null){
+    checkAction.value = true;
+    return "success"
+  }else{
+    checkAction.value = false;
+    return "error";
+  }
+}
+
 const save = async () => {
   try {
     const result = await formRef.value?.validate();
-    if (props.type == "create") {
-      ModelService.create(form_data.value).then((res) => {
-        emit("create", res);
-      });
-    } else if (props.type == "update") {
-      ModelService.update(props.id, form_data.value).then((res) => {
-        emit("update", res);
-      });
+    if(checkAction.value){
+      if (props.type == "create") {
+        ModelService.create(form_data.value).then((res) => {
+          emit("create", res);
+        });
+      } else if (props.type == "update") {
+        ModelService.update(props.id, form_data.value).then((res) => {
+          emit("update", res);
+        });
+      }
+    }else{
+      message.warning("Xarajat sababni tanlang!!!")
     }
   } catch (e) {}
 };
+
+
 ///// input format numbers
 const format = (value) => {
   if (value === null) return "";
@@ -345,7 +389,7 @@ const WhoSearch = (user) => {
   <div class="user-message">
     <n-form :model="form_data" ref="formRef" :rules="rules">
       <div class="user-message-header">
-        <n-grid cols="1 s:2 m:2 l:5" :x-gap="12" :y-gap="6" responsive="screen">
+        <n-grid cols="1 s:2 m:2 l:4" :x-gap="12" :y-gap="0" responsive="screen">
           <n-grid-item>
             <n-form-item label="Sana" path="date">
               <n-date-picker
@@ -358,7 +402,7 @@ const WhoSearch = (user) => {
             </n-form-item>
           </n-grid-item>
           <n-grid-item v-if="findRole == 'SuperAdmin'">
-            <n-form-item label="Filial" path="filial_id" >
+            <n-form-item label="Filial" path="filial_id">
               <n-input-group>
                 <n-select
                   @keydown="BranchKey"
@@ -406,7 +450,7 @@ const WhoSearch = (user) => {
                   :render-tag="renderUserSelect"
                   v-model:value="form_data.user_id"
                   :options="UserOptions"
-                  :disabled="props.type == 'read' || props.type == 'update'"
+                  :disabled="props.type == 'read'"
                   value-field="id"
                   label-field="fullname"
                   clearable
@@ -436,7 +480,25 @@ const WhoSearch = (user) => {
               </n-input-group>
             </n-form-item>
           </n-grid-item>
-
+          <n-grid-item>
+            <n-form-item label="To'lov turi" path="pay_type_id">
+              <n-select
+                v-model:value="form_data.pay_type_id"
+                :options="payTypeOptions"
+                :disabled="props.type == 'read'"
+                value-field="id"
+                label-field="name"
+                filterable
+              >
+                <template #action>
+                  <p style="text-align: center">Ro'yxatni ko'rish "F4"</p>
+                </template>
+                <template #empty>
+                  <p style="text-align: center">Qo'shish uchun "Insert"</p>
+                </template>
+              </n-select>
+            </n-form-item>
+          </n-grid-item>
           <n-grid-item>
             <n-form-item label="Summa" path="summa">
               <n-input-number
@@ -461,32 +523,35 @@ const WhoSearch = (user) => {
               </n-input>
             </n-form-item>
           </n-grid-item>
+          <n-grid-item v-if="props.type != 'read'">
+            <n-form-item>
+              <n-button @click="AddRasxod" type="success">
+                <template #icon>
+                  <n-icon size="18">
+                    <AddIcon />
+                  </n-icon>
+                </template>
+                Qo'shish
+              </n-button>
+            </n-form-item>
+          </n-grid-item>
         </n-grid>
-        <div class="btn-action" style="margin-bottom: 10px"  v-if="props.type != 'read'">
-          <n-button @click="AddRasxod" type="success">
-            <template #icon>
-              <n-icon size="18">
-                <AddIcon />
-              </n-icon>
-            </template>
-            Qo'shish
-          </n-button>
-        </div>
-        <n-scrollbar  trigger="none" x-scrollable>
-          <n-table style="min-width: 850px; background-color: red ">
+
+        <n-scrollbar trigger="none" x-scrollable style="height: calc(100vh - 325px);">
+          <n-table :bordered="true" :single-line="false" size="small">
             <thead>
               <tr>
-                <th style="max-width: 20px">N0</th>
+                <th style="width: 30px">№</th>
                 <th>Sababi</th>
                 <th>Kimga</th>
                 <th>Berilgan summa</th>
                 <th>Izoh</th>
-                <th v-if="props.type != 'read'">Amal</th>
+                <th v-if="props.type != 'read'" style="width: 50px;">Amal</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in form_data.rasxod_table">
-                <td style="max-width: 20px">{{ index + 1 }}</td>
+                <td style="width: 30px; text-align:center;">{{ index + 1 }}</td>
                 <td>
                   <n-input-group>
                     <n-select
@@ -495,6 +560,7 @@ const WhoSearch = (user) => {
                       v-model:value="item.becouse_id"
                       :disabled="props.type == 'read'"
                       :options="BecouseOptions"
+                      :status="checkValidation(item.becouse_id)"
                       value-field="id"
                       label-field="name"
                       filterable
@@ -584,7 +650,7 @@ const WhoSearch = (user) => {
                     :disabled="props.type == 'read'"
                   ></n-input>
                 </td>
-                <td  v-if="props.type != 'read'">
+                <td v-if="props.type != 'read'" style="width: 50px; text-align: center;">
                   <div
                     class="d-flex-btn"
                     style="
@@ -629,7 +695,7 @@ const WhoSearch = (user) => {
           </template>
           Chiqish
         </n-button>
-        <n-button @click="save" type="success" >
+        <n-button @click="save" type="success">
           <template #icon>
             <n-icon>
               <save-icon />
@@ -644,7 +710,7 @@ const WhoSearch = (user) => {
       transform-orign="center"
       v-model:show="showBranch"
       preset="card"
-      style="width: calc(100% - 35px)"
+      style="width: calc(100% - 35px);"
       size="small"
     >
       <BranchIndex

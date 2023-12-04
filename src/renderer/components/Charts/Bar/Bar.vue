@@ -9,7 +9,7 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, watch, onMounted, inject } from "vue";
+import { ref, provide, watch, onMounted, inject, onBeforeMount, reactive  } from "vue";
 import ReportService from "../../../services/report.service";
 import { useCounterStore } from "../../../stores/counter";
 use([
@@ -36,7 +36,9 @@ watch(
     }
   }
 );
-
+const yMaxValue = reactive({
+  max_sum:0
+})
 const getAllReports = async (data) => {
   let kirimData = [];
   let chiqimData = [];
@@ -51,9 +53,44 @@ const getAllReports = async (data) => {
     option.value.series[0].data = kirimData;
     option.value.series[1].data = chiqimData;
     option.value.xAxis[0].data = dataDays;
+    yMaxValue.max_sum = res.maxPrice;
   });
  
 };
+
+const sumFormat = (value)=>{
+  return Intl.NumberFormat('ru-RU',{
+    style:'decimal',
+    maximumFractionDigits:2
+  }).format(value)
+}
+
+const days = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+
+  const thisMonth = new Date(today.getFullYear(), today.getMonth());
+  const range_date = [thisMonth.getTime(), today.getTime()];
+  
+  let sendData = {
+    start_date: Math.floor(range_date[0] / 1000),
+    end_date: Math.floor(range_date[1] / 1000),
+    filial_id: JSON.parse(localStorage.getItem("filial_id")),
+    pay_type_id: null,
+  };
+
+  const lastDayOfMonth = new Date(year, month, 0);
+  const daysInMonth = lastDayOfMonth.getDate();
+  // for(let i = 1; i <= daysInMonth; i++){
+    // let el = dayJS(new Date(year, month -1 , i).getTime()).format("YYYY-MM-DD");
+    // option.value.xAxis[0].data.push(el)
+  // }
+
+  getAllReports(sendData);
+};
+
+days()
 
 const option = ref({
   tooltip: {
@@ -90,8 +127,8 @@ const option = ref({
       type: "value",
       name: "Kassa",
       min: 0,
-      max: 1000000,
-      interval: 100000,
+      max: 10000000,
+      interval: 1000000,
       axisLabel: {
         formatter: "{value} so'm",
       },
@@ -103,7 +140,7 @@ const option = ref({
       type: "bar",
       tooltip: {
         valueFormatter: function (value) {
-          return value + " so'm";
+          return sumFormat(value) + " so'm";
         },
       },
       data: [],
@@ -113,7 +150,7 @@ const option = ref({
       type: "bar",
       tooltip: {
         valueFormatter: function (value) {
-          return value + " so'm";
+          return sumFormat(value) + " so'm";
         },
       },
       data: [],
@@ -168,32 +205,8 @@ const option = ref({
 //   ],
 // });
 
-const days = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
 
-  const thisMonth = new Date(today.getFullYear(), today.getMonth());
-  const range_date = [thisMonth.getTime(), today.getTime()];
-  
-  let sendData = {
-    start_date: Math.floor(range_date[0] / 1000),
-    end_date: Math.floor(range_date[1] / 1000),
-    filial_id: JSON.parse(localStorage.getItem("filial_id")),
-    pay_type_id: null,
-  };
-
-  const lastDayOfMonth = new Date(year, month, 0);
-  const daysInMonth = lastDayOfMonth.getDate();
-  // for(let i = 1; i <= daysInMonth; i++){
-    // let el = dayJS(new Date(year, month -1 , i).getTime()).format("YYYY-MM-DD");
-    // option.value.xAxis[0].data.push(el)
-  // }
-
-  getAllReports(sendData);
-};
 onMounted(async () => {
-  await days();
   if (counter.theme) {
     autoTheme.value = "dark";
   } else {

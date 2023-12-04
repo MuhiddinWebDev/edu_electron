@@ -14,7 +14,7 @@ import {
 } from "naive-ui";
 import ModelForm from "./Form.vue";
 import ModelFormMore from "./MoreForm.vue";
-import ModelRead from "./Read.vue"
+import ModelRead from "./Read.vue";
 import {
   Add20Filled as AddIcon,
   AddSquareMultiple16Filled as AddMoreIcon,
@@ -31,9 +31,9 @@ const notification = useNotification();
 const showCreate = ref(false);
 const showCreateMore = ref(false);
 const showUpdate = ref(false);
-const showRead = ref(false)
+const showRead = ref(false);
 const updateId = ref(null);
-const readId = ref(null)
+const readId = ref(null);
 
 const img_url = inject("img_url");
 const loadingRef = ref(true);
@@ -49,7 +49,24 @@ const sendData = ref({
   id: null,
   filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
   role: "User",
+  active: null
 });
+
+const activeOption = ref([
+  {
+    active: "null",
+    label: "Hammasi",
+  },
+  {
+    active: 1,
+    label: "Faol",
+  },
+  {
+    active: 0,
+    label: "Nofaol",
+  },
+]);
+
 const getUserOptions = (resData) => {
   ModelService.getAll(resData).then((res) => {
     UserOptions.value = res;
@@ -81,7 +98,10 @@ const formatUzbekPhoneNumber = (phoneNumber) => {
   const match = cleaned.match(/^998(\d{2})(\d{3})(\d{4})$/);
 
   if (match) {
-    return `+998 ${match[1]}  ${match[2]}  ${match[3].slice(0,2)} ${match[3].slice(2, 4)}`;
+    return `+998 ${match[1]}  ${match[2]}  ${match[3].slice(
+      0,
+      2
+    )} ${match[3].slice(2, 4)}`;
   }
 
   return phoneNumber;
@@ -211,7 +231,7 @@ const columns = ref([
     width: 110,
     render(row) {
       return [
-      h(
+        h(
           NButton,
           {
             size: "small",
@@ -220,9 +240,9 @@ const columns = ref([
               showRead.value = true;
               readId.value = row.id;
             },
-            style:{
-              marginRight:'12px'
-            }
+            style: {
+              marginRight: "12px",
+            },
           },
           {
             icon: () =>
@@ -266,10 +286,10 @@ onMounted(() => {
   } else if (props.action == 0) {
     getAllSort("User");
   } else if (props.action == 2) {
-    getAllSort("Teacher");
+    getAllSort("User");
   } else if (props.action == 3) {
     showCreate.value = true;
-    getAllSort("Teacher");
+    getAllSort("User");
     defaultObeject.value.name = props.itemValue;
     defaultObeject.value.actionId = props.action;
   } else {
@@ -307,7 +327,7 @@ const modalClose = (e) => {
     showUpdate.value = false;
   } else if (e == "more-create") {
     showCreateMore.value = false;
-  }else if (e == 'read'){
+  } else if (e == "read") {
     showRead.value = false;
   }
 };
@@ -335,7 +355,16 @@ const showOneUser = (e) => {
   sendData.value.id = e;
   getAll(sendData.value);
 };
+const updateTabs = (active)=>{
+  if(active != 'null'){
+    sendData.value.active = JSON.parse(active);
+  }else{
+    sendData.value.active = null;
+  }
 
+  getAll(sendData.value);
+
+}
 ////////////////////////////////////////////////////////////////
 const rowProps = (row) => {
   return {
@@ -410,7 +439,6 @@ const renderUser = (option) => {
     ]
   );
 };
-
 
 //// render select function end
 const rowClassName = (row) => {
@@ -499,20 +527,28 @@ const pagination = reactive({
       </div>
     </div>
     <div class="box-table">
-      <n-data-table
-        :loading="loadingRef"
-        :columns="columns"
-        :data="data"
-        :pagination="pagination"
-        :bordered="true"
-        :single-line="false"
-        style="min-width: 1000px"
-        max-height="calc(100vh - 300px)"
-        :row-props="rowProps"
-        :row-class-name="rowClassName"
-        size="small"
-      >
-      </n-data-table>
+      <n-tabs type="bar" size="small" @update:value="updateTabs">
+        <n-tab-pane
+          v-for="(item, index) in activeOption"
+          :name="item.active"
+          :tab="item.label"
+        >
+          <n-data-table
+            :loading="loadingRef"
+            :columns="columns"
+            :data="data"
+            :pagination="pagination"
+            :bordered="true"
+            :single-line="false"
+            style="min-width: 1000px"
+            max-height="calc(100vh - 300px)"
+            :row-props="rowProps"
+            :row-class-name="rowClassName"
+            size="small"
+          >
+          </n-data-table>
+        </n-tab-pane>
+      </n-tabs>
     </div>
   </div>
   <!-- Modal create and Update -->
@@ -597,11 +633,7 @@ const pagination = reactive({
         closable
         @close="modalClose('read')"
       >
-        <ModelRead
-          @close="modalClose('read')"
-          type="read"
-          :id="readId"
-        />
+        <ModelRead @close="modalClose('read')" type="read" :id="readId" />
       </n-card>
     </n-modal>
 

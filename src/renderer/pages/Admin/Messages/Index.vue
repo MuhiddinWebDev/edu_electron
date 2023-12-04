@@ -170,7 +170,6 @@ const searchUser = ()=>{
     if(UserId.value != null){
         loading.value = true;
         ModelService.searchModel(UserId.value).then((res) => {
-            console.log(res)
             data.value = res;
             loading.value = false;
         });

@@ -39,6 +39,12 @@ class Service {
     });
   }
 
+  studentRegisterDel(id) {
+    return axios.delete(END_POINT + `/student-delete/${id}`).then((res) => {
+      return res;
+    });
+  }
+
   teacherReport(data) {
     return axios.post(END_POINT + `/teacher`, data).then((res) => {
       return res;
@@ -47,6 +53,12 @@ class Service {
 
   teacherSverka(data) {
     return axios.post(END_POINT + `/teacher-sverka`, data).then((res) => {
+      return res;
+    });
+  }
+
+  teacherRegisterDel(id) {
+    return axios.delete(END_POINT + `/teacher-delete/${id}`).then((res) => {
       return res;
     });
   }

@@ -37,6 +37,11 @@ class Service {
       return res
     })
   }
+  getTableOne(data){
+    return axios.post(END_POINT + `/table-one`, data).then((res) => {
+      return res
+    })
+  }
   delete(id) {
     return axios.delete(END_POINT + `/id/${id}`).then((res) => {
       return res;

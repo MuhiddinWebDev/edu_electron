@@ -210,13 +210,9 @@ const rowProps = (row) => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .report-data-row {
   cursor: pointer;
 }
-.box-table {
-  max-height: calc(100vh - 190px);
-  overflow: hidden;
-  overflow: auto;
-}
+
 </style>

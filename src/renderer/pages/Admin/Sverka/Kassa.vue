@@ -10,6 +10,16 @@ const findRole = ref(localStorage.getItem("role"));
 
 const branchOption = ref([]);
 const payTypeOption = ref([]);
+const typeOptoin = ref([
+  {
+    type:1,
+    name:"Kirim"
+  },
+  {
+    type:0,
+    name:"Chiqim"
+  }
+])
 const router = useRouter();
 const reportAct = useReportData();
 
@@ -44,11 +54,12 @@ const searchData = ref({
   end_date: Math.floor(range_date.value[1] / 1000),
   pay_type_id: null,
   filial_id: JSON.parse(localStorage.getItem("filial_id")),
+  type:null
 });
 
 const showReport = () => {
   loading.value = true;
-
+  console.log(searchData.value)
   ReportService.kassaSverka(searchData.value).then((res) => {
     reportData.value = res;
     loading.value = false;
@@ -124,12 +135,31 @@ const rowProps = (row) => {
           </n-input-group>
         </div>
         <div class="search-action_item">
+          <n-input-group style="width: 100%;">
+            <n-input-group-label>Turi</n-input-group-label>
+            <n-select
+              :options="typeOptoin"
+              v-model:value="searchData.type"
+              label-field="name"
+              value-field="type"
+              placeholder="Qidiruv"
+              filterable
+              clearable
+            ></n-select>
+          </n-input-group>
+        </div>
+        <div class="search-action_item">
           <n-button @click="showReport" type="success">Ko'rish</n-button>
         </div>
       </div>
     </div>
     <div class="box-table">
-      <n-table :bordered="true" :single-line="false" size="small" style="min-width: 820px;">
+      <n-table 
+        :bordered="true" 
+        :single-line="false" 
+        size="small" 
+        style="min-width: 820px;" 
+        >
         <thead>
           <tr>
             <th style="width: 50px">№</th>
@@ -161,6 +191,7 @@ const rowProps = (row) => {
             v-for="(item, index) in reportData.data"
             :key="index"
             @dblclick="rowProps(item)"
+            
           >
             <td style="width: 50px">{{ index + 1 }}</td>
             <td>

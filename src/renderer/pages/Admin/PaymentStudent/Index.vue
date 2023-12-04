@@ -91,7 +91,6 @@ const getAllStudents = (id) => {
 const updateBtn = (id) => {
   showUpdate.value = true;
   updateId.value = id;
-  console.log(showUpdate.value)
 
 };
 const checkBtn = (id)=>{

@@ -64,14 +64,11 @@ const printObj = ref({
   extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>',
   beforeOpenCallback(vue) {
     vue.printLoading = true;
-    console.log("beforeOpenCallback");
   },
   openCallback(vue) {
     vue.printLoading = false;
-    console.log("openCallback");
   },
   closeCallback(vue) {
-    console.log("closeCallback");
   },
 });
 //// print automatic end

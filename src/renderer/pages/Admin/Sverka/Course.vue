@@ -7,14 +7,29 @@ import CourseService from "../../../services/course.service";
 import { useReportData } from "../../../stores/report";
 //// report variables
 const reportAct = useReportData();
-const courseId = ref(null);
 
 const findRole = ref(localStorage.getItem("role"));
-const branchId = ref(JSON.parse(localStorage.getItem("filial_id")));
+const router = useRouter();
 
+const filterOption = ref({
+  filial_id:JSON.parse(localStorage.getItem("filial_id")),
+  course_id: null,
+  type:null
+})
+
+const typeOption = ref([
+  {
+    type:1,
+    name:"Kirim"
+  },
+  {
+    type:0,
+    name:"Chiqim"
+  }
+])
 const branchOption = ref([]);
 const courseOptions = ref([]);
-const router = useRouter();
+
 const getAllBranches = () => {
   BranchService.getAll().then((res) => {
     branchOption.value = res;
@@ -22,10 +37,7 @@ const getAllBranches = () => {
 };
 
 const getAllCourses = (branch) => {
-  let sendData = {
-    filial_id: branch ? branch : branchId.value,
-  };
-  CourseService.searchModel(sendData).then((res) => {
+  CourseService.searchModel(filterOption.value).then((res) => {
     courseOptions.value = res;
   });
 };
@@ -52,14 +64,16 @@ onMounted(() => {
   }
 });
 const UpdateBranch = (branch) => {
-  getAllCourses(branch);
+  filterOption.value.filial_id = branch;
+  getAllCourses();
 };
 const showReport = () => {
   const sendData = {
     start_date: Math.floor(range_date.value[0] / 1000),
     end_date: Math.floor(range_date.value[1] / 1000),
-    course_id: courseId.value,
-    filial_id: branchId.value,
+    course_id: filterOption.value.course_id,
+    filial_id: filterOption.value.filial_id,
+    type: filterOption.value.type
   };
   loading.value = true;
   ReportService.courseSverka(sendData).then((res) => {
@@ -109,7 +123,7 @@ const rowProps = (row) => {
             <n-select
               @update:value="UpdateBranch"
               :options="branchOption"
-              v-model:value="branchId"
+              v-model:value="filterOption.filial_id"
               label-field="name"
               value-field="id"
               placeholder="Qidiruv"
@@ -123,7 +137,7 @@ const rowProps = (row) => {
             <n-input-group-label>Kurs</n-input-group-label>
             <n-select
               :options="courseOptions"
-              v-model:value="courseId"
+              v-model:value="filterOption.course_id"
               label-field="name"
               value-field="id"
               placeholder="Qidiruv"
@@ -132,6 +146,22 @@ const rowProps = (row) => {
             ></n-select>
           </n-input-group>
         </div>
+
+        <div class="search-action_item">
+          <n-input-group>
+            <n-input-group-label>Turi</n-input-group-label>
+            <n-select
+              :options="typeOption"
+              v-model:value="filterOption.type"
+              label-field="name"
+              value-field="type"
+              placeholder="Qidiruv"
+              filterable
+              clearable
+            ></n-select>
+          </n-input-group>
+        </div>
+
         <div class="search-action_item">
           <n-button @click="showReport" type="success">Ko'rish</n-button>
         </div>
@@ -262,11 +292,6 @@ const rowProps = (row) => {
   cursor: pointer;
 }
 
-.box-table {
-  max-height: calc(100vh - 190px);
-  overflow: hidden;
-  overflow: auto;
-}
 
 .report-empty {
   padding: 20px;

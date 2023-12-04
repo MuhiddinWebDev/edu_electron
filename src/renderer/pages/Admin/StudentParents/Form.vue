@@ -146,9 +146,7 @@ const checkPhone = (e) => {
         message.warning(
           `${formatUzbekPhoneNumber(res.phone)} telefon raqam oldin kiritilgan!`
         );
-      } else {
-        console.log("Raqam yoq");
-      }
+      } 
     });
   }
 };

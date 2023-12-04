@@ -4,12 +4,14 @@ import { useRouter } from "vue-router";
 import ReportService from "../../../services/report.service";
 import PayTypeService from "../../../services/payType.service";
 import BranchService from "../../../services/branch.service";
+import RasxodCouseService from "../../../services/rasxodBecouse.service"
 import { useReportData } from "../../../stores/report";
 
 const findRole = ref(localStorage.getItem("role"));
 
 const branchOption = ref([]);
 const payTypeOption = ref([]);
+const rasxodOption = ref([]);
 const router = useRouter();
 const reportAct = useReportData();
 
@@ -23,6 +25,11 @@ const getAllPayType = () => {
     payTypeOption.value = res;
   });
 };
+const getAllBecouse = () =>{
+  RasxodCouseService.searchModel(searchData.value).then((res)=>{
+    rasxodOption.value = res
+  })
+}
 const time_def = ref(new Date());
 const thisMonth = ref(
   new Date(time_def.value.getFullYear(), time_def.value.getMonth())
@@ -33,6 +40,7 @@ const searchData = ref({
   start_date: Math.floor(range_date.value[0] / 1000),
   end_date: Math.floor(range_date.value[1] / 1000),
   pay_type_id: null,
+  becouse_id:null,
   filial_id: JSON.parse(localStorage.getItem("filial_id")),
 });
 ///// table veribles
@@ -43,6 +51,7 @@ const dayJS = inject("dayJS");
 onMounted(() => {
   getAllBranches();
   getAllPayType();
+  getAllBecouse();
 });
 
 const showReport = () => {
@@ -95,6 +104,20 @@ const rowProps = (row) => {
         </div>
         <div class="search-action_item">
           <n-input-group>
+            <n-input-group-label>Xarajat sababi</n-input-group-label>
+            <n-select
+              :options="rasxodOption"
+              v-model:value="searchData.becouse_id"
+              label-field="name"
+              value-field="id"
+              placeholder="Qidiruv"
+              filterable
+              clearable
+            ></n-select>
+          </n-input-group>
+        </div>
+        <div class="search-action_item">
+          <n-input-group>
             <n-input-group-label>To'lov turi</n-input-group-label>
             <n-select
               :options="payTypeOption"
@@ -127,7 +150,7 @@ const rowProps = (row) => {
             <th>Sababi</th>
             <th>To'lov turi</th>
             <th>Izoh</th>
-            <th class="col-same">Summa</th>
+            <th class="col-same background-error">Summa</th>
           </tr>
         </thead>
         <tbody>
@@ -159,7 +182,7 @@ const rowProps = (row) => {
             <td>{{ item.becouse_name }}</td>
             <td>{{ item.pay_type ? item.pay_type.name : "" }}</td>
             <td>{{ item.comment }}</td>
-            <td class="text-right">
+            <td class="text-right background-error">
               {{
                 Intl.NumberFormat("ru-RU", {
                   style: "decimal",

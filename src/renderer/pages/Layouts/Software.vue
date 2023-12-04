@@ -20,7 +20,6 @@ const checkPermission = async () => {
     soft_id: counter.soft_id,
   };
   PaymentService.checkDate(data).then((res) => {
-    console.log(res)
     if (res.live) {
       router.push({ path: "Login" });
     }

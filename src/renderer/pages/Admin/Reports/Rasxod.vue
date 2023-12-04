@@ -51,7 +51,6 @@ const showReport = () => {
 };
 
 const rowProps = (row) => {
-  console.log(row.place);
   if (row.place == "Xarajatlar") {
     router.push({ name: "Xarajatlar" });
   }

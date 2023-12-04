@@ -167,7 +167,8 @@ const rowProps = (row) => {
         <thead>
           <tr>
             <th style="width: 50px">№</th>
-            <th class="col-same">Sana</th>
+            <th class="col-same">Davomat sana</th>
+            <th class="col-same">Dars sanasi</th>
             <th>Talaba</th>
             <th>Guruh</th>
             <th>O'qituvchi</th>
@@ -186,7 +187,10 @@ const rowProps = (row) => {
           >
             <td style="width: 50px">{{ index + 1 }}</td>
             <td class="col-same">
-              {{ dayJS(item.doc_date * 1000).format("YYYY-MM-DD HH:mm:ss") }}
+              {{ dayJS(item.doc_date > Math.pow(10, 7) ? item.doc_date * 1000 : item.doc_date * Math.pow(10, 6)).format("YYYY-MM-DD HH:mm") }}
+            </td>
+            <td class="col-same">
+              {{ dayJS(item.date * 1000).format("YYYY-MM-DD HH:mm") }}
             </td>
             <td>{{ item.student_name }}</td>
             <td>{{ item.group ? item.group.name : "" }}</td>
@@ -250,11 +254,6 @@ const rowProps = (row) => {
   cursor: pointer;
 }
 
-.box-table {
-  max-height: calc(100vh - 190px);
-  overflow: hidden;
-  overflow: auto;
-}
 .report-empty {
   padding: 20px;
 }

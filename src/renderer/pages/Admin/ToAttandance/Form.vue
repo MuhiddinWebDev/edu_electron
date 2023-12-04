@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, inject, h } from "vue";
+import { useRouter } from "vue-router";
 import ModelService from "../../../services/attendance.service";
 import GroupsService from "../../../services/groups.service";
 import BranchService from "../../../services/branch.service";
@@ -11,8 +12,9 @@ import { useNotification } from "naive-ui";
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 const notification = useNotification();
-const props = defineProps(["type", "id"]);
-const emit = defineEmits(["close", "create", "update"]);
+const router = useRouter();
+const props = defineProps(["type", "id", "tableRow"]);
+const emit = defineEmits(["close", "create", "update", "by-table"]);
 
 const spinBtn = ref(false);
 const GroupsOptions = ref([]);
@@ -70,6 +72,7 @@ const notiFunc = (text) => {
 };
 
 const allowClick = ref(null);
+const tableId = ref(null);
 
 const UpdateCourse = (id) => {
   form_data.value.course_id = id;
@@ -94,7 +97,6 @@ const UpdateBranch = (id) => {
   form_data.value.filial_id = id;
   getAllCourses(id);
 };
-
 onMounted(() => {
   if (props.type == "update" || props.type == "read") {
     ModelService.getOneUpdate(props.id).then((res) => {
@@ -104,6 +106,45 @@ onMounted(() => {
       getAllCourses(res.filial_id);
       getAllGroups(res.course_id);
     });
+  } else if (props.type == "by-table") {
+    let el = props.tableRow;
+
+    getAllCourses(el.filial_id);
+    getAllGroups(el.course_id);
+    form_data.value.filial_id = el.filial_id;
+    form_data.value.course_id = el.course_id;
+    form_data.value.group_id = el.group_id;
+    form_data.value.date = new Date(`${el.date} ${el.begin_date}`).getTime();
+    if (!el.done) {
+      UpdateGroup(el.group_id);
+    } else {
+      ModelService.getTableOne(form_data.value).then((res) => {
+        if (res) {
+          tableId.value = res.id;
+          ModelService.getOneUpdate(res.id).then((last) => {
+            form_data.value = last;
+            form_data.value.date = 1000 * form_data.value.date;
+            allowClick.value = true;
+          });
+        } else {
+          let fd = form_data.value;
+          let jsFd = {
+            filial_id: fd.filial_id,
+            course_id: fd.course_id,
+            group_id: fd.group_id,
+          };
+          localStorage.setItem("form_data", JSON.stringify(jsFd));
+          notification["warning"]({
+            content: "Ogohlantirish",
+            title: "Davomat olish dars jadvali bo'limida olinmagan!!!",
+            content: "Iltimos davomatni o'zgatirmoqchi bo'lsangiz. Davomat bo'limida amalga oshiring. ",
+            duration: 2500,
+            keepAliveOnHover: true,
+          });
+          router.push({path:'/to-attendance'});
+        }
+      });
+    }
   }
   getAllBranches();
   getAllCourses();
@@ -123,6 +164,17 @@ const save = async () => {
       ModelService.update(props.id, form_data.value).then((res) => {
         emit("update");
       });
+    } else if (props.type == "by-table") {
+      let el = props.tableRow;
+      if (!el.done) {
+        ModelService.create(form_data.value).then((res) => {
+          emit("by-table");
+        });
+      } else {
+        ModelService.update(tableId.value, form_data.value).then((res) => {
+          emit("by-table");
+        });
+      }
     }
   } catch (e) {
     console.error(e.message);
@@ -186,7 +238,11 @@ const renderGroup = (option) => {
               :style="{ width: '100%' }"
               type="datetime"
               v-model:value="form_data.date"
-              :disabled="props.type == 'update' || props.type == 'read'"
+              :disabled="
+                props.type == 'update' ||
+                props.type == 'read' ||
+                props.type == 'by-table'
+              "
             ></n-date-picker>
           </n-form-item>
         </n-grid-item>
@@ -200,7 +256,11 @@ const renderGroup = (option) => {
               label-field="name"
               value-field="id"
               v-model:value="form_data.filial_id"
-              :disabled="props.type == 'update' || props.type == 'read'"
+              :disabled="
+                props.type == 'update' ||
+                props.type == 'read' ||
+                props.type == 'by-table'
+              "
             ></n-select>
           </n-form-item>
         </n-grid-item>
@@ -215,7 +275,11 @@ const renderGroup = (option) => {
               label-field="name"
               value-field="id"
               v-model:value="form_data.course_id"
-              :disabled="props.type == 'update' || props.type == 'read'"
+              :disabled="
+                props.type == 'update' ||
+                props.type == 'read' ||
+                props.type == 'by-table'
+              "
             ></n-select>
           </n-form-item>
         </n-grid-item>
@@ -230,7 +294,11 @@ const renderGroup = (option) => {
               label-field="name"
               value-field="id"
               v-model:value="form_data.group_id"
-              :disabled="props.type == 'update' || props.type == 'read'"
+              :disabled="
+                props.type == 'update' ||
+                props.type == 'read' ||
+                props.type == 'by-table'
+              "
             ></n-select>
           </n-form-item>
         </n-grid-item>

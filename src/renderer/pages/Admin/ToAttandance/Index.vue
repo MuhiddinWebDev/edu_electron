@@ -96,14 +96,23 @@ const columns = ref([
     align: "center"
   },
   {
-    title: "Sana",
+    title: "Dars sana",
     key: "date",
     resizable: true,
     sortOrder:true,
     sorter:"default",
-    width:250,
     render(row) {
         return dayJS(row.date * 1000).format('YYYY-MM-DD HH:mm:ss');
+    }
+  },
+  {
+    title: "Davomat sana",
+    key: "doc_date",
+    resizable: true,
+    sortOrder:true,
+    sorter:"default",
+    render(row) {
+        return dayJS(row.doc_date * 1000).format('YYYY-MM-DD HH:mm:ss');
     }
   },
   {
@@ -144,7 +153,8 @@ const columns = ref([
   {
     title: "Amallar",
     key: "action",
-    width: 75,
+    width: 110,
+    align:'center',
     render(row) {
       return [
         h(
@@ -152,7 +162,6 @@ const columns = ref([
           {
             size: "small",
             type: "success",
-            block: true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -165,46 +174,46 @@ const columns = ref([
               }),
           }
         ),
-        // h(
-        //   NButton,
-        //   {
-        //     size: "small",
-        //     type: "error",
-        //     style: {
-        //       marginLeft: "8px",
-        //     },
-        //     onClick: (e) => {
-        //       dialog.warning({
-        //         title: "Ogohlantirish",
-        //         content: `Rostan ham o'chirasizmi`,
-        //         positiveText: "Xa",
-        //         negativeText: "Yo'q",
-        //         onPositiveClick: () => {
-        //           ModelService.delete(row.id)
-        //             .then((res) => {
-        //               const index = data.value.findIndex(
-        //                 (val) => val.id == row.id
-        //               );
-        //               data.value.splice(index, 1);
-        //               message.success("Ma'lumot o'chirildi");
-        //             })
-        //             .catch((err) => {
-        //               message.error("Ma'lumot o'chirilmadi");
-        //             });
-        //         },
-        //         onNegativeClick: () => {
-        //           message.error("Ma'lumot o'chirilmadi");
-        //         },
-        //       });
-        //     },
-        //   },
-        //   {
-        //     icon: () =>
-        //       h(NIcon, {
-        //         component: TrashIcon,
-        //       }),
-        //   }
-        // ),
+        h(
+          NButton,
+          {
+            size: "small",
+            type: "error",
+            style: {
+              marginLeft: "8px",
+            },
+            onClick: (e) => {
+              dialog.warning({
+                title: "Ogohlantirish",
+                content: `Rostan ham o'chirasizmi`,
+                positiveText: "Xa",
+                negativeText: "Yo'q",
+                onPositiveClick: () => {
+                  ModelService.delete(row.id)
+                    .then((res) => {
+                      const index = data.value.findIndex(
+                        (val) => val.id == row.id
+                      );
+                      data.value.splice(index, 1);
+                      message.success("Ma'lumot o'chirildi");
+                    })
+                    .catch((err) => {
+                      message.error("Ma'lumot o'chirilmadi");
+                    });
+                },
+                onNegativeClick: () => {
+                  message.error("Ma'lumot o'chirilmadi");
+                },
+              });
+            },
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: TrashIcon,
+              }),
+          }
+        ),
       ];
     },
   },
@@ -228,7 +237,14 @@ onMounted(() => {
     getAllGroups(findBranch.value,null);
     getBySearch(null, null, branchId.value);
   }
-
+  let local = JSON.parse(localStorage.getItem('form_data'))
+  if(local){
+    branchId.value = local.filial_id;
+    courseId.value = local.course_id;
+    groupsId.value = local.group_id
+    getBySearch(local.group_id, local.course_id, local.filial_id);
+    localStorage.removeItem('form_data')
+  }
 });
 ///  create and update functions
 const closeCreate = () => {
@@ -251,7 +267,7 @@ const showClose = (e) => {
 const closeUpdate = () => {
   showUpdate.value = false;
 };
-const updateModel = () => {
+const updateModel = (res,allow) => {
   showUpdate.value = false;
   message.success("Ma'lumot yangilandi");
   getBySearch(null, null, branchId.value);
@@ -263,6 +279,7 @@ const UpdateBranch = (branch)=>{
   courseId.value = null;
   getALlCourse(branch);
   getAllGroups(branch, null);
+
 }
 
 
@@ -469,7 +486,8 @@ const renderCourse = (option) => {
         :bordered="true"
         :single-line="false"
         size="small"
-        style="min-width: 1000px; max-height: calc(100vh - 300px)"
+        :max-height="600"
+        style="min-width: 1000px;"
       >
       </n-data-table>
     </div>

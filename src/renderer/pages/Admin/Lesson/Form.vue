@@ -134,7 +134,6 @@ const getAllRooms = (branch) => {
   if(branch){
     filterData.value.filial_id = branch
   }
-  console.log(branch)
   RoomsService.searchModel(filterData.value).then((res) => {
     roomsOptions.value = res;
   });
@@ -194,7 +193,6 @@ const save = async () => {
         emit("create", res);
       });
     } else if (props.type == "update") {
-      console.log(form_data.value)
       ModelService.lessonUpdate(props.id, form_data.value).then((res) => {
         emit("update", res);
       });
@@ -292,11 +290,12 @@ const isMinuteDisabled = (minute) => {
 ///// disabled date and check room;
 
 const resLength = ref(null);
-const getTimeAction = (room, weekday, teacher) => {
+const getTimeAction = (room, weekday, teacher, course_id) => {
   let sendData = {
     roomID: room,
     weekday: weekday,
     teacher_id: teacher,
+    course_id:course_id
   };
   ModelService.checkTable(sendData).then((res) => {
     if (res.length > 0) {
@@ -329,7 +328,7 @@ const choosDays = (e) => {
 
             CourseService.getOne(courseId).then((res) => {
               teacherID.value = res.teacher_id;
-              getTimeAction(roomID.value, element.course_date, res.teacher_id);
+              getTimeAction(roomID.value, element.course_date, res.teacher_id, res.id);
             });
 
           }
@@ -377,7 +376,8 @@ const roomChange = ($event, index) => {
   let room = $event;
   let day = AddDays.value[index].course_date;
   let teacher = teacherID.value;
-  getTimeAction(room, day, teacher);
+  let course = form_data.value.course_id
+  getTimeAction(room, day, teacher, course);
 };
 const delBtn = (id) => {
   const index = AddDays.value.findIndex((item) => item.course_date == id);

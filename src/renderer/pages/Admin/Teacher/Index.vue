@@ -52,6 +52,21 @@ const sendData = ref({
   filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
   role: "Teacher",
 });
+
+const activeOption = ref([
+  {
+    active: "null",
+    label: "Hammasi",
+  },
+  {
+    active: 1,
+    label: "Faol",
+  },
+  {
+    active: 0,
+    label: "Nofaol",
+  },
+]);
 const getUserOptions = (resData) => {
   ModelService.getAll(resData).then((res) => {
     UserOptions.value = res;

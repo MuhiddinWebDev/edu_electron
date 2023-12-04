@@ -154,7 +154,6 @@ const getAll = (parent_id) => {
   let searchData = {
     parent_id: parent_id
   }
-  console.log(searchData)
   ModelService.getAll(searchData).then((res) => {
     loading.value = false;
     data.value = res;

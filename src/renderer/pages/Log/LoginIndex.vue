@@ -240,7 +240,6 @@ onMounted(() => {
 //   if (debounceTimer.value) {
 //     clearTimeout(debounceTimer.value);
 //   }
-//   console.log(debounceTimer.value);
 //   debounceTimer.value = setTimeout(formatPhoneNumber(), 300);
 // };
 ////// input number format

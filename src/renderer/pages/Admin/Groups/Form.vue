@@ -8,7 +8,7 @@ import BranchService from "../../../services/branch.service";
 ///// import indexs start
 import CourseIndex from "../Courses/Index.vue";
 import BranchIndex from "../Branch/Index.vue";
-import UserIndex from "../Users/Index.vue";
+import StudentIndex from "../Student/Index.vue";
 import Dots from "../../../components/Dots/dots.vue";
 ///// import indexs start
 
@@ -23,7 +23,7 @@ const course_image = inject("course_img");
 const user_image = inject("img_url");
 const CoursName = ref("");
 const BranchName = ref("");
-const UserName = ref("");
+const StudentName = ref("");
 
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
@@ -204,6 +204,7 @@ const addUsers = ref([]);
 const delBtn = (id) => {
   const index = addUsers.value.findIndex((item) => item.user_id == id);
   addUsers.value.splice(index, 1);
+  form_data.value.count = addUsers.value.length;
 };
 const chooseUser = (e) => {
   if (e != null) {
@@ -225,8 +226,8 @@ const chooseUser = (e) => {
   }
 };
 /// user start
-const showUser = ref(false);
-const showUserForm = ref(null);
+const showStudent = ref(false);
+const showStudentForm = ref(null);
 /// user end
 //course start
 const showCourse = ref(false);
@@ -361,7 +362,7 @@ const chooseBranch = (data) => {
 };
 const chooseUserByIndex = (data) => {
   chooseUser(data.id);
-  showUser.value = false;
+  showStudent.value = false;
   getAllUser();
 };
 
@@ -387,17 +388,17 @@ const BranchKey = (e) => {
 
 const UserKey = (e) => {
   if (e.code == "F4") {
-    showUser.value = true;
-    showUserForm.value = 0;
+    showStudent.value = true;
+    showStudentForm.value = 0;
   } else if (e.code == "Insert") {
-    showUser.value = true;
-    showUserForm.value = 1;
+    showStudent.value = true;
+    showStudentForm.value = 1;
   }
 };
 
-const addUsersByBtn = () => {
-  showUser.value = true;
-  showUserForm.value = 0;
+const addStudentBtn = () => {
+  showStudent.value = true;
+  showStudentForm.value = 0;
 };
 
 const CourseSearch = (item) => {
@@ -408,8 +409,8 @@ const BranchSearch = (branch) => {
   BranchName.value = branch;
 };
 
-const UserSearch = (user) => {
-  UserName.value = user;
+const studentSearch = (user) => {
+  StudentName.value = user;
 };
 
 //// end
@@ -550,7 +551,7 @@ const UserSearch = (user) => {
               <n-select
                 @keydown="UserKey"
                 @update:value="chooseUser"
-                @search="UserSearch"
+                @search="studentSearch"
                 placement="top-start"
                 :options="UserOptions"
                 filterable
@@ -569,7 +570,7 @@ const UserSearch = (user) => {
               <n-tooltip placement="right" trigger="hover">
                 <template #trigger>
                   <n-button
-                    @click="addUsersByBtn"
+                    @click="addStudentBtn"
                     type="success"
                     :style="{ padding: '0px 8px' }"
                   >
@@ -690,17 +691,17 @@ const UserSearch = (user) => {
     <!-- user start -->
     <n-modal
       transform-orign="center"
-      v-model:show="showUser"
+      v-model:show="showStudent"
       preset="card"
       style="width: calc(100% - 35px)"
       size="small"
     >
       <div class="no-padding">
-        <UserIndex
+        <StudentIndex
           @select="chooseUserByIndex"
-          :action="showUserForm"
-          :itemValue="UserName"
-        ></UserIndex>
+          :action="showStudentForm"
+          :itemValue="StudentName"
+        ></StudentIndex>
       </div>
     </n-modal>
     <!-- user end -->

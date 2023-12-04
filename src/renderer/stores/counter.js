@@ -8,7 +8,7 @@ export const useCounterStore = defineStore('counter', () => {
   const teacherCourse = ref(false);
   const lesson = ref(false);
   const loadAction = ref(true);
-  const soft_id = ref("OM0006")
+  const soft_id = ref("OM0002")
   return {coursePlan, teacherCourse,theme, itemsTranslate, lesson, loadAction, soft_id}
 })
 // //////// soft_id /////////////////// start /////////////

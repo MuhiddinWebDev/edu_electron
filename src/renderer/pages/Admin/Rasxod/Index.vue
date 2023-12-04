@@ -1,43 +1,68 @@
 <script setup>
 import { h, ref, onMounted, watch, reactive, inject } from "vue";
 import { useMagicKeys } from "@vueuse/core";
+////// API service
 import ModelService from "../../../services/rasxod.service";
+import BranchService from "../../../services/branch.service";
+import PayTypeService from "../../../services/payType.service";
+////// API service
+
 import { NButton, NIcon, useMessage, useDialog } from "naive-ui";
 import { Add20Filled as AddIcon } from "@vicons/fluent";
-import { TrashCan as TrashIcon, Pen as PenICon } from "@vicons/carbon";
+import { Pen as PenICon } from "@vicons/carbon";
 import { useReportData } from "../../../stores/report";
+
 import ModelForm from "./Form.vue";
 
 const reportAct = useReportData();
-const message = useMessage();
-const dialog = useDialog();
+
 const dayJS = inject("dayJS");
 const showCreate = ref(false);
 const showUpdate = ref(false);
 const loading = ref(true);
 const updateId = ref(null);
+
+const payTypeOptions = ref([]);
+const branchOptions = ref([])
 const data = ref([]);
-const allSumma = ref(0);
 
 const findRole = ref(localStorage.getItem("role"));
 const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
+const filterItem = ref({
+  filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
+  pay_type_id: null
+})
+
 const getAllData = () => {
   loading.value = true;
-  let sendData = {
-    filial_id: findRole.value == "SuperAdmin" ? null : findBranch.value,
-  };
-  ModelService.searchModel(sendData).then((res) => {
+  ModelService.searchModel(filterItem.value).then((res) => {
+    loading.value = false;
     data.value = res;
+  }).catch((err)=>{
     loading.value = false;
   });
 };
+
+const getAllBranches = ()=>{
+  BranchService.getAll().then((res)=>{
+    branchOptions.value = res
+  })
+}
+
+const getAllPayType = ()=>{
+  PayTypeService.getAll().then((res)=>{
+    payTypeOptions.value = res;
+  })
+}
+
 
 const columns = ref([
   {
     title: "№",
     key: "id",
     width: 50,
+    align:'center'
   },
   {
     title: "Sana",
@@ -54,11 +79,10 @@ const columns = ref([
     resizable: true,
   },
   {
-    title: "Filial",
-    key: "filial.name",
+    title: "To'lov turi",
+    key: "pay_type.name",
     resizable: true,
   },
-
   {
     title: "Summa",
     key: "summa",
@@ -73,6 +97,11 @@ const columns = ref([
   {
     title: "Izoh",
     key: "text",
+    resizable: true,
+  },
+  {
+    title: "Filial",
+    key: "filial.name",
     resizable: true,
   },
   {
@@ -146,29 +175,38 @@ const columns = ref([
 
 onMounted(() => {
   getAllData();
+  getAllBranches();
+  getAllPayType();
 });
+
+
+const clearFilter = ()=>{
+  filterItem.value.filial_id = null;
+  filterItem.value.pay_type_id = null;
+  getAllData();
+}
+
+const UpdateBranch = (id)=>{
+  filterItem.value.filial_id = id;
+  getAllData();
+}
+const UpdatePayType = (id)=>{
+  filterItem.value.pay_type_id = id;
+  getAllData()
+}
 ///  create and update functions
-const closeCreate = () => {
-  showCreate.value = false;
-};
 const createModel = () => {
-  showCreate.value = false;
+  showClose()
   getAllData();
 };
-const showClose = (e) => {
-  if (e == "create") {
-    showCreate.value = false;
-  } else if (e == "update") {
-    showUpdate.value = false;
-  } else if (e == "read") {
-    reportAct.rasxodPass.read = false;
-  }
-};
-const closeUpdate = () => {
+const showClose = () => {
+  showCreate.value = false;
   showUpdate.value = false;
+  reportAct.rasxodPass.read = false;
 };
+
 const updateModel = () => {
-  showUpdate.value = false;
+  showClose()
   getAllData();
 };
 ///// window key event start
@@ -212,14 +250,29 @@ const pagination = reactive({
           </n-button>
         </div>
       </div>
-      <!-- <div class="search-action">
+      <div class="search-action">
         <div class="search-action_item">
           <n-input-group>
-            <n-input-group-label>Shaxs</n-input-group-label>
+            <n-input-group-label>Filial</n-input-group-label>
             <n-select
-              v-model:value="groupsId"
-              :options="groupsOptions"
-              @update:value="UpdateGroup"
+              :options="branchOptions"
+              v-model:value="filterItem.filial_id"
+              @update:value="UpdateBranch"
+              label-field="name"
+              value-field="id"
+              placeholder="Qidiruv"
+              filterable
+              clearable
+            ></n-select>
+          </n-input-group>
+        </div>
+        <div class="search-action_item">
+          <n-input-group>
+            <n-input-group-label>To'lov turi</n-input-group-label>
+            <n-select
+              :options="payTypeOptions"
+              v-model:value="filterItem.pay_type_id"
+              @update:value="UpdatePayType"
               label-field="name"
               value-field="id"
               placeholder="Qidiruv"
@@ -230,9 +283,9 @@ const pagination = reactive({
         </div>
       
         <div class="search-action_item">
-          <n-button @click="searchFuction" type="success">Ko'rish</n-button>
+          <n-button @click="clearFilter" type="info">Tozalash</n-button>
         </div>
-      </div> -->
+      </div>
     </div>
     <div class="box-table">
       <n-data-table
@@ -252,21 +305,21 @@ const pagination = reactive({
   <section>
     <n-modal v-model:show="showCreate" :mask-closable="false">
       <n-card
-        style="width: calc(100vw - 35px); max-height: calc(100vh - 10px)"
+        style="width: calc(100vw - 35px);height: calc(100vh - 10px)"
         title="Xarajat qo'shish"
         :bordered="false"
         size="medium"
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('create')"
+        @close="showClose()"
       >
-        <ModelForm @close="closeCreate" @create="createModel" type="create" />
+        <ModelForm @close="showClose" @create="createModel" type="create" />
       </n-card>
     </n-modal>
     <n-modal v-model:show="showUpdate" :mask-closable="false">
       <n-card
-        style="width: calc(100vw - 35px); max-height: calc(100vh - 10px)"
+        style="width: calc(100vw - 15px); height: calc(100vh - 10px)"
         title="Xarajatni o'zgartirish "
         :bordered="false"
         size="medium"
@@ -276,7 +329,7 @@ const pagination = reactive({
         @close="showClose('update')"
       >
         <ModelForm
-          @close="closeUpdate"
+          @close="showClose"
           type="update"
           :id="updateId"
           @update="updateModel"
@@ -286,13 +339,13 @@ const pagination = reactive({
 
     <n-modal v-model:show="reportAct.rasxodPass.read" :mask-closable="false">
       <n-card
-        style="width: calc(100vw - 35px); max-height: calc(100vh - 10px)"
+        style="width: calc(100vw - 15px); height: calc(100vh - 10px)"
         :title="'№' + reportAct.rasxodPass.id + ' Xarajat'"
         :bordered="false"
         role="dialog"
         aria-modal="true"
         closable
-        @close="showClose('read')"
+        @close="showClose"
       >
         <ModelForm type="read" :id="reportAct.rasxodPass.id" />
       </n-card>

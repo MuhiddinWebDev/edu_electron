@@ -197,7 +197,7 @@ const rowProps = (row) => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .report-data-row {
   cursor: pointer;
 }

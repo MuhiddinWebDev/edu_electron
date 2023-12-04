@@ -22,11 +22,14 @@ export const useReportData = defineStore('report', () => {
     range_date: null,
     teacher_id: null,
     filial_id: null,
+    course_id: null,
     show: false,
   });
   const studentSverka = ref({
     range_date: null,
     student_id: null,
+    course_id:null,
+    group_id: null,
     filial_id: null,
     show: false,
   });

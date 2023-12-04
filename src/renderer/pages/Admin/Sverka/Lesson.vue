@@ -220,9 +220,5 @@ const rowProps = (row) => {};
   align-items: center;
   justify-content: space-between;
 }
-.box-table {
-  max-height: calc(100vh - 190px);
-  overflow: hidden;
-  overflow: auto;
-}
+
 </style>
