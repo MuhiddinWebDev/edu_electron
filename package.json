@@ -5,11 +5,10 @@
   "main": "build/main/main.js",
   "scripts": {
     "dev": "node scripts/dev-server.js",
-    "build": "node scripts/build.js && electron-builder",
-    "build:memory": "node --max-old-space-size=4096 scripts/build.js && electron-builder",
-    "build:win": "node scripts/build.js && electron-builder --win",
-    "build:mac": "node scripts/build.js && electron-builder --mac",
-    "build:linux": "node scripts/build.js && electron-builder --linux"
+    "build": "node --max-old-space-size=4096 scripts/build.js && electron-builder",
+    "build:win": "node --max-old-space-size=4096 scripts/build.js && electron-builder --win",
+    "build:mac": "node --max-old-space-size=4096 scripts/build.js && electron-builder --mac",
+    "build:linux": "node --max-old-space-size=4096 scripts/build.js && electron-builder --linux"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",
