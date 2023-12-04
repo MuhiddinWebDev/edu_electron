@@ -26,10 +26,10 @@ const error_store = useErrorStore()
 
 ////////////////////////////////
 // const BASE_URL = ref('http://89.232.184.175:3005/api/v1'); ////  Edu App Default backend url
-// const BASE_URL = ref('http://89.232.184.175:3009/api/v1'); ////  Samarqand EF school OM0006
+const BASE_URL = ref('http://89.232.184.175:3009/api/v1'); ////  Samarqand EF school OM0006
 // const BASE_URL = ref('http://89.232.184.175:3010/api/v1'); ////  Navoiy The best academy OM0008
 // const BASE_URL = ref('http://89.232.184.175:3001/api/v1') //// Edu App Fargona Platon OM0002
-const BASE_URL = ref('http://localhost:5000/api/v1') ///// EduApp localhost test url
+// const BASE_URL = ref('http://localhost:5000/api/v1') ///// EduApp localhost test url
 axios.defaults.baseURL = BASE_URL.value;
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
