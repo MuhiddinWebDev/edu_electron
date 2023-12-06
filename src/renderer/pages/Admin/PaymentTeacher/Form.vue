@@ -319,6 +319,50 @@ const save = async () => {
               </n-select>
             </n-form-item>
           </n-grid-item>
+         
+          <n-grid-item>
+            <n-form-item label="To'lov turi" path="pay_type_id">
+              <n-select
+                :options="payTypeOptions"
+                v-model:value="form_data.pay_type_id"
+                label-field="name"
+                :disabled="props.type == 'read'"
+                value-field="id"
+                filterable
+              >
+              </n-select>
+            </n-form-item>
+          </n-grid-item>
+
+          <n-grid-item>
+            <n-form-item label="To'lov summa" path="summa">
+              <n-input-number
+                :format="useFormatnumber"
+                :parse="useParsenumber"
+                :style="{ width: '100%' }"
+                :min="0"
+                :max="form_data.all_sum"
+                :step="form_data.all_sum"
+                :disabled="props.type == 'read'"
+                v-model:value="form_data.pay_summa"
+              />
+            </n-form-item>
+          </n-grid-item>
+
+          <n-grid-item>
+
+            <n-form-item label="Kurs narxi" path="course_price">
+              <n-input-number
+                :disabled="true"
+                :format="useFormatnumber"
+                :parse="useParsenumber"
+                :show-button="false"
+                :style="{ width: '100%' }"
+                v-model:value="form_data.course_price"
+              />
+            </n-form-item>
+          </n-grid-item>
+       
           <n-grid-item>
             <n-form-item label="Talaba soni" path="student_count">
               <n-input-number
@@ -343,45 +387,7 @@ const save = async () => {
             </n-form-item>
           </n-grid-item>
 
-          <n-grid-item>
-            <n-form-item label="Kurs narxi" path="course_price">
-              <n-input-number
-                :disabled="true"
-                :format="useFormatnumber"
-                :parse="useParsenumber"
-                :show-button="false"
-                :style="{ width: '100%' }"
-                v-model:value="form_data.course_price"
-              />
-            </n-form-item>
-          </n-grid-item>
-          <n-grid-item>
-            <n-form-item label="To'lov turi" path="pay_type_id">
-              <n-select
-                :options="payTypeOptions"
-                v-model:value="form_data.pay_type_id"
-                label-field="name"
-                :disabled="props.type == 'read'"
-                value-field="id"
-                filterable
-              >
-              </n-select>
-            </n-form-item>
-          </n-grid-item>
-          <n-grid-item>
-            <n-form-item label="To'lov summa" path="summa">
-              <n-input-number
-                :format="useFormatnumber"
-                :parse="useParsenumber"
-                :style="{ width: '100%' }"
-                :min="0"
-                :max="form_data.all_sum"
-                :step="form_data.all_sum"
-                :disabled="props.type == 'read'"
-                v-model:value="form_data.pay_summa"
-              />
-            </n-form-item>
-          </n-grid-item>
+     
           <n-grid-item>
             <n-form-item label="Izoh" path="comment">
               <n-input
