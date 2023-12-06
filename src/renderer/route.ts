@@ -339,7 +339,11 @@ const router = createRouter({
       name: "Software Payment",
       component: () => import("./pages/Layouts/Software.vue"),
     },
-
+	{ 
+		path: "/:pathMatch(.*)*",
+		name: 'Kirish',
+		component: () => import("./pages/Log/LoginIndex.vue")
+	}
   ],
 });
 
