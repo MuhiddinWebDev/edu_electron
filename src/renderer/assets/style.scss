@@ -1110,11 +1110,15 @@
     );
   }
   &-success{
-    background-color: #08bf5eb7;
+    background-color: #06da69b7 !important;
     font-weight: bold;
   }
   &-warning{
-    background-color: #f0a020b3;
+    background-color: #f0a020b3 !important;
+    font-weight: bold;
+  }
+  &-error{
+    background-color: #f3371180 !important;
     font-weight: bold;
   }
 }
