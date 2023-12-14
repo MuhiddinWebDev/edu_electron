@@ -8,6 +8,7 @@ import UserService from "../../../services/users.service";
 import BranchService from "../../../services/branch.service";
 import PayTypeService from "../../../services/payType.service";
 import CourseService from "../../../services/course.service";
+import UserBalanceService from "../../../services/report.service"
 import { Save24Filled as SaveIcon } from "@vicons/fluent";
 import { Exit as ExitIcon } from "@vicons/ionicons5";
 
@@ -15,12 +16,14 @@ import {
   useParsenumber,
   useFormatnumber,
 } from "../../../composible/NumberFormat";
+
 const props = defineProps(["type", "id"]);
 const emit = defineEmits(["create", "update", "close"]);
 const formRef = ref("");
 const showFeedback = ref(false);
 const spinBtn = ref(false);
 const notification = useNotification();
+const balance = ref(0)
 ////// select options
 const courseOptions = ref([]);
 const teacherOptions = ref([]);
@@ -154,10 +157,21 @@ const teacherUpdate = (id) => {
   }
 };
 
+const getBalance = (course_id)=>{
+  let searchData = {
+    user_id: form_data.value.teacher_id,
+    course_id: course_id,
+  };
+  UserBalanceService.userBalance(searchData).then((res)=>{
+    balance.value = res.balance ? res.balance: 0;
+  })
+}
+
 const CourseUpdate = (id) => {
   cleanData();
   if (id != null) {
     getAllGroups(id);
+    getBalance(id)
   }
 };
 
@@ -176,6 +190,8 @@ const BranchUpdate = (id) => {
   form_data.value.teacher_id = null;
   getAllTeachers(id);
 };
+
+
 
 const rules = {
   group_id: {
@@ -268,7 +284,7 @@ const save = async () => {
   <div class="user-message">
     <n-form :model="form_data" ref="formRef" :rules="rules">
       <n-spin size="large" :show="spinBtn">
-        <n-grid cols="1 s:2 m:3 l:3" responsive="screen" :x-gap="12" :y-gap="4">
+        <n-grid cols="1 s:2 m:3 l:3" responsive="screen" :x-gap="8" :y-gap="2">
           <n-grid-item>
             <n-form-item label="Sana" path="datetime">
               <n-date-picker
@@ -301,6 +317,7 @@ const save = async () => {
                 label-field="fullname"
                 value-field="id"
                 v-model:value="form_data.teacher_id"
+                filterable
               >
               </n-select>
             </n-form-item>
@@ -397,6 +414,18 @@ const save = async () => {
               />
             </n-form-item>
           </n-grid-item>
+
+          <n-grid-item>
+            <n-form-item>
+              <div class="user-balance">
+                <div :class="balance >= 0 ? 'status-success user-balance_item':'status-warning user-balance_item'">
+                O'qituvchi hisobi: {{ new Intl.NumberFormat('ru-RU',{
+                  style:'decimal'
+                }).format(balance) }} so'm
+                </div>
+              </div>
+            </n-form-item>
+            </n-grid-item>
         </n-grid>
         <n-scrollbar x-scrollable>
           <n-table   size="small" :bordered="true" :single-line="false">
@@ -440,6 +469,14 @@ const save = async () => {
 </template>
 
 <style scoped>
+.user-balance{
+  display: flex;
+  align-items: center;
+}
+.user-balance_item{
+  padding: 2px 6px;
+  border-radius: 3px;
+}
 .user-message{
   overflow: hidden;
   overflow-y: auto;

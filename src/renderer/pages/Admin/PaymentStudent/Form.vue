@@ -6,6 +6,7 @@ import BranchService from "../../../services/branch.service";
 import GroupService from "../../../services/groups.service";
 import DiscountService from "../../../services/discount.service";
 import PayTypeService from "../../../services/payType.service";
+import UserBalanceService from "../../../services/report.service";
 
 import { Save24Filled as SaveIcon } from "@vicons/fluent";
 import { Exit as ExitIcon } from "@vicons/ionicons5";
@@ -28,6 +29,7 @@ const showFeedback = ref(false);
 const spinBtn = ref(false);
 const message = useMessage();
 const showDiscount = ref(false);
+const balance = ref(0)
 ////// select options
 
 const coursesOptions = ref([]);
@@ -73,10 +75,7 @@ const getAllDiscount = (filial) => {
 const studentOfCourse = (id) => {
   const params = {
     group_id: id,
-    filial_id:
-      findRole.value == "SuperAdmin"
-        ? form_data.value.filial_id
-        : findBranch.value,
+    filial_id:findRole.value == "SuperAdmin"? form_data.value.filial_id : findBranch.value,
   };
   GroupService.getCourseStudent(params).then((res) => {
     studentOptions.value = res.students;
@@ -100,7 +99,15 @@ const getAllGroups = (branch) => {
     groupsOptions.value = res;
   });
 };
-
+const getUserBalance = (id)=>{
+  let searchData = {
+    user_id: id,
+    course_id: form_data.value.course_id
+  }
+  UserBalanceService.userBalance(searchData).then((res)=>{
+    balance.value = res.balance ? res.balance : 0 ;
+  })
+}
 const beginValues = () => {
   form_data.value.student_id = null;
   form_data.value.course_id = null;
@@ -118,14 +125,17 @@ const UpdateGroup = (id) => {
   studentOfCourse(id);
 };
 
+const updateStudent = (id)=>{
+  getUserBalance(id)
+}
+
 const UpdateDiscount = (id) => {
   if (id) {
     const idx = discountOptions.value.findIndex((item) => item.id == id);
-    const allowId = form_data.value.student_pay_table.findIndex(
-      (item) => item.discount_id == id
-    );
+    const allowId = form_data.value.student_pay_table.findIndex((item) => item.discount_id == id);
+
     let el = discountOptions.value[idx];
-    let pr = (el.amount / 100) * form_data.value.pay_sum;
+    let pr = (el.amount / 100) * form_data.value.course_price;
     if (allowId == -1) {
       form_data.value.student_pay_table.push({
         discount_id: el.id,
@@ -141,6 +151,8 @@ const UpdateDiscount = (id) => {
     } else {
       message.warning("Bu chegirma qo'shilgan");
     }
+    form_data.value.pay_sum = form_data.value.course_price - form_data.value.discount_sum;
+
   }
 };
 
@@ -195,6 +207,7 @@ onMounted(() => {
       getAllDiscount(res.filial_id);
       getAllGroups(res.filial_id);
       studentOfCourse(res.group_id);
+      getUserBalance(res.student_id)
     });
   }
   getAllBranches();
@@ -278,8 +291,7 @@ const checkValidation = (value, id) => {
 };
 
 const delBtn = (index) => {
-  form_data.value.discount_sum -=
-    form_data.value.student_pay_table[index].discount_price;
+  form_data.value.discount_sum -= form_data.value.student_pay_table[index].discount_price;
   form_data.value.student_pay_table.splice(index, 1);
   if (form_data.value.student_pay_table.length == 0) {
     form_data.value.discount_sum = 0;
@@ -337,6 +349,7 @@ const delBtn = (index) => {
               <n-form-item label="Talaba" path="student_id">
                 <n-select
                   :options="studentOptions"
+                  @update:value="updateStudent"
                   label-field="fullname"
                   value-field="id"
                   v-model:value="form_data.student_id"
@@ -393,7 +406,7 @@ const delBtn = (index) => {
                   :min="0"
                   :disabled="props.type == 'read'"
                   :max="form_data.course_price - form_data.discount_sum"
-                  :step="100000"
+                  :step="form_data.course_price - form_data.discount_sum"
                   :style="{ width: '100%' }"
                 ></n-input-number>
               </n-form-item>
@@ -419,9 +432,18 @@ const delBtn = (index) => {
                 ></n-input>
               </n-form-item>
             </n-grid-item>
+            <n-grid-item>
+              <div class="user-balance">
+                <div :class="balance >= 0 ? 'status-success user-balance_item':'status-warning user-balance_item'">
+                Talaba hisobi: {{ new Intl.NumberFormat('ru-RU',{
+                  style:'decimal'
+                }).format(balance) }} so'm
+                </div>
+              </div>
+            </n-grid-item>
           </n-grid>
-          <n-divider :style="{ margin: '12px 0px' }"
-            >Chegirmalar ro'yxati</n-divider
+          <n-divider :style="{ margin: '2px 0px' }"
+            >Chegirmalar berish</n-divider
           >
           <div class="d-flex-row">
             <n-input-group>
@@ -441,7 +463,7 @@ const delBtn = (index) => {
               />
             </n-input-group>
           </div>
-          <div class="table-scroll">
+          <div class="table-scroll" v-if="(form_data.student_id && form_data.course_id ? false : true) || props.type =='read' ? false:true">
             <n-table :bordered="false" :single-line="false">
               <thead class="table-scroll-top">
                 <tr>
@@ -539,8 +561,16 @@ const delBtn = (index) => {
 </template>
 
 <style scoped>
+.user-balance{
+  display: flex;
+  align-items: center;
+}
+.user-balance_item{
+  padding: 2px 6px;
+  border-radius: 3px;
+}
 .pay-box{
-  height: calc(100vh - 140px);
+  max-height: calc(100vh - 140px);
   overflow: hidden;
   overflow-y: auto;
   padding-right: 6px;

@@ -12,7 +12,7 @@ import {
   Print20Regular as PrintIcon 
 } from "@vicons/fluent";
 import { RemoveRedEyeSharp as eyeIcon } from "@vicons/material";
-import { Pen as PenIcon } from "@vicons/carbon";
+import { Pen as PenIcon, TrashCan as TrashIcon, } from "@vicons/carbon";
 import { useReportData } from "../../../stores/report";
 
 const findRole = ref(localStorage.getItem("role"));
@@ -20,6 +20,7 @@ const findBranch = ref(JSON.parse(localStorage.getItem("filial_id")));
 
 const reportAct = useReportData();
 const message = useMessage();
+const dialog = useDialog();
 const dayJS = inject("dayJS");
 
 const showCreate = ref(false);
@@ -172,7 +173,7 @@ const columns = ref([
   {
     title: "Amal",
     key: "action",
-    width: 100,
+    width: 150,
     render(row) {
       return [
         h(
@@ -210,6 +211,46 @@ const columns = ref([
             icon: () =>
               h(NIcon, {
                 component: PenIcon,
+              }),
+          }
+        ),
+        h(
+          NButton,
+          {
+            size: "small",
+            type: "error",
+            style: {
+              marginLeft: "8px",
+            },
+            onClick: (e) => {
+              dialog.warning({
+                title: "Ogohlantirish",
+                content: `${row.user?.fullname}ni to'lovni o'chirasizmi`,
+                positiveText: "Xa",
+                negativeText: "Yo'q",
+                onPositiveClick: () => {
+                  ModelService.delete(row.id)
+                    .then((res) => {
+                      const index = Data.value.findIndex(
+                        (val) => val.id == row.id
+                      );
+                      Data.value.splice(index, 1);
+                      message.success("Ma'lumot o'chirildi");
+                    })
+                    .catch((err) => {
+                      message.error("Ma'lumot o'chirilmadi");
+                    });
+                },
+                onNegativeClick: () => {
+                  message.error("Ma'lumot o'chirilmadi");
+                },
+              });
+            },
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: TrashIcon,
               }),
           }
         ),

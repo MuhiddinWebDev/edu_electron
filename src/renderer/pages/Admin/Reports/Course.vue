@@ -82,6 +82,7 @@ const rowProps = (row) => {
     range_date: range_date.value,
     course_id: row.course.id,
     filial_id: filterOption.value.filial_id,
+    type: filterOption.value.type,
     show: true,
   }
   router.push({path:"/sverka-course"})
@@ -176,7 +177,7 @@ const rowProps = (row) => {
           >
             <td class="text-center" style="width: 50px">{{ index + 1 }}</td>
             <td>{{ item.course ? item.course.name : "" }}</td>
-            <td class="text-right ">
+            <td class="text-right " :class="item.begin_total >= 0 ? 'status-success':'status-error'">
               {{
                 new Intl.NumberFormat("ru-Ru", {
                   style: "decimal",
@@ -204,13 +205,14 @@ const rowProps = (row) => {
                 }).format(item.chiqim)
               }}
             </td>
-            <td class="text-right ">
+            <td class="text-right " :class="item.end_total >= 0 ? 'status-success':'status-error'"  >
               {{
                 new Intl.NumberFormat("ru-Ru", {
                   style: "decimal",
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 }).format(item.end_total)
+                
               }}
             </td>
 

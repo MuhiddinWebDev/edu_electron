@@ -90,6 +90,7 @@ onMounted(() => {
     filterData.value.group_id = el.group_id;
     filterData.value.student_id = el.student_id;
     filterData.value.filial_id = el.filial_id;
+    filterData.value.type = el.type;
     showReport();
     el.show = false;
   }

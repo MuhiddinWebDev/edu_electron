@@ -2,6 +2,11 @@ import axios from "axios";
 const END_POINT = "/report";
 
 class Service {
+  userBalance(data) {
+    return axios.post(END_POINT + `/user-balance`, data).then((res) => {
+      return res;
+    });
+  }
 
   kassaSverka(data) {
     return axios.post(END_POINT + `/kassa-sverka`, data).then((res) => {
@@ -88,7 +93,7 @@ class Service {
   }
   
   courseReport(data) {
-    return axios.post(END_POINT + "//course-report", data).then((res) => {
+    return axios.post(END_POINT + "/course-report", data).then((res) => {
       return res;
     });
   }

@@ -96,6 +96,7 @@ const rowProps = (row) => {
     course_id: row.course.id,
     group_id: row.group.id,
     filial_id: filterData.value.filial_id,
+    type: filterData.value.type,
     show: true,
   };
   router.push({ path: "/sverka-student" });
@@ -233,7 +234,7 @@ const rowProps = (row) => {
             <td>{{ item.user ? item.user.fullname : "" }}</td>
             <td>{{ item.group ? item.group.name : "" }}</td>
             <td>{{ item.course ? item.course.name : "" }}</td>
-            <td class="text-right">
+            <td class="text-right" :class="item.begin_total >= 0 ? 'status-success':'status-error'">
               {{
                 new Intl.NumberFormat("ru-Ru", {
                   style: "decimal",
@@ -269,7 +270,7 @@ const rowProps = (row) => {
                 }).format(item.chiqim)
               }}
             </td>
-            <td class="text-right">
+            <td class="text-right" :class="item.end_total >= 0 ? 'status-success':'status-error'">
               {{
                 new Intl.NumberFormat("ru-Ru", {
                   style: "decimal",

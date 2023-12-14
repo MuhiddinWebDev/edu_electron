@@ -96,6 +96,7 @@ const rowProps = (row) => {
     teacher_id: row.teacher.id,
     filial_id: filterOptions.value.filial_id,
     course_id: row.course.id,
+    type: filterOptions.value.type,
     show: true,
   };
   router.push({ path: "/sverka-teacher" });
@@ -214,7 +215,7 @@ const rowProps = (row) => {
 
             <td>{{ item.teacher ? item.teacher.fullname : "" }}</td>
             <td>{{ item.course ? item.course.name : "" }}</td>
-            <td class="text-right">
+            <td class="text-right" :class="item.begin_total <= 0 ? 'status-success':'status-error'">
               {{
                 new Intl.NumberFormat("ru-Ru", {
                   style: "decimal",
@@ -242,7 +243,7 @@ const rowProps = (row) => {
                 }).format(item.chiqim)
               }}
             </td>
-            <td class="text-right">
+            <td class="text-right" :class="item.end_total <= 0 ? 'status-success':'status-error'">
               {{
                 new Intl.NumberFormat("ru-Ru", {
                   style: "decimal",

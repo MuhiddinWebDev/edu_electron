@@ -3,13 +3,17 @@ import { h, ref, onMounted, inject, reactive } from "vue";
 import ModelService from "../../../services/teacherSalary.service";
 import UserService from "../../../services/users.service";
 import BranchService from "../../../services/branch.service";
-import { NButton, NIcon } from "naive-ui";
+import { NButton, NIcon ,useMessage, useDialog} from "naive-ui";
 import ModelForm from "./Form.vue";
 import { Add20Filled as AddIcon } from "@vicons/fluent";
-import { Pen as PenICon } from "@vicons/carbon";
+
+import { Pen as PenICon, TrashCan as TrashIcon, } from "@vicons/carbon";
 import { useReportData } from "../../../stores/report";
 
 const reportAct = useReportData();
+const message = useMessage();
+const dialog = useDialog();
+
 const dayJS = inject("dayJS");
 const showCreate = ref(false);
 const showUpdate = ref(false);
@@ -128,7 +132,8 @@ const columns = ref([
   {
     title: "Amal",
     key: "action",
-    width: 60,
+    width: 100,
+    align: "center",
     render(row) {
       return [
         h(
@@ -136,7 +141,6 @@ const columns = ref([
           {
             size: "small",
             type: "success",
-            block: true,
             onClick: (e) => {
               showUpdate.value = true;
               updateId.value = row.id;
@@ -149,46 +153,46 @@ const columns = ref([
               }),
           }
         ),
-        // h(
-        //   NButton,
-        //   {
-        //     size: "small",
-        //     type: "error",
-        //     style: {
-        //       marginLeft: "8px",
-        //     },
-        //     onClick: (e) => {
-        //       dialog.warning({
-        //         title: "Ogohlantirish",
-        //         content: `${row.id} Rostan ham o'chirasizmi`,
-        //         positiveText: "Xa",
-        //         negativeText: "Yo'q",
-        //         onPositiveClick: () => {
-        //           ModelService.delete(row.id)
-        //             .then((res) => {
-        //               const index = Data.value.findIndex(
-        //                 (val) => val.id == row.id
-        //               );
-        //               Data.value.splice(index, 1);
-        //               message.success("Ma'lumot o'chirildi");
-        //             })
-        //             .catch((err) => {
-        //               message.error("Ma'lumot o'chirilmadi");
-        //             });
-        //         },
-        //         onNegativeClick: () => {
-        //           message.error("Ma'lumot o'chirilmadi");
-        //         },
-        //       });
-        //     },
-        //   },
-        //   {
-        //     icon: () =>
-        //       h(NIcon, {
-        //         component: TrashIcon,
-        //       }),
-        //   }
-        // ),
+        h(
+          NButton,
+          {
+            size: "small",
+            type: "error",
+            style: {
+              marginLeft: "8px",
+            },
+            onClick: (e) => {
+              dialog.warning({
+                title: "Ogohlantirish",
+                content: `№${row.id} ${row.teacher?.fullname}ni to'lovni o'chirasizmi`,
+                positiveText: "Xa",
+                negativeText: "Yo'q",
+                onPositiveClick: () => {
+                  ModelService.delete(row.id)
+                    .then((res) => {
+                      const index = Data.value.findIndex(
+                        (val) => val.id == row.id
+                      );
+                      Data.value.splice(index, 1);
+                      message.success("Ma'lumot o'chirildi");
+                    })
+                    .catch((err) => {
+                      message.error("Ma'lumot o'chirilmadi");
+                    });
+                },
+                onNegativeClick: () => {
+                  message.error("Ma'lumot o'chirilmadi");
+                },
+              });
+            },
+          },
+          {
+            icon: () =>
+              h(NIcon, {
+                component: TrashIcon,
+              }),
+          }
+        ),
       ];
     },
   },

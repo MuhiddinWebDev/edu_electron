@@ -57,8 +57,9 @@ onMounted(() => {
   if (reportAct.courseSverka.show) {
     let el = reportAct.courseSverka;
     range_date.value = el.range_date;
-    courseId.value = el.course_id;
-    branchId.value = el.filial_id;
+    filterOption.value.course_id = el.course_id;
+    filterOption.value.filial_id = el.filial_id;
+    filterOption.value.type = el.type;
     showReport();
     el.show = false;
   }

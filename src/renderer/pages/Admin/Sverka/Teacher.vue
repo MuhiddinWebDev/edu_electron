@@ -72,7 +72,7 @@ onMounted(() => {
     range_date.value = el.range_date;
     filterOptions.value.teacher_id = el.teacher_id;
     filterOptions.value.course_id = el.course_id;
-    
+    filterOptions.value.type = el.type
     showReport();
     el.show = false;
   }
